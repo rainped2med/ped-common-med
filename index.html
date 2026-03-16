@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Pediatric Prescription & PALS Calculator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f7f6; color: #333; }
+        .container { max-width: 850px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; text-align: center; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; }
+        .warning { background-color: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; font-size: 0.85em; text-align: center; margin-bottom: 25px; border: 1px solid #ffeeba; line-height: 1.4; }
+        .input-group { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-top: 10px; margin-bottom: 8px; color: #34495e; }
+        input[type="number"], select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #bdc3c7; font-size: 16px; margin-bottom: 10px; background-color: #fff; box-sizing: border-box; transition: all 0.3s; }
+        input[type="number"]:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.4); }
+        #result-box { margin-top: 25px; padding: 20px; border-left: 5px solid #27ae60; background-color: #eafaf1; display: none; border-radius: 0 8px 8px 0; position: relative; }
+        .rx-title { font-weight: bold; color: #27ae60; margin-bottom: 12px; display: block; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; }
+        .rx-content { font-family: 'Courier New', Courier, monospace; font-size: 1.2em; line-height: 1.6; color: #2c3e50; font-weight: bold; background: #fff; padding: 15px; border-radius: 6px; border: 1px dashed #27ae60; }
+        .rx-note { font-family: 'Segoe UI', sans-serif; font-size: 0.9em; color: #7f8c8d; margin-top: 12px; font-weight: normal; background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ecf0f1; }
+        .highlight { color: #e74c3c; font-weight: bold; background: #fadbd8; padding: 2px 6px; border-radius: 4px; }
+        .copy-btn { position: absolute; top: 20px; right: 20px; background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold; transition: background 0.3s; }
+        .copy-btn:hover { background: #219150; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Mega Pediatric Rx & PALS Calculator</h2>
+    <div class="warning">
+        <strong>Disclaimer:</strong> Educational tool only. Assumes standard mg/kg dosing. Always independently verify maximum limits, contraindications, and dilutions before prescribing.
+    </div>
+
+    <div class="input-group">
+        <label for="weight">Patient Weight (kg)</label>
+        <input type="number" id="weight" placeholder="Enter weight in kg (e.g., 14.5)" step="0.1" min="0" oninput="showPrescription()">
+    </div>
+
+    <label for="category">1. Select Clinical System / Category</label>
+    <select id="category" onchange="updateMedList()">
+        <option value="">-- Choose Category --</option>
+        <option value="neuro_pain">Analgesia, Sedation & Neurology (Seizure)</option>
+        <option value="respiratory">Respiratory, Asthma & Allergy</option>
+        <option value="gi">Gastrointestinal</option>
+        <option value="antimicrobial">Antimicrobials (PO & IV)</option>
+        <option value="cardio">Cardiovascular & Diuretics</option>
+        <option value="emergency">Emergency, Resuscitation & PALS</option>
+        <option value="fluids">IV Fluids, Electrolytes & Blood</option>
+    </select>
+
+    <label for="medication">2. Select Medication & Concentration</label>
+    <select id="medication" onchange="showPrescription()" disabled>
+        <option value="">-- Select Category First --</option>
+    </select>
+
+    <div id="result-box">
+        <button class="copy-btn" onclick="copyToClipboard()" id="copyBtn">Copy Text</button>
+        <span class="rx-title">Calculated Order:</span>
+        <div id="prescription-text" class="rx-content"></div>
+        <div id="prescription-note" class="rx-note"></div>
+    </div>
+</div>
+
+<script>
+    // 4-2-1 Maintenance Fluid Rule
+    function calcMaintenance(wt) {
+        if (wt <= 10) return (wt * 4).toFixed(1);
+        if (wt <= 20) return (40 + ((wt - 10) * 2)).toFixed(1);
+        return (60 + ((wt - 20) * 1)).toFixed(1);
+    }
+
+    // Mega Database
+    const medData = {
+        neuro_pain: [
+            { name: "Paracetamol Syrup (120mg/5ml)", rx: "Paracetamol Syrup (120 mg/5 ml) {dose} ml PO PRN q 4-6 hr for fever/pain", note: "Calculated at 15 mg/kg/dose. Max 75 mg/kg/day or 4g/day.", calc: w => Math.min(((w * 15) / 24), 41.6).toFixed(1) },
+            { name: "Paracetamol Syrup (250mg/5ml)", rx: "Paracetamol Syrup (250 mg/5 ml) {dose} ml PO PRN q 4-6 hr for fever/pain", note: "Calculated at 15 mg/kg/dose. Max 1g/dose.", calc: w => Math.min(((w * 15) / 50), 20).toFixed(1) },
+            { name: "Paracetamol IV (10 mg/ml)", rx: "Paracetamol IV (10 mg/ml) {dose} ml IV infusion over 15 mins q 6 hr", note: "Calculated at 15 mg/kg/dose. Max 1g (100ml)/dose.", calc: w => Math.min(((w * 15) / 10), 100).toFixed(1) },
+            { name: "Ibuprofen Suspension (100mg/5ml)", rx: "Ibuprofen Susp (100 mg/5 ml) {dose} ml PO q 6-8 hr PC for fever/pain", note: "Calculated at 10 mg/kg/dose. Max 400mg/dose. Not for infants < 6 mos.", calc: w => Math.min(((w * 10) / 20), 20).toFixed(1) },
+            { name: "Morphine IV (1 mg/ml)", rx: "Morphine IV (1 mg/ml) {dose} ml IV slow push q 2-4 hr PRN severe pain", note: "Calculated at 0.1 mg/kg/dose. Max 5 mg/dose initially.", calc: w => Math.min((w * 0.1), 5).toFixed(2) },
+            { name: "Fentanyl IV (50 mcg/ml)", rx: "Fentanyl (50 mcg/ml) {dose} ml IV slow push q 1-2 hr PRN", note: "Calculated at 1 mcg/kg/dose. Max 50 mcg (1 ml) initially.", calc: w => Math.min(((w * 1) / 50), 1).toFixed(2) },
+            { name: "Ketorolac IV (30 mg/ml)", rx: "Ketorolac (30 mg/ml) {dose} ml IV q 6 hr", note: "Calculated at 0.5 mg/kg/dose. Max 15-30 mg/dose.", calc: w => Math.min(((w * 0.5) / 30), 0.5).toFixed(2) },
+            { name: "Diazepam Rectal Gel/Tube (5 mg/ml)", rx: "Diazepam Rectal (5 mg/ml) {dose} ml PR x 1 dose for active seizure", note: "Calculated at 0.5 mg/kg. Max 10-20 mg depending on age.", calc: w => Math.min(((w * 0.5) / 5), 4).toFixed(1) },
+            { name: "Diazepam IV (5 mg/ml)", rx: "Diazepam IV (5 mg/ml) {dose} ml IV slow push for active seizure", note: "Calculated at 0.2 mg/kg. Max 5-10 mg per dose.", calc: w => Math.min(((w * 0.2) / 5), 2).toFixed(2) },
+            { name: "Lorazepam IV (2 mg/ml)", rx: "Lorazepam IV (2 mg/ml) {dose} ml IV slow push for active seizure", note: "Calculated at 0.1 mg/kg. Max 4 mg/dose.", calc: w => Math.min(((w * 0.1) / 2), 2).toFixed(2) },
+            { name: "Midazolam IN/Buccal (5 mg/ml)", rx: "Midazolam (5 mg/ml) {dose} ml Intranasal/Buccal x 1 dose", note: "Calculated at 0.2 mg/kg. Max 10 mg/dose.", calc: w => Math.min(((w * 0.2) / 5), 2).toFixed(2) },
+            { name: "Levetiracetam IV/PO (100 mg/ml)", rx: "Levetiracetam (100 mg/ml) {dose} ml IV/PO BID", note: "Maintenance: Calculated at 10 mg/kg/dose BID (20 mg/kg/day).", calc: w => ((w * 10) / 100).toFixed(1) },
+            { name: "Phenytoin IV Loading (50 mg/ml)", rx: "Phenytoin (50 mg/ml) {dose} ml IV infusion over 20-30 mins", note: "Status Epilepticus Load: Calculated at 20 mg/kg. Max 1g.", calc: w => Math.min(((w * 20) / 50), 20).toFixed(1) },
+            { name: "Phenobarbital IV Loading (130 mg/ml)", rx: "Phenobarbital (130 mg/ml) {dose} ml IV infusion over 20 mins", note: "Status Load: Calculated at 20 mg/kg. Max 1g.", calc: w => Math.min(((w * 20) / 130), 7.7).toFixed(1) }
+        ],
+        respiratory: [
+            { name: "Cetirizine Syrup (5mg/5ml)", rx: "Cetirizine Syrup (5 mg/5 ml) {dose} ml PO OD HS", note: "Est. 0.25 mg/kg/dose. Standard: 6-24mo(2.5mg), 2-5yr(2.5-5mg), >6yr(5-10mg).", calc: w => Math.min(((w * 0.25) / 1), 10).toFixed(1) },
+            { name: "Chlorpheniramine Syrup (2mg/5ml)", rx: "Chlorpheniramine Syrup (2 mg/5 ml) {dose} ml PO q 6 hr PRN", note: "Calculated at 0.08 mg/kg/dose.", calc: w => ((w * 0.08) / 0.4).toFixed(1) },
+            { name: "Salbutamol Syrup (2mg/5ml)", rx: "Salbutamol Syrup (2 mg/5 ml) {dose} ml PO q 6-8 hr PRN wheezing", note: "Calculated at 0.15 mg/kg/dose.", calc: w => ((w * 0.15) / 0.4).toFixed(1) },
+            { name: "Salbutamol Nebulizer (5 mg/ml)", rx: "Salbutamol Respirator Sol (5 mg/ml) {dose} ml + 2.5 ml NS Nebulized q 4 hr", note: "Calculated at 0.03 ml/kg (0.15 mg/kg). Min 0.5 ml (2.5mg), Max 1 ml (5mg).", calc: w => { let d = w * 0.03; if(d < 0.5) d = 0.5; if(d > 1) d = 1; return d.toFixed(2); } },
+            { name: "Ipratropium Nebulizer (250 mcg/ml)", rx: "Ipratropium Bromide {dose} ml Nebulized q 6 hr", note: "<20kg: 1ml (250mcg). >20kg: 2ml (500mcg).", calc: w => (w < 20 ? 1 : 2).toFixed(1) },
+            { name: "Budesonide Nebulizer (0.5 mg/2ml respule)", rx: "Budesonide {dose} respule(s) Nebulized BID", note: "Standard: 1 respule (0.5mg) to 2 respules (1mg) BID based on severity.", calc: w => (w < 15 ? 1 : 2).toFixed(0) },
+            { name: "Dexamethasone PO/IV (Croup) (4 mg/ml)", rx: "Dexamethasone (4 mg/ml) {dose} ml PO/IV x 1 dose for Croup", note: "Calculated at 0.6 mg/kg. Max dose 16 mg (4 ml).", calc: w => Math.min(((w * 0.6) / 4), 4).toFixed(1) },
+            { name: "Prednisolone Syrup (5mg/5ml)", rx: "Prednisolone Syrup (5 mg/5 ml) {dose} ml PO OD for 3-5 days", note: "Asthma standard: 1-2 mg/kg/day. Calculated here at 1 mg/kg. Max 60 mg/day.", calc: w => Math.min(((w * 1) / 1), 60).toFixed(1) },
+            { name: "Hydrocortisone IV (Asthma/Anaphylaxis)", rx: "Hydrocortisone {dose} mg IV q 6 hr", note: "Calculated at 4 mg/kg/dose (Asthma/Allergy). Max 100-250 mg.", calc: w => Math.min((w * 4), 250).toFixed(0) },
+            { name: "Adrenaline Nebulizer (Croup) (1:1,000)", rx: "Epinephrine 1:1,000 (1mg/ml) {dose} ml + NS to 5ml Nebulized", note: "0.5 ml/kg of 1:1,000. Max 5 ml (5 mg) per nebulization.", calc: w => Math.min((w * 0.5), 5).toFixed(1) },
+            { name: "Magnesium Sulfate IV (Asthma)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV over 20 mins", note: "Calculated at 50 mg/kg. Max 2g (4 ml).", calc: w => Math.min(((w * 50) / 500), 4).toFixed(1) }
+        ],
+        gi: [
+            { name: "Ondansetron Syrup (4mg/5ml)", rx: "Ondansetron Syrup (4 mg/5 ml) {dose} ml PO q 8 hr PRN vomiting", note: "Calculated at 0.15 mg/kg/dose. Max 8 mg/dose.", calc: w => Math.min(((w * 0.15) / 0.8), 10).toFixed(1) },
+            { name: "Ondansetron IV (2 mg/ml)", rx: "Ondansetron IV (2 mg/ml) {dose} ml IV slow push q 8 hr PRN", note: "Calculated at 0.15 mg/kg/dose. Max 8 mg (4 ml).", calc: w => Math.min(((w * 0.15) / 2), 4).toFixed(1) },
+            { name: "Domperidone Suspension (1mg/ml)", rx: "Domperidone Susp (1 mg/ml) {dose} ml PO TID 15 mins AC", note: "Calculated at 0.25 mg/kg/dose.", calc: w => (w * 0.25).toFixed(1) },
+            { name: "Omeprazole PO (10mg capsule/susp)", rx: "Omeprazole {dose} mg PO OD", note: "Calculated at 1 mg/kg/dose. Max 40 mg/day.", calc: w => Math.min((w * 1), 40).toFixed(0) },
+            { name: "Omeprazole IV (40mg vial)", rx: "Omeprazole IV {dose} mg IV OD", note: "Calculated at 1 mg/kg/dose. Max 40 mg/day.", calc: w => Math.min((w * 1), 40).toFixed(0) },
+            { name: "Famotidine PO/IV (10 mg/ml)", rx: "Famotidine (10 mg/ml) {dose} ml PO/IV BID", note: "Calculated at 0.5 mg/kg/dose. Max 20 mg/dose.", calc: w => Math.min(((w * 0.5) / 10), 2).toFixed(1) },
+            { name: "Lactulose Solution (3.3g/5ml)", rx: "Lactulose {dose} ml PO OD to BID for constipation", note: "Calculated at 1 ml/kg/dose. Adjust based on response.", calc: w => (w * 1).toFixed(1) }
+        ],
+        antimicrobial: [
+            { name: "Amoxicillin Drops (50mg/ml)", rx: "Amoxicillin Drops (50 mg/ml) {dose} ml PO BID", note: "Standard Dose: 45 mg/kg/day divided BID.", calc: w => ((w * 22.5) / 50).toFixed(1) },
+            { name: "Amoxicillin Syrup (250mg/5ml) - HIGH DOSE", rx: "Amoxicillin Syrup (250 mg/5 ml) {dose} ml PO BID", note: "High Dose (AOM/Pneumonia): 90 mg/kg/day divided BID. Max 1g/dose.", calc: w => Math.min(((w * 45) / 50), 20).toFixed(1) },
+            { name: "Augmentin Syrup (457mg/5ml) - HIGH DOSE", rx: "Amoxicillin/Clavulanate (457 mg/5 ml) {dose} ml PO BID", note: "High Dose: 90 mg/kg/day of Amox component divided BID.", calc: w => ((w * 45) / 80).toFixed(1) },
+            { name: "Azithromycin Suspension (200mg/5ml)", rx: "Azithromycin Susp (200 mg/5 ml) {dose} ml PO OD x 3-5 days", note: "Calculated at 10 mg/kg/dose. Max 500mg/dose.", calc: w => Math.min(((w * 10) / 40), 12.5).toFixed(1) },
+            { name: "Cephalexin Syrup (250mg/5ml)", rx: "Cephalexin Syrup (250 mg/5 ml) {dose} ml PO BID", note: "Calculated at 50 mg/kg/day divided BID.", calc: w => ((w * 25) / 50).toFixed(1) },
+            { name: "Cefdinir Suspension (250mg/5ml)", rx: "Cefdinir Susp (250 mg/5 ml) {dose} ml PO OD", note: "Calculated at 14 mg/kg/day. Max 600mg/day.", calc: w => Math.min(((w * 14) / 50), 12).toFixed(1) },
+            { name: "Cotrimoxazole/Bactrim (200/40mg per 5ml)", rx: "Cotrimoxazole Susp (200/40 mg per 5 ml) {dose} ml PO BID", note: "Calculated at 8 mg/kg/day Trimethoprim component divided BID.", calc: w => ((w * 4) / 8).toFixed(1) },
+            { name: "Ceftriaxone IV (Standard)", rx: "Ceftriaxone {dose} mg IV OD", note: "Calculated at 50 mg/kg/day. Max 2g/day.", calc: w => Math.min((w * 50), 2000).toFixed(0) },
+            { name: "Ceftriaxone IV (Meningitis)", rx: "Ceftriaxone {dose} mg IV BID", note: "Calculated at 100 mg/kg/day divided BID (50 mg/kg/dose). Max 4g/day.", calc: w => Math.min((w * 50), 2000).toFixed(0) },
+            { name: "Cefotaxime IV", rx: "Cefotaxime {dose} mg IV q 8 hr", note: "Calculated at 150 mg/kg/day divided q8 hr (50 mg/kg/dose).", calc: w => (w * 50).toFixed(0) },
+            { name: "Meropenem IV", rx: "Meropenem {dose} mg IV q 8 hr", note: "Calculated at 20 mg/kg/dose. (Meningitis: 40 mg/kg/dose). Max 1g/dose (2g for meningitis).", calc: w => Math.min((w * 20), 1000).toFixed(0) },
+            { name: "Vancomycin IV", rx: "Vancomycin {dose} mg IV q 6 hr", note: "Calculated at 15 mg/kg/dose. Check trough levels.", calc: w => (w * 15).toFixed(0) },
+            { name: "Gentamicin IV", rx: "Gentamicin {dose} mg IV OD", note: "Calculated at 5 to 7.5 mg/kg/day OD. Shown at 7.5 mg/kg. Check levels.", calc: w => (w * 7.5).toFixed(1) },
+            { name: "Acyclovir IV", rx: "Acyclovir {dose} mg IV q 8 hr", note: "Calculated at 10 mg/kg/dose (Encephalitis: 20 mg/kg/dose). Maintain hydration.", calc: w => (w * 10).toFixed(0) },
+            { name: "Fluconazole IV/PO", rx: "Fluconazole {dose} mg IV/PO OD", note: "Calculated at 6 mg/kg/day.", calc: w => (w * 6).toFixed(0) },
+            { name: "Oseltamivir PO (Tamiflu)", rx: "Oseltamivir {dose} mg PO BID x 5 days", note: "<15kg: 30mg. 15-23kg: 45mg. 23-40kg: 60mg. >40kg: 75mg.", calc: w => { if(w<15) return 30; if(w<=23) return 45; if(w<=40) return 60; return 75; } }
+        ],
+        cardio: [
+            { name: "Furosemide PO (10 mg/ml)", rx: "Furosemide (10 mg/ml) {dose} ml PO BID", note: "Calculated at 1 mg/kg/dose.", calc: w => ((w * 1) / 10).toFixed(1) },
+            { name: "Furosemide IV (10 mg/ml)", rx: "Furosemide (10 mg/ml) {dose} ml IV slow push", note: "Calculated at 1 mg/kg/dose. Max 20-40 mg initially.", calc: w => Math.min(((w * 1) / 10), 4).toFixed(1) },
+            { name: "Spironolactone PO (Suspension)", rx: "Spironolactone {dose} mg PO OD", note: "Calculated at 1 mg/kg/day.", calc: w => (w * 1).toFixed(1) },
+            { name: "Captopril PO", rx: "Captopril {dose} mg PO TID", note: "Calculated at 0.1 mg/kg/dose initially. Titrate up.", calc: w => (w * 0.1).toFixed(2) },
+            { name: "Milrinone IV Loading", rx: "Milrinone {dose} mcg IV over 15-60 mins", note: "Calculated at 50 mcg/kg load. Maintenance: 0.25-0.75 mcg/kg/min.", calc: w => (w * 50).toFixed(0) }
+        ],
+        emergency: [
+            { name: "Epinephrine ARREST (1:10,000)", rx: "Epinephrine 1:10,000 (0.1 mg/ml) {dose} ml IV/IO rapid q 3-5 min", note: "Calculated at 0.1 ml/kg. Max single dose 10 ml (1 mg).", calc: w => Math.min((w * 0.1), 10).toFixed(2) },
+            { name: "Epinephrine ANAPHYLAXIS (1:1,000)", rx: "Epinephrine 1:1,000 (1 mg/ml) {dose} ml IM in anterolateral thigh", note: "Calculated at 0.01 ml/kg. Max single dose 0.3 ml (prepubertal) or 0.5 ml (adolescent).", calc: w => Math.min((w * 0.01), 0.5).toFixed(2) },
+            { name: "Amiodarone (50mg/ml)", rx: "Amiodarone (50 mg/ml) {dose} ml IV/IO rapid bolus", note: "Indication: pVT/VF. Calculated at 5 mg/kg. Max 300 mg (6 ml) per dose.", calc: w => Math.min(((w * 5) / 50), 6).toFixed(1) },
+            { name: "Adenosine (3mg/ml) - 1st Dose", rx: "Adenosine (3 mg/ml) {dose} ml rapid IV/IO push", note: "Indication: SVT. Calculated at 0.1 mg/kg. Max 1st dose 6 mg (2 ml). Follow with rapid flush.", calc: w => Math.min(((w * 0.1) / 3), 2).toFixed(2) },
+            { name: "Atropine (0.1 mg/ml)", rx: "Atropine (0.1 mg/ml) {dose} ml IV/IO", note: "Calculated at 0.02 mg/kg. Min dose 0.1 mg (1 ml), Max single dose 0.5 mg (5 ml).", calc: w => { let d = w * 0.02; if(d < 0.1) d = 0.1; if(d > 0.5) d = 0.5; return (d / 0.1).toFixed(1); } },
+            { name: "Calcium Gluconate (10%)", rx: "Calcium Gluconate 10% (100mg/ml) {dose} ml IV/IO slow push", note: "Calculated at 60 mg/kg (0.6 ml/kg). Max 20 ml.", calc: w => Math.min((w * 0.6), 20).toFixed(1) },
+            { name: "Calcium Chloride (10%)", rx: "Calcium Chloride 10% (100mg/ml) {dose} ml IV/IO slow push", note: "Central line preferred. Calculated at 20 mg/kg (0.2 ml/kg). Max 20 ml.", calc: w => Math.min((w * 0.2), 20).toFixed(1) },
+            { name: "Dextrose: D10W (Hypoglycemia)", rx: "D10W {dose} ml IV/IO bolus", note: "Calculated at 5 ml/kg.", calc: w => (w * 5).toFixed(0) },
+            { name: "Dextrose: D25W (Hypoglycemia)", rx: "D25W {dose} ml IV/IO bolus", note: "Calculated at 2 ml/kg.", calc: w => (w * 2).toFixed(0) },
+            { name: "Lidocaine 2% (20mg/ml)", rx: "Lidocaine 2% (20 mg/ml) {dose} ml IV/IO bolus", note: "Alternative to Amiodarone. Calculated at 1 mg/kg. Max 100 mg (5 ml).", calc: w => Math.min(((w * 1) / 20), 5).toFixed(1) },
+            { name: "Magnesium Sulfate 50% (500mg/ml)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV/IO over 10-20 mins", note: "Torsades/Severe Asthma. Calculated at 50 mg/kg. Max 2g (4 ml).", calc: w => Math.min(((w * 50) / 500), 4).toFixed(1) },
+            { name: "Naloxone (0.4mg/ml)", rx: "Naloxone (0.4 mg/ml) {dose} ml IV/IO/IM", note: "Opioid reversal. Calculated at 0.1 mg/kg. Max 2 mg (5 ml).", calc: w => Math.min(((w * 0.1) / 0.4), 5).toFixed(2) },
+            { name: "Sodium Bicarbonate 8.4% (1mEq/ml)", rx: "Sodium Bicarbonate 8.4% {dose} ml IV/IO slow push", note: "Calculated at 1 mEq/kg (1 ml/kg). Max 50 mEq.", calc: w => Math.min((w * 1), 50).toFixed(1) },
+            { name: "Ketamine IV (RSI/Procedural)", rx: "Ketamine (10 mg/ml) {dose} ml IV slow push", note: "Calculated at 1-2 mg/kg. (Shown at 1.5 mg/kg).", calc: w => ((w * 1.5) / 10).toFixed(1) },
+            { name: "Rocuronium IV (RSI)", rx: "Rocuronium (10 mg/ml) {dose} ml IV rapid push", note: "Calculated at 1 mg/kg for RSI.", calc: w => ((w * 1) / 10).toFixed(1) },
+            { name: "Defibrillation Shock", rx: "Defibrillate at {dose} Joules", note: "Initial shock 2 J/kg. Subsequent 4 J/kg. (Shown at 2 J/kg).", calc: w => (w * 2).toFixed(0) }
+        ],
+        fluids: [
+            { name: "0.9% Normal Saline (Fluid Bolus)", rx: "0.9% NaCl {dose} ml IV/IO Bolus", note: "Calculated at 20 ml/kg. Push over 5-10 mins for shock, or 20-30 mins for dehydration.", calc: w => (w * 20).toFixed(0) },
+            { name: "Ringer's Lactate (Fluid Bolus)", rx: "Ringer's Lactate {dose} ml IV/IO Bolus", note: "Calculated at 20 ml/kg.", calc: w => (w * 20).toFixed(0) },
+            { name: "3% Hypertonic Saline", rx: "3% NaCl {dose} ml IV/IO over 10-20 mins", note: "Elevated ICP / Symptomatic Hyponatremia. Calculated at 3 ml/kg. Max 250 ml.", calc: w => Math.min((w * 3), 250).toFixed(0) },
+            { name: "Packed Red Blood Cells (PRBCs)", rx: "PRBCs {dose} ml IV Transfusion over 2-4 hrs", note: "Calculated at 10 ml/kg.", calc: w => (w * 10).toFixed(0) },
+            { name: "Maintenance Fluid (D5 1/2 NS)", rx: "D5 0.45% NaCl IV Rate at {dose} ml/hr", note: "Calculated using the standard 4-2-1 Rule.", calc: w => calcMaintenance(w) },
+            { name: "Maintenance Fluid (D5 NS)", rx: "D5 0.9% NaCl IV Rate at {dose} ml/hr", note: "4-2-1 Rule. Increasingly preferred to prevent hospital hyponatremia.", calc: w => calcMaintenance(w) },
+            { name: "Potassium Chloride (KCl) Replacement", rx: "KCl {dose} mEq added to maintenance fluid", note: "Calculated at 2 mEq/kg/day. Do not exceed 40 mEq/L in peripheral line.", calc: w => (w * 2).toFixed(1) }
+        ]
+    };
+
+    function updateMedList() {
+        const catSelect = document.getElementById("category");
+        const medSelect = document.getElementById("medication");
+        const resultBox = document.getElementById("result-box");
+        
+        medSelect.innerHTML = '<option value="">-- Select Medication & Concentration --</option>';
+        resultBox.style.display = "none";
+
+        if (catSelect.value) {
+            medSelect.disabled = false;
+            medData[catSelect.value].forEach((item, index) => {
+                let opt = document.createElement("option");
+                opt.value = index;
+                opt.textContent = item.name;
+                medSelect.appendChild(opt);
+            });
+        } else {
+            medSelect.disabled = true;
+        }
+        
+        showPrescription();
+    }
+
+    function showPrescription() {
+        const wtInput = parseFloat(document.getElementById("weight").value);
+        const catValue = document.getElementById("category").value;
+        const medIndex = document.getElementById("medication").value;
+        const resultBox = document.getElementById("result-box");
+        const rxText = document.getElementById("prescription-text");
+        const rxNote = document.getElementById("prescription-note");
+        const copyBtn = document.getElementById("copyBtn");
+
+        // Reset copy button
+        copyBtn.innerText = "Copy Text";
+        copyBtn.style.background = "#27ae60";
+
+        if (catValue && medIndex !== "") {
+            const med = medData[catValue][medIndex];
+            let finalRx = med.rx;
+
+            if (!isNaN(wtInput) && wtInput > 0) {
+                const calculatedDose = med.calc(wtInput);
+                finalRx = finalRx.replace('{dose}', `<span class="highlight">${calculatedDose}</span>`);
+            } else {
+                finalRx = finalRx.replace('{dose}', '____');
+            }
+
+            rxText.innerHTML = finalRx;
+            rxNote.innerText = med.note;
+            resultBox.style.display = "block";
+        } else {
+            resultBox.style.display = "none";
+        }
+    }
+
+    function copyToClipboard() {
+        const textToCopy = document.getElementById("prescription-text").innerText;
+        const copyBtn = document.getElementById("copyBtn");
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            copyBtn.innerText = "Copied!";
+            copyBtn.style.background = "#2c3e50";
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert("Clipboard access denied. You can manually highlight and copy the text.");
+        });
+    }
+</script>
+
+</body>
+</html>
