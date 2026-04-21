@@ -11,12 +11,13 @@
         .warning { background-color: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; font-size: 0.85em; text-align: center; margin-bottom: 25px; border: 1px solid #ffeeba; line-height: 1.4; }
         .input-group { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 20px; }
         label { font-weight: bold; display: block; margin-top: 10px; margin-bottom: 8px; color: #34495e; }
-        input[type="number"], select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #bdc3c7; font-size: 16px; margin-bottom: 10px; background-color: #fff; box-sizing: border-box; transition: all 0.3s; }
-        input[type="number"]:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.4); }
+        input[type="number"], input[type="text"], select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #bdc3c7; font-size: 16px; margin-bottom: 10px; background-color: #fff; box-sizing: border-box; transition: all 0.3s; }
+        input[type="number"]:focus, input[type="text"]:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.4); }
         #result-box { margin-top: 25px; padding: 20px; border-left: 5px solid #27ae60; background-color: #eafaf1; display: none; border-radius: 0 8px 8px 0; position: relative; }
         .rx-title { font-weight: bold; color: #27ae60; margin-bottom: 12px; display: block; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; }
         .rx-content { font-family: 'Courier New', Courier, monospace; font-size: 1.2em; line-height: 1.6; color: #2c3e50; font-weight: bold; background: #fff; padding: 15px; border-radius: 6px; border: 1px dashed #27ae60; }
         .rx-note { font-family: 'Segoe UI', sans-serif; font-size: 0.9em; color: #7f8c8d; margin-top: 12px; font-weight: normal; background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ecf0f1; }
+        .max-limit-alert { color: #a93226; background: #fdecea; border-color: #f5c6cb; font-weight: 600; }
         .highlight { color: #e74c3c; font-weight: bold; background: #fadbd8; padding: 2px 6px; border-radius: 4px; }
         .copy-btn { position: absolute; top: 20px; right: 20px; background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold; transition: background 0.3s; }
         .copy-btn:hover { background: #219150; }
@@ -48,6 +49,7 @@
     </select>
 
     <label for="medication">2. Select Medication & Concentration</label>
+    <input type="text" id="med-search" placeholder="Search medication in selected category..." oninput="filterMedications()" disabled>
     <select id="medication" onchange="showPrescription()" disabled>
         <option value="">-- Select Category First --</option>
     </select>
@@ -56,6 +58,7 @@
         <button class="copy-btn" onclick="copyToClipboard()" id="copyBtn">Copy Text</button>
         <span class="rx-title">Calculated Order:</span>
         <div id="prescription-text" class="rx-content"></div>
+        <div id="dose-limit-note" class="rx-note" style="display: none;"></div>
         <div id="prescription-note" class="rx-note"></div>
     </div>
 </div>
@@ -163,26 +166,87 @@
         ]
     };
 
+    function getDoseUnit(rxTemplate) {
+        const unitMatch = rxTemplate.match(/\{dose\}\s*([A-Za-z%/]+)/);
+        return unitMatch ? unitMatch[1] : "";
+    }
+
+    function getDoseLimitInfo(med, wtInput, numericDose) {
+        if (!Number.isFinite(numericDose)) return null;
+        if (!/(max|do not exceed|not exceed)/i.test(med.note)) return null;
+
+        const probeWeights = [50, 100, 200, 500].filter(weight => weight > wtInput);
+        if (probeWeights.length === 0) return null;
+
+        let higherDoseFound = false;
+        const epsilon = 0.000001;
+
+        probeWeights.forEach(weight => {
+            const probeDose = parseFloat(med.calc(weight));
+            if (Number.isFinite(probeDose) && probeDose > (numericDose + epsilon)) {
+                higherDoseFound = true;
+            }
+        });
+
+        if (higherDoseFound) return null;
+
+        return {
+            limitDose: numericDose,
+            unit: getDoseUnit(med.rx)
+        };
+    }
+
+    function populateMedicationOptions() {
+        const catValue = document.getElementById("category").value;
+        const medSearch = document.getElementById("med-search").value.trim().toLowerCase();
+        const medSelect = document.getElementById("medication");
+        const currentSelection = medSelect.value;
+
+        medSelect.innerHTML = '<option value="">-- Select Medication & Concentration --</option>';
+
+        if (!catValue) {
+            medSelect.disabled = true;
+            medSelect.innerHTML = '<option value="">-- Select Category First --</option>';
+            return;
+        }
+
+        const filteredMeds = medData[catValue]
+            .map((item, index) => ({ item, index }))
+            .filter(({ item }) => item.name.toLowerCase().includes(medSearch));
+
+        medSelect.disabled = false;
+
+        if (filteredMeds.length === 0) {
+            medSelect.innerHTML = '<option value="">-- No medications match this search --</option>';
+            return;
+        }
+
+        filteredMeds.forEach(({ item, index }) => {
+            let opt = document.createElement("option");
+            opt.value = index;
+            opt.textContent = item.name;
+            if (String(index) === currentSelection) {
+                opt.selected = true;
+            }
+            medSelect.appendChild(opt);
+        });
+    }
+
     function updateMedList() {
         const catSelect = document.getElementById("category");
-        const medSelect = document.getElementById("medication");
+        const medSearchInput = document.getElementById("med-search");
         const resultBox = document.getElementById("result-box");
-        
-        medSelect.innerHTML = '<option value="">-- Select Medication & Concentration --</option>';
+
+        medSearchInput.value = "";
+        medSearchInput.disabled = !catSelect.value;
         resultBox.style.display = "none";
 
-        if (catSelect.value) {
-            medSelect.disabled = false;
-            medData[catSelect.value].forEach((item, index) => {
-                let opt = document.createElement("option");
-                opt.value = index;
-                opt.textContent = item.name;
-                medSelect.appendChild(opt);
-            });
-        } else {
-            medSelect.disabled = true;
-        }
-        
+        populateMedicationOptions();
+        showPrescription();
+    }
+
+    function filterMedications() {
+        populateMedicationOptions();
         showPrescription();
     }
 
@@ -192,12 +256,16 @@
         const medIndex = document.getElementById("medication").value;
         const resultBox = document.getElementById("result-box");
         const rxText = document.getElementById("prescription-text");
+        const doseLimitNote = document.getElementById("dose-limit-note");
         const rxNote = document.getElementById("prescription-note");
         const copyBtn = document.getElementById("copyBtn");
 
         // Reset copy button
         copyBtn.innerText = "Copy Text";
         copyBtn.style.background = "#27ae60";
+        doseLimitNote.style.display = "none";
+        doseLimitNote.classList.remove("max-limit-alert");
+        doseLimitNote.innerText = "";
 
         if (catValue && medIndex !== "") {
             const med = medData[catValue][medIndex];
@@ -205,7 +273,16 @@
 
             if (!isNaN(wtInput) && wtInput > 0) {
                 const calculatedDose = med.calc(wtInput);
+                const numericDose = parseFloat(calculatedDose);
+                const doseLimitInfo = getDoseLimitInfo(med, wtInput, numericDose);
+
                 finalRx = finalRx.replace('{dose}', `<span class="highlight">${calculatedDose}</span>`);
+
+                if (doseLimitInfo) {
+                    doseLimitNote.innerText = `Max dose limit applied at ${doseLimitInfo.limitDose}${doseLimitInfo.unit ? ` ${doseLimitInfo.unit}` : ""}.`;
+                    doseLimitNote.classList.add("max-limit-alert");
+                    doseLimitNote.style.display = "block";
+                }
             } else {
                 finalRx = finalRx.replace('{dose}', '____');
             }
