@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+                <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -29,6 +29,31 @@
         .copy-btn { position: absolute; top: 20px; right: 20px; background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold; transition: background 0.3s; }
         .copy-btn:hover { background: #219150; }
         .or-divider { text-align: center; font-weight: bold; color: #95a5a6; margin: 15px 0; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }
+
+        .advanced-panel { margin-top: 20px; border: 1px solid #d6e4f0; border-radius: 8px; overflow: hidden; display: none; }
+        .advanced-panel.visible { display: block; }
+        .advanced-toggle { width: 100%; padding: 14px 16px; background: #ebf5fb; border: none; cursor: pointer; text-align: left; font-size: 15px; font-weight: bold; color: #2980b9; display: flex; align-items: center; justify-content: space-between; }
+        .advanced-toggle:hover { background: #d4e6f1; }
+        .advanced-toggle .chevron { transition: transform 0.2s; font-size: 12px; }
+        .advanced-toggle.open .chevron { transform: rotate(180deg); }
+        .advanced-body { padding: 16px; background: #f8fbfd; border-top: 1px solid #d6e4f0; display: none; }
+        .advanced-body.open { display: block; }
+        .advanced-hint { font-size: 0.85em; color: #7f8c8d; margin: 0 0 12px 0; line-height: 1.4; }
+        .advanced-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 600px) { .advanced-grid { grid-template-columns: 1fr; } }
+        .advanced-grid label { margin-top: 0; font-size: 0.9em; }
+        .advanced-grid input, .advanced-grid select { margin-bottom: 0; }
+        #other-fluid-wrap { display: none; margin-top: 8px; }
+        #other-fluid-wrap.visible { display: block; }
+        .rx-subtitle { font-size: 0.8em; color: #7f8c8d; margin-bottom: 8px; font-weight: normal; text-transform: none; letter-spacing: 0; }
+        .concentration-line { color: #2980b9; font-weight: bold; margin-top: 8px; }
+
+        .dose-adjust-panel { margin-top: 15px; padding: 14px; background: #fef9e7; border: 1px solid #f9e79f; border-radius: 8px; display: none; }
+        .dose-adjust-panel.visible { display: block; }
+        .dose-adjust-panel label.inline { font-weight: normal; display: flex; align-items: center; gap: 8px; margin-top: 0; }
+        .dose-range-hint { font-size: 0.85em; color: #7f8c8d; margin: 6px 0 10px 0; }
+        #doseAdjustFields { margin-top: 10px; }
+        #doseAdjustFields label { margin-top: 0; }
     </style>
 </head>
 <body>
@@ -69,11 +94,60 @@
         <option value="">-- Select Category First --</option>
     </select>
 
+    <div id="dose-adjust-panel" class="dose-adjust-panel">
+        <label class="inline"><input type="checkbox" id="doseAdjustEnabled" onchange="onDoseAdjustChange()"> Dose adjustment</label>
+        <p class="dose-range-hint" id="doseRangeHint"></p>
+        <div id="doseAdjustFields" style="display:none;">
+            <label for="customMgKg" id="customMgKgLabel">Custom dose (mg/kg)</label>
+            <input type="number" id="customMgKg" placeholder="e.g. 75" min="0" step="0.1" oninput="recalculateCurrent()">
+        </div>
+    </div>
+
     <div id="result-box">
         <button class="copy-btn" onclick="copyToClipboard()" id="copyBtn">Copy Text</button>
         <span class="rx-title">Calculated Order:</span>
+        <span class="rx-subtitle" id="order-mode-label"></span>
         <div id="prescription-text" class="rx-content"></div>
         <div id="prescription-note" class="rx-note"></div>
+    </div>
+
+    <div id="advanced-panel" class="advanced-panel">
+        <button type="button" class="advanced-toggle" id="advancedToggle" onclick="toggleAdvancedPanel()">
+            <span>Advanced: IV dilution and drip order</span>
+            <span class="chevron" id="advancedChevron">▼</span>
+        </button>
+        <div class="advanced-body" id="advancedBody">
+            <p class="advanced-hint">Optional. Core dose calculation stays the same. Use this to build a dilution + drip order you can copy into the chart (e.g. drug + NSS up to volume, infusion time, and interval).</p>
+            <label><input type="checkbox" id="advancedEnabled" onchange="onAdvancedEnabledChange()"> Enable IV mixing and drip wording</label>
+
+            <div id="advancedFields" style="display:none; margin-top:14px;">
+                <label for="mixFluid">Diluent / fluid to mix with</label>
+                <select id="mixFluid" onchange="onMixFluidChange(); recalculateCurrent()">
+                    <option value="NSS">NSS (0.9% NaCl)</option>
+                    <option value="5DW">5% DW</option>
+                    <option value="other">Other (specify)</option>
+                </select>
+                <div id="other-fluid-wrap">
+                    <label for="otherFluid">Other fluid name</label>
+                    <input type="text" id="otherFluid" placeholder="e.g. D5 1/2 NS, LR" oninput="recalculateCurrent()">
+                </div>
+
+                <div class="advanced-grid" style="margin-top:12px;">
+                    <div>
+                        <label for="totalVolume">Total volume (ml)</label>
+                        <input type="number" id="totalVolume" placeholder="e.g. 100" min="1" step="1" oninput="recalculateCurrent()">
+                    </div>
+                    <div>
+                        <label for="intervalHr">Every (hr) — q __ hr</label>
+                        <input type="number" id="intervalHr" placeholder="e.g. 24" min="1" step="1" oninput="recalculateCurrent()">
+                    </div>
+                    <div>
+                        <label for="dripMins">Drip in (minutes)</label>
+                        <input type="number" id="dripMins" placeholder="e.g. 30" min="1" step="1" oninput="recalculateCurrent()">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -87,16 +161,122 @@
         return Math.min(rate, 120).toFixed(1); 
     }
 
+    function calcWithMgKg(w, mgKg, maxMg, decimals, doseUnit, dosesPerDay) {
+        let perDoseMgKg = mgKg;
+        if (doseUnit === "mg/kg/day") {
+            perDoseMgKg = mgKg / (dosesPerDay || 1);
+        }
+        return Math.min(w * perDoseMgKg, maxMg).toFixed(decimals);
+    }
+
+    function getAdjustedMgKg(med) {
+        if (med.doseAdjustable && document.getElementById("doseAdjustEnabled").checked) {
+            const v = parseFloat(document.getElementById("customMgKg").value);
+            if (!isNaN(v) && v > 0) return v;
+        }
+        return med.standardMgKg;
+    }
+
+    function calculateMedDose(med, w) {
+        if (!w || w <= 0) return null;
+        if (med.doseAdjustable) {
+            const mgKg = getAdjustedMgKg(med);
+            if (med.concMgMl && med.rx.includes("{dose} ml")) {
+                let perDoseMgKg = mgKg;
+                if (med.doseUnit === "mg/kg/day") {
+                    perDoseMgKg = mgKg / (med.dosesPerDay || 1);
+                }
+                const mg = Math.min(w * perDoseMgKg, med.maxMg);
+                const maxMl = med.maxMg / med.concMgMl;
+                return Math.min(mg / med.concMgMl, maxMl).toFixed(med.decimals ?? 1);
+            }
+            return calcWithMgKg(w, mgKg, med.maxMg, med.decimals ?? 0, med.doseUnit, med.dosesPerDay);
+        }
+        return med.calc(w);
+    }
+
+    function getDoseRangeHint(med) {
+        if (!med.doseRange) return "";
+        const unit = med.doseUnit || "mg/kg";
+        return `Usual range: ${med.doseRange[0]}–${med.doseRange[1]} ${unit}. Standard: ${med.standardMgKg} ${unit}. Max cap: ${med.maxMg} mg per dose.`;
+    }
+
+    function updateDoseAdjustUI(med) {
+        const panel = document.getElementById("dose-adjust-panel");
+        const hint = document.getElementById("doseRangeHint");
+        const fields = document.getElementById("doseAdjustFields");
+        const label = document.getElementById("customMgKgLabel");
+
+        if (med && med.doseAdjustable) {
+            panel.classList.add("visible");
+            hint.textContent = getDoseRangeHint(med);
+            label.textContent = `Custom dose (${med.doseUnit || "mg/kg"})`;
+        } else {
+            panel.classList.remove("visible");
+            document.getElementById("doseAdjustEnabled").checked = false;
+            fields.style.display = "none";
+            document.getElementById("customMgKg").value = "";
+            hint.textContent = "";
+        }
+    }
+
+    function resetDoseAdjustForMed(med) {
+        document.getElementById("doseAdjustEnabled").checked = false;
+        document.getElementById("doseAdjustFields").style.display = "none";
+        document.getElementById("customMgKg").value = "";
+        updateDoseAdjustUI(med);
+    }
+
+    function onDoseAdjustChange() {
+        const enabled = document.getElementById("doseAdjustEnabled").checked;
+        document.getElementById("doseAdjustFields").style.display = enabled ? "block" : "none";
+        if (enabled && currentSelectedValue) {
+            const [catId, medIdx] = currentSelectedValue.split("|");
+            const med = medData[catId][medIdx];
+            if (med.doseAdjustable && !document.getElementById("customMgKg").value) {
+                document.getElementById("customMgKg").value = med.standardMgKg;
+            }
+        }
+        recalculateCurrent();
+    }
+
+    function applyDefaultPremixVolume(med) {
+        if (med.defaultVolume && !document.getElementById("totalVolume").value) {
+            document.getElementById("totalVolume").value = med.defaultVolume;
+        }
+    }
+
+    function buildDosingNote(med) {
+        let note = med.note;
+        if (med.doseAdjustable && document.getElementById("doseAdjustEnabled").checked) {
+            const mgKg = getAdjustedMgKg(med);
+            note = `Adjusted: ${mgKg} ${med.doseUnit} (max ${med.maxMg} mg/dose enforced). ${note}`;
+        }
+        if (med.typicalFinalMgMl && med.defaultVolume) {
+            note = `Typical dilution: ${med.defaultVolume} ml bag (~${med.typicalFinalMgMl} mg/ml when using standard volume). ${note}`;
+        }
+        return note;
+    }
+
+    function getMedConcentration(med) {
+        if (med.concMgMl) return med.concMgMl;
+        const mgPerMl = med.name.match(/\(([\d.]+)\s*mg\/ml\)/i);
+        if (mgPerMl) return parseFloat(mgPerMl[1]);
+        const mgPer5 = med.name.match(/\(([\d.]+)\s*mg\/5\s*ml\)/i);
+        if (mgPer5) return parseFloat(mgPer5[1]) / 5;
+        return null;
+    }
+
     // Database
     const medData = {
         neuro_pain: [
             { name: "Paracetamol PO (120mg/5ml)", rx: "Paracetamol Syrup (120 mg/5 ml) {dose} ml PO PRN q 4-6 hr for fever/pain", note: "15 mg/kg. Max 1000 mg (41.6 ml) per dose.", calc: w => Math.min(((w * 15) / 24), 41.6).toFixed(1) },
             { name: "Paracetamol PO (250mg/5ml)", rx: "Paracetamol Syrup (250 mg/5 ml) {dose} ml PO PRN q 4-6 hr for fever/pain", note: "15 mg/kg. Max 1000 mg (20 ml) per dose.", calc: w => Math.min(((w * 15) / 50), 20).toFixed(1) },
-            { name: "Paracetamol IV (10 mg/ml)", rx: "Paracetamol IV (10 mg/ml) {dose} ml IV infusion over 15 mins q 6 hr", note: "15 mg/kg. Max 1000 mg (100 ml) per dose.", calc: w => Math.min(((w * 15) / 10), 100).toFixed(1) },
+            { name: "Paracetamol IV (10 mg/ml)", rx: "Paracetamol IV (10 mg/ml) {dose} ml IV infusion over 15 mins q 6 hr", note: "15 mg/kg. Max 1000 mg (100 ml) per dose.", concMgMl: 10, defaultVolume: 100, calc: w => Math.min(((w * 15) / 10), 100).toFixed(1) },
             { name: "Ibuprofen PO (100mg/5ml)", rx: "Ibuprofen Susp (100 mg/5 ml) {dose} ml PO q 6-8 hr PC for fever/pain", note: "10 mg/kg. Max 400 mg (20 ml) per dose.", calc: w => Math.min(((w * 10) / 20), 20).toFixed(1) },
-            { name: "Morphine IV (1 mg/ml)", rx: "Morphine IV (1 mg/ml) {dose} ml IV slow push q 2-4 hr PRN severe pain", note: "0.1 mg/kg. Max 10 mg (10 ml) per dose.", calc: w => Math.min((w * 0.1), 10).toFixed(2) },
-            { name: "Fentanyl IV (50 mcg/ml)", rx: "Fentanyl (50 mcg/ml) {dose} ml IV slow push q 1-2 hr PRN", note: "1 mcg/kg. Max 100 mcg (2 ml) per dose.", calc: w => Math.min(((w * 1) / 50), 2).toFixed(2) },
-            { name: "Ketorolac IV (30 mg/ml)", rx: "Ketorolac (30 mg/ml) {dose} ml IV q 6 hr", note: "0.5 mg/kg. Max 30 mg (1 ml) per dose.", calc: w => Math.min(((w * 0.5) / 30), 1).toFixed(2) },
+            { name: "Morphine IV (1 mg/ml)", rx: "Morphine IV (1 mg/ml) {dose} ml IV slow push q 2-4 hr PRN severe pain", note: "0.1 mg/kg. Max 10 mg (10 ml) per dose.", concMgMl: 1, defaultVolume: 10, calc: w => Math.min((w * 0.1), 10).toFixed(2) },
+            { name: "Fentanyl IV (50 mcg/ml)", rx: "Fentanyl (50 mcg/ml) {dose} ml IV slow push q 1-2 hr PRN", note: "1 mcg/kg. Max 100 mcg (2 ml) per dose.", concMcgMl: 50, defaultVolume: 10, calc: w => Math.min(((w * 1) / 50), 2).toFixed(2) },
+            { name: "Ketorolac IV (30 mg/ml)", rx: "Ketorolac (30 mg/ml) {dose} ml IV q 6 hr", note: "0.5 mg/kg. Max 30 mg (1 ml) per dose.", concMgMl: 30, defaultVolume: 50, calc: w => Math.min(((w * 0.5) / 30), 1).toFixed(2) },
             { name: "Diazepam Rectal Gel (5 mg/ml)", rx: "Diazepam Rectal (5 mg/ml) {dose} ml PR x 1 dose for active seizure", note: "0.5 mg/kg. Max 20 mg (4 ml) per dose.", calc: w => Math.min(((w * 0.5) / 5), 4).toFixed(1) },
             { name: "Diazepam IV (5 mg/ml)", rx: "Diazepam IV (5 mg/ml) {dose} ml IV slow push for active seizure", note: "0.2 mg/kg. Max 10 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.2) / 5), 2).toFixed(2) },
             { name: "Lorazepam IV (2 mg/ml)", rx: "Lorazepam IV (2 mg/ml) {dose} ml IV slow push for active seizure", note: "0.1 mg/kg. Max 4 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.1) / 2), 2).toFixed(2) },
@@ -109,15 +289,15 @@
             { name: "Salbutamol Nebulizer (5 mg/ml)", rx: "Salbutamol Respirator Sol (5 mg/ml) {dose} ml + 2.5 ml NS Nebulized q 4 hr", note: "0.03 ml/kg. Min 0.5 ml, Max 1 ml (5mg) per dose.", calc: w => { let d = w * 0.03; if(d < 0.5) d = 0.5; if(d > 1) d = 1; return d.toFixed(2); } },
             { name: "Ipratropium Nebulizer (250 mcg/ml)", rx: "Ipratropium Bromide {dose} ml Nebulized q 6 hr", note: "<20kg: 1ml (250mcg). >20kg: 2ml (500mcg max).", calc: w => (w < 20 ? 1 : 2).toFixed(1) },
             { name: "Budesonide Nebulizer (0.5 mg/2ml respule)", rx: "Budesonide {dose} respule(s) Nebulized BID", note: "1 to 2 respules based on severity. Max 2 mg/day.", calc: w => (w < 15 ? 1 : 2).toFixed(0) },
-            { name: "Dexamethasone PO/IV (4 mg/ml)", rx: "Dexamethasone (4 mg/ml) {dose} ml PO/IV x 1 dose for Croup", note: "0.6 mg/kg. Max dose 16 mg (4 ml).", calc: w => Math.min(((w * 0.6) / 4), 4).toFixed(1) },
+            { name: "Dexamethasone PO/IV (4 mg/ml)", rx: "Dexamethasone (4 mg/ml) {dose} ml PO/IV x 1 dose for Croup", note: "0.15–0.6 mg/kg x1. Standard 0.6 mg/kg. Max 16 mg (4 ml).", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 0.6, doseRange: [0.15, 0.6], maxMg: 16, decimals: 1, concMgMl: 4, calc: w => Math.min(((w * 0.6) / 4), 4).toFixed(1) },
             { name: "Prednisolone PO (5mg/5ml)", rx: "Prednisolone Syrup (5 mg/5 ml) {dose} ml PO OD for 3-5 days", note: "Asthma: 1 mg/kg. Max 60 mg (12 ml) per day.", calc: w => Math.min(((w * 1) / 1), 12).toFixed(1) },
-            { name: "Hydrocortisone IV", rx: "Hydrocortisone {dose} mg IV q 6 hr", note: "4 mg/kg. Max 250 mg per dose.", calc: w => Math.min((w * 4), 250).toFixed(0) },
+            { name: "Hydrocortisone IV", rx: "Hydrocortisone {dose} mg IV q 6 hr", note: "2–4 mg/kg/dose q6 hr. Standard 4 mg/kg/dose. Max 250 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 4, doseRange: [2, 4], maxMg: 250, decimals: 0, defaultVolume: 50, calc: w => calcWithMgKg(w, 4, 250, 0, "mg/kg/dose", 1) },
             { name: "Adrenaline Nebulizer (Croup) (1:1,000)", rx: "Epinephrine 1:1,000 (1mg/ml) {dose} ml + NS to 5ml Nebulized", note: "0.5 ml/kg. Max 5 ml (5 mg) per dose.", calc: w => Math.min((w * 0.5), 5).toFixed(1) },
             { name: "Magnesium Sulfate IV (Asthma)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV over 20 mins", note: "50 mg/kg. Max 2000 mg (4 ml) per dose.", calc: w => Math.min(((w * 50) / 500), 4).toFixed(1) }
         ],
         gi: [
             { name: "Ondansetron PO (4mg/5ml)", rx: "Ondansetron Syrup (4 mg/5 ml) {dose} ml PO q 8 hr PRN vomiting", note: "0.15 mg/kg. Max 8 mg (10 ml) per dose.", calc: w => Math.min(((w * 0.15) / 0.8), 10).toFixed(1) },
-            { name: "Ondansetron IV (2 mg/ml)", rx: "Ondansetron IV (2 mg/ml) {dose} ml IV slow push q 8 hr PRN", note: "0.15 mg/kg. Max 8 mg (4 ml) per dose.", calc: w => Math.min(((w * 0.15) / 2), 4).toFixed(1) },
+            { name: "Ondansetron IV (2 mg/ml)", rx: "Ondansetron IV (2 mg/ml) {dose} ml IV slow push q 8 hr PRN", note: "0.15 mg/kg. Max 8 mg (4 ml) per dose.", concMgMl: 2, defaultVolume: 50, calc: w => Math.min(((w * 0.15) / 2), 4).toFixed(1) },
             { name: "Domperidone PO (1mg/ml)", rx: "Domperidone Susp (1 mg/ml) {dose} ml PO TID 15 mins AC", note: "0.25 mg/kg. Max 10 mg (10 ml) per dose.", calc: w => Math.min((w * 0.25), 10).toFixed(1) },
             { name: "Omeprazole PO/IV", rx: "Omeprazole {dose} mg PO/IV OD", note: "1 mg/kg. Max 40 mg per day.", calc: w => Math.min((w * 1), 40).toFixed(0) },
             { name: "Famotidine PO/IV (10 mg/ml)", rx: "Famotidine (10 mg/ml) {dose} ml PO/IV BID", note: "0.5 mg/kg. Max 20 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.5) / 10), 2).toFixed(1) },
@@ -127,19 +307,19 @@
             { name: "Amoxicillin Drops (50mg/ml)", rx: "Amoxicillin Drops (50 mg/ml) {dose} ml PO BID", note: "Standard: 45 mg/kg/day div BID. Max 1000 mg (20 ml) per dose.", calc: w => Math.min(((w * 22.5) / 50), 20).toFixed(1) },
             { name: "Amoxicillin PO (250mg/5ml) - HIGH DOSE", rx: "Amoxicillin Syrup (250 mg/5 ml) {dose} ml PO BID", note: "AOM High Dose: 90 mg/kg/day div BID. Max 1000 mg (20 ml) per dose.", calc: w => Math.min(((w * 45) / 50), 20).toFixed(1) },
             { name: "Augmentin (Amoxicillin/Clavulanic acid) PO (457mg/5ml) - HIGH DOSE", rx: "Amoxicillin/Clavulanate (457 mg/5 ml) {dose} ml PO BID", note: "90 mg/kg/day Amox component. Max 1000 mg Amox (11 ml) per dose.", calc: w => Math.min(((w * 45) / 80), 11).toFixed(1) },
-            { name: "Augmentin ES (Amoxicillin/Clavulanic acid) PO (600mg/5ml) - HIGH DOSE", rx: "Amoxicillin/Clavulanate ES (600 mg/5 ml) {dose} ml PO BID", note: "90 mg/kg/day Amox. Max 2000 mg (16.7 ml) per dose.", calc: w => Math.min(((w * 45) / 120), 16.7).toFixed(1) },
+            { name: "Augmentin ES (Amoxicillin/Clavulanic acid) PO (600mg/5ml) - HIGH DOSE", rx: "Amoxicillin/Clavulanate ES (600 mg/5 ml) {dose} ml PO BID", note: "90 mg/kg/day Amox. Max 1000 mg (8.4 ml) per dose.", calc: w => Math.min(((w * 45) / 120), 8.4).toFixed(1) },
             { name: "Azithromycin PO (200mg/5ml)", rx: "Azithromycin Susp (200 mg/5 ml) {dose} ml PO OD x 3-5 days", note: "10 mg/kg. Max 500 mg (12.5 ml) per dose.", calc: w => Math.min(((w * 10) / 40), 12.5).toFixed(1) },
             { name: "Cephalexin PO (250mg/5ml)", rx: "Cephalexin Syrup (250 mg/5 ml) {dose} ml PO BID", note: "50 mg/kg/day div BID. Max 1000 mg (20 ml) per dose.", calc: w => Math.min(((w * 25) / 50), 20).toFixed(1) },
-            { name: "Cefdinir PO (250mg/5ml)", rx: "Cefdinir Susp (250 mg/5 ml) {dose} ml PO OD", note: "14 mg/kg. Max 600 mg (12 ml) per day.", calc: w => Math.min(((w * 14) / 50), 12).toFixed(1) },
+            { name: "Cefdinir PO (125mg/5ml)", rx: "Cefdinir Susp (125 mg/5 ml) {dose} ml PO OD", note: "14 mg/kg. Max 600 mg (24 ml) per day.", calc: w => Math.min(((w * 14) / 25), 24).toFixed(1) },
             { name: "Cotrimoxazole/Bactrim PO (200/40mg/5ml)", rx: "Cotrimoxazole Susp {dose} ml PO BID", note: "8 mg/kg/day TMP div BID. Max 160 mg TMP (20 ml) per dose.", calc: w => Math.min(((w * 4) / 8), 20).toFixed(1) },
-            { name: "Ceftriaxone IV (Standard)", rx: "Ceftriaxone {dose} mg IV OD", note: "50 mg/kg/day. Max 2000 mg per day.", calc: w => Math.min((w * 50), 2000).toFixed(0) },
-            { name: "Ceftriaxone IV (Meningitis)", rx: "Ceftriaxone {dose} mg IV BID", note: "100 mg/kg/day div BID. Max 2000 mg per dose (4g/day).", calc: w => Math.min((w * 50), 2000).toFixed(0) },
-            { name: "Cefotaxime IV", rx: "Cefotaxime {dose} mg IV q 8 hr", note: "150 mg/kg/day div q8 hr. Max 2000 mg per dose.", calc: w => Math.min((w * 50), 2000).toFixed(0) },
-            { name: "Meropenem IV", rx: "Meropenem {dose} mg IV q 8 hr", note: "20 mg/kg (Meningitis 40 mg/kg). Max 2000 mg per dose.", calc: w => Math.min((w * 20), 2000).toFixed(0) },
-            { name: "Vancomycin IV", rx: "Vancomycin {dose} mg IV q 6 hr", note: "15 mg/kg. Max 1000 mg per dose.", calc: w => Math.min((w * 15), 1000).toFixed(0) },
-            { name: "Gentamicin IV", rx: "Gentamicin {dose} mg IV OD", note: "7.5 mg/kg. Max 500 mg per dose.", calc: w => Math.min((w * 7.5), 500).toFixed(1) },
-            { name: "Acyclovir IV", rx: "Acyclovir {dose} mg IV q 8 hr", note: "10 mg/kg. Max 800 mg per dose.", calc: w => Math.min((w * 10), 800).toFixed(0) },
-            { name: "Fluconazole IV/PO", rx: "Fluconazole {dose} mg IV/PO OD", note: "6 mg/kg. Max 800 mg per day.", calc: w => Math.min((w * 6), 800).toFixed(0) },
+            { name: "Ceftriaxone IV (Standard)", rx: "Ceftriaxone {dose} mg IV OD", note: "50–100 mg/kg/day. Standard 50 mg/kg/day. Max 2000 mg/day.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 50, doseRange: [50, 100], maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 50, 2000, 0, "mg/kg/day", 1) },
+            { name: "Ceftriaxone IV (Meningitis)", rx: "Ceftriaxone {dose} mg IV BID", note: "50–100 mg/kg/day div BID. Standard 100 mg/kg/day. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 100, doseRange: [50, 100], dosesPerDay: 2, maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 100, 2000, 0, "mg/kg/day", 2) },
+            { name: "Cefotaxime IV", rx: "Cefotaxime {dose} mg IV q 8 hr", note: "100–200 mg/kg/day div q8 hr. Standard 150 mg/kg/day. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 150, doseRange: [100, 200], dosesPerDay: 3, maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 150, 2000, 0, "mg/kg/day", 3) },
+            { name: "Meropenem IV", rx: "Meropenem {dose} mg IV q 8 hr", note: "20–40 mg/kg/dose q8 hr. Standard 20 mg/kg/dose. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 20, doseRange: [20, 40], maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 20, 2000, 0, "mg/kg/dose", 1) },
+            { name: "Vancomycin IV", rx: "Vancomycin {dose} mg IV q 6 hr", note: "10–15 mg/kg/dose q6 hr. Standard 15 mg/kg/dose. Max 1000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 15, doseRange: [10, 15], maxMg: 1000, decimals: 0, defaultVolume: 250, typicalFinalMgMl: 5, calc: w => calcWithMgKg(w, 15, 1000, 0, "mg/kg/dose", 1) },
+            { name: "Gentamicin IV", rx: "Gentamicin {dose} mg IV OD", note: "5–7.5 mg/kg/day. Standard 7.5 mg/kg/day. Max 500 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 7.5, doseRange: [5, 7.5], maxMg: 500, decimals: 1, defaultVolume: 50, typicalFinalMgMl: 1.5, calc: w => calcWithMgKg(w, 7.5, 500, 1, "mg/kg/day", 1) },
+            { name: "Acyclovir IV", rx: "Acyclovir {dose} mg IV q 8 hr", note: "10–20 mg/kg/dose q8 hr. Standard 10 mg/kg/dose. Max 800 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 20], maxMg: 800, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 5, calc: w => calcWithMgKg(w, 10, 800, 0, "mg/kg/dose", 1) },
+            { name: "Fluconazole IV/PO", rx: "Fluconazole {dose} mg IV/PO OD", note: "6–12 mg/kg/day. Standard 6 mg/kg/day. Max 800 mg/day.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 6, doseRange: [6, 12], maxMg: 800, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 6, 800, 0, "mg/kg/day", 1) },
             { name: "Oseltamivir PO (Tamiflu)", rx: "Oseltamivir {dose} mg PO BID x 5 days", note: "Weight-based bands. Max 75 mg per dose.", calc: w => { if(w<15) return 30; if(w<=23) return 45; if(w<=40) return 60; return 75; } }
         ],
         cardio: [
@@ -180,6 +360,148 @@
 
     let allMedsList = [];
     let currentSelectedValue = ""; // Keeps track of what is currently displaying
+    let advancedPanelOpen = false;
+
+    function toggleAdvancedPanel() {
+        const body = document.getElementById("advancedBody");
+        const btn = document.getElementById("advancedToggle");
+        advancedPanelOpen = !advancedPanelOpen;
+        body.classList.toggle("open", advancedPanelOpen);
+        btn.classList.toggle("open", advancedPanelOpen);
+    }
+
+    function onAdvancedEnabledChange() {
+        const enabled = document.getElementById("advancedEnabled").checked;
+        document.getElementById("advancedFields").style.display = enabled ? "block" : "none";
+        if (enabled && currentSelectedValue) {
+            const [catId, medIdx] = currentSelectedValue.split("|");
+            const med = medData[catId][medIdx];
+            if (!document.getElementById("intervalHr").value) {
+                document.getElementById("intervalHr").value = inferIntervalFromRx(med.rx);
+            }
+            if (!document.getElementById("dripMins").value) {
+                document.getElementById("dripMins").value = 30;
+            }
+            applyDefaultPremixVolume(med);
+        }
+        recalculateCurrent();
+    }
+
+    function onMixFluidChange() {
+        const isOther = document.getElementById("mixFluid").value === "other";
+        document.getElementById("other-fluid-wrap").classList.toggle("visible", isOther);
+    }
+
+    function isIvMed(med) {
+        return /\bIV\b|IV\/IO|IV\/IM/i.test(med.rx);
+    }
+
+    function resetAdvancedPanel() {
+        document.getElementById("advancedEnabled").checked = false;
+        document.getElementById("advancedFields").style.display = "none";
+        document.getElementById("advancedBody").classList.remove("open");
+        document.getElementById("advancedToggle").classList.remove("open");
+        advancedPanelOpen = false;
+    }
+
+    function getDrugBaseName(med) {
+        let base = med.rx.split("{dose}")[0].trim();
+        const ivIdx = base.indexOf(" IV");
+        if (ivIdx > 0) base = base.substring(0, ivIdx);
+        const parenIdx = base.indexOf(" (");
+        if (parenIdx > 0) base = base.substring(0, parenIdx);
+        return base;
+    }
+
+    function getDoseInMg(med, doseValue) {
+        if (doseValue === null || doseValue === undefined || doseValue === "") return null;
+        const dose = parseFloat(doseValue);
+        if (isNaN(dose)) return null;
+        if (med.rx.includes("{dose} mg")) return dose;
+        const mgPerMl = getMedConcentration(med);
+        if (med.rx.includes("{dose} ml") && mgPerMl) {
+            return dose * mgPerMl;
+        }
+        if (med.concMcgMl && med.rx.includes("{dose} ml")) {
+            return (dose * med.concMcgMl) / 1000;
+        }
+        const mcgPerMl = med.name.match(/\(([\d.]+)\s*mcg\/ml\)/i);
+        if (med.rx.includes("{dose} ml") && mcgPerMl) {
+            return (dose * parseFloat(mcgPerMl[1])) / 1000;
+        }
+        return null;
+    }
+
+    function inferIntervalFromRx(rx) {
+        if (/\bOD\b|once daily/i.test(rx)) return 24;
+        if (/\bBID\b/i.test(rx)) return 12;
+        if (/\bTID\b/i.test(rx)) return 8;
+        const m = rx.match(/q\s*(\d+(?:\.\d+)?)\s*hr/i);
+        if (m) return parseFloat(m[1]);
+        if (/q\s*6-8\s*hr/i.test(rx)) return 8;
+        if (/q\s*4-6\s*hr/i.test(rx)) return 6;
+        if (/q\s*2-4\s*hr/i.test(rx)) return 4;
+        return 24;
+    }
+
+    function getFluidLabel() {
+        const sel = document.getElementById("mixFluid").value;
+        if (sel === "NSS") return "NSS";
+        if (sel === "5DW") return "5% DW";
+        const other = document.getElementById("otherFluid").value.trim();
+        return other || "Other fluid";
+    }
+
+    function formatMg(mg) {
+        if (mg === null || isNaN(mg)) return "____";
+        const rounded = Math.round(mg * 100) / 100;
+        return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+    }
+
+    function highlightVal(val) {
+        return val === "____" ? "____" : `<span class="highlight">${val}</span>`;
+    }
+
+    function buildBasicRx(med, calculatedDose) {
+        const doseStr = calculatedDose !== null ? String(calculatedDose) : "____";
+        let html = med.rx;
+        if (calculatedDose !== null) {
+            html = html.replace("{dose}", `<span class="highlight">${calculatedDose}</span>`);
+        } else {
+            html = html.replace("{dose}", "____");
+        }
+        return { html, plain: med.rx.replace("{dose}", doseStr) };
+    }
+
+    function buildAdvancedRx(med, calculatedDose) {
+        const drugName = getDrugBaseName(med);
+        const mg = getDoseInMg(med, calculatedDose);
+        const mgDisplay = formatMg(mg);
+        const fluid = getFluidLabel();
+        const vol = document.getElementById("totalVolume").value || "____";
+        const interval = document.getElementById("intervalHr").value || "____";
+        const drip = document.getElementById("dripMins").value || "____";
+
+        const plain = `${drugName} ${mgDisplay} mg + ${fluid} up to ${vol} ml IV drip in ${drip} mins q ${interval} hr`;
+        const html = `${drugName} ${highlightVal(mgDisplay)} mg + ${fluid} up to ${highlightVal(vol)} ml IV drip in ${highlightVal(drip)} mins q ${highlightVal(interval)} hr`;
+
+        let concLine = "";
+        if (mg !== null && vol !== "____") {
+            const volNum = parseFloat(vol);
+            if (!isNaN(volNum) && volNum > 0) {
+                const conc = mg / volNum;
+                const concStr = conc >= 1 ? conc.toFixed(2) : conc.toFixed(3);
+                concLine = `Final concentration: ${concStr} mg/ml (${mgDisplay} mg in ${vol} ml total volume).`;
+            }
+        }
+
+        let noteHtml = buildDosingNote(med);
+        if (concLine) {
+            noteHtml = '<div class="concentration-line">' + concLine + '</div><br>' + noteHtml;
+        }
+
+        return { html, plain, noteHtml };
+    }
 
     // Flatten database for search
     function initSearchList() {
@@ -243,7 +565,11 @@
         const resultBox = document.getElementById("result-box");
         
         medSelect.innerHTML = '<option value="">-- Select Medication & Concentration --</option>';
-        if(clearSearch) resultBox.style.display = "none";
+        if(clearSearch) {
+            resultBox.style.display = "none";
+            document.getElementById("advanced-panel").classList.remove("visible");
+            document.getElementById("dose-adjust-panel").classList.remove("visible");
+        }
 
         if (catSelect.value) {
             medSelect.disabled = false;
@@ -260,7 +586,8 @@
 
     // Calculation Logic
     function showPrescription(selectedValue) {
-        if(selectedValue && typeof selectedValue === "string") {
+        const prevSelection = currentSelectedValue;
+        if (selectedValue && typeof selectedValue === "string") {
             currentSelectedValue = selectedValue;
         }
         
@@ -269,6 +596,8 @@
         const rxText = document.getElementById("prescription-text");
         const rxNote = document.getElementById("prescription-note");
         const copyBtn = document.getElementById("copyBtn");
+        const advancedPanel = document.getElementById("advanced-panel");
+        const orderLabel = document.getElementById("order-mode-label");
 
         copyBtn.innerText = "Copy Text";
         copyBtn.style.background = "#27ae60";
@@ -276,20 +605,49 @@
         if (currentSelectedValue) {
             const [catId, medIdx] = currentSelectedValue.split("|");
             const med = medData[catId][medIdx];
-            let finalRx = med.rx;
 
-            if (!isNaN(wtInput) && wtInput > 0) {
-                const calculatedDose = med.calc(wtInput);
-                finalRx = finalRx.replace('{dose}', `<span class="highlight">${calculatedDose}</span>`);
-            } else {
-                finalRx = finalRx.replace('{dose}', '____');
+            if (selectedValue && selectedValue !== prevSelection) {
+                resetDoseAdjustForMed(med);
+                document.getElementById("totalVolume").value = med.defaultVolume || "";
+                if (!isIvMed(med)) resetAdvancedPanel();
             }
 
-            rxText.innerHTML = finalRx;
-            rxNote.innerText = med.note;
+            updateDoseAdjustUI(med);
+
+            let calculatedDose = null;
+            if (!isNaN(wtInput) && wtInput > 0) {
+                calculatedDose = calculateMedDose(med, wtInput);
+            }
+
+            const dosingNote = buildDosingNote(med);
+            const isIv = isIvMed(med);
+            const advancedOn = isIv && document.getElementById("advancedEnabled").checked;
+            if (isIv) {
+                advancedPanel.classList.add("visible");
+            } else {
+                advancedPanel.classList.remove("visible");
+            }
+
+            if (advancedOn) {
+                const advanced = buildAdvancedRx(med, calculatedDose);
+                rxText.innerHTML = advanced.html;
+                rxNote.innerHTML = advanced.noteHtml;
+                orderLabel.textContent = "IV dilution & drip (advanced) — copy text below";
+                rxText.dataset.plainOrder = advanced.plain;
+            } else {
+                const basic = buildBasicRx(med, calculatedDose);
+                rxText.innerHTML = basic.html;
+                rxNote.innerText = dosingNote;
+                orderLabel.textContent = "";
+                rxText.dataset.plainOrder = basic.plain;
+            }
+
             resultBox.style.display = "block";
         } else {
             resultBox.style.display = "none";
+            advancedPanel.classList.remove("visible");
+            document.getElementById("dose-adjust-panel").classList.remove("visible");
+            orderLabel.textContent = "";
         }
     }
     
@@ -301,7 +659,8 @@
     }
 
     function copyToClipboard() {
-        const textToCopy = document.getElementById("prescription-text").innerText;
+        const rxEl = document.getElementById("prescription-text");
+        const textToCopy = rxEl.dataset.plainOrder || rxEl.innerText;
         const copyBtn = document.getElementById("copyBtn");
         
         navigator.clipboard.writeText(textToCopy).then(() => {
