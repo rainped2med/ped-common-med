@@ -54,6 +54,23 @@
         .dose-range-hint { font-size: 0.85em; color: #7f8c8d; margin: 6px 0 10px 0; }
         #doseAdjustFields { margin-top: 10px; }
         #doseAdjustFields label { margin-top: 0; }
+        #weight { font-size: 20px; padding: 14px; font-weight: bold; }
+        .dl-cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+        .dl-cat-chip { padding: 5px 12px; border-radius: 20px; border: 1px solid #bdc3c7; background: white; cursor: pointer; font-size: 0.8em; font-weight: bold; color: #7f8c8d; transition: all 0.15s; }
+        .dl-cat-chip.active { background: #2980b9; color: white; border-color: #2980b9; }
+        .disease-grid { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; max-height: 150px; overflow-y: auto; padding: 4px 2px; }
+        .disease-chip { padding: 7px 15px; border-radius: 20px; border: 1px solid #2980b9; background: white; color: #2980b9; cursor: pointer; font-size: 0.83em; font-weight: bold; transition: all 0.15s; white-space: nowrap; }
+        .disease-chip:hover { background: #d6eaf8; }
+        .disease-chip.active { background: #2980b9; color: white; }
+        #disease-rec-panel { margin-bottom: 15px; padding: 16px; background: #f0f8ff; border: 1px solid #aed6f1; border-radius: 8px; display: none; }
+        .drec-title { font-weight: bold; color: #1a5276; font-size: 1.05em; margin-bottom: 8px; }
+        .drec-note { font-size: 0.84em; color: #555; margin-bottom: 14px; line-height: 1.5; background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #d6e4f0; }
+        .drec-med-label { font-size: 0.78em; font-weight: bold; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .drec-med-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .drec-calc-btn { padding: 9px 15px; border-radius: 6px; border: none; background: #27ae60; color: white; cursor: pointer; font-size: 0.86em; font-weight: bold; transition: all 0.15s; }
+        .drec-calc-btn:hover { background: #1e8449; transform: translateY(-1px); }
+        .drec-calc-btn.active { box-shadow: 0 0 0 3px rgba(39,174,96,0.4); background: #1e8449; }
+        .drec-no-calc { padding: 8px 14px; border-radius: 6px; background: #f2f3f4; color: #99a3a4; font-size: 0.84em; border: 1px dashed #d5d8dc; }
     </style>
 </head>
 <body>
@@ -66,10 +83,37 @@
 
     <div class="input-group">
         <label for="weight">⚖️ Patient Weight (kg)</label>
-        <input type="number" id="weight" placeholder="Enter weight in kg (e.g., 14.5)" step="0.1" min="0" oninput="recalculateCurrent()">
+        <input type="number" id="weight" placeholder="Enter weight in kg (e.g., 14.5)" step="0.1" min="0" oninput="recalculateCurrent(); checkWeightRange(this.value)">
+        <div id="weight-warn" style="display:none; margin-top:4px; padding:8px 12px; background:#fadbd8; border:1px solid #f1948a; border-radius:6px; font-size:0.85em; color:#922b21;">
+            ⚠️ <strong>Weight out of typical pediatric range (&lt;3 kg or &gt;100 kg).</strong> Double-check before calculating.
+        </div>
     </div>
 
-    <div class="input-group search-group">
+    <div class="input-group" style="background:#eaf4fb; border-color:#aed6f1; margin-bottom:0; border-bottom-left-radius:0; border-bottom-right-radius:0;">
+        <label style="margin-top:0;">🔬 Diagnosis Lookup</label>
+        <input type="text" id="diseaseSearch" placeholder="Type a diagnosis (e.g. Asthma, AOM, Croup, UTI)..." oninput="handleDiseaseSearch()" autocomplete="off" style="margin-bottom:4px;">
+        <div class="dl-cat-chips" id="dl-cat-chips">
+            <button class="dl-cat-chip active" onclick="filterDiseaseCat('', this)">All</button>
+            <button class="dl-cat-chip" onclick="filterDiseaseCat('Respiratory & Allergy', this)">Respiratory</button>
+            <button class="dl-cat-chip" onclick="filterDiseaseCat('Gastrointestinal & Hepatology', this)">GI</button>
+            <button class="dl-cat-chip" onclick="filterDiseaseCat('Infectious Diseases', this)">Infectious</button>
+            <button class="dl-cat-chip" onclick="filterDiseaseCat('Neurology & Development', this)">Neurology</button>
+            <button class="dl-cat-chip" onclick="filterDiseaseCat('Dermatology', this)">Dermatology</button>
+            <button class="dl-cat-chip" onclick="filterDiseaseCat('Nephrology & Genitourinary', this)">Nephrology</button>
+            <button class="dl-cat-chip" onclick="filterDiseaseCat('Cardiovascular / Rheumatology', this)">Cardiology</button>
+            <button class="dl-cat-chip" onclick="filterDiseaseCat('Nutrition & Endocrine', this)">Endocrine</button>
+        </div>
+        <div class="disease-grid" id="disease-grid"></div>
+    </div>
+
+    <div id="disease-rec-panel">
+        <div class="drec-title" id="drec-title"></div>
+        <div class="drec-note" id="drec-note"></div>
+        <div class="drec-med-label">Recommended medications — tap to calculate dose:</div>
+        <div class="drec-med-grid" id="drec-med-grid"></div>
+    </div>
+
+    <div class="input-group search-group" style="margin-top:15px;">
         <label for="search">🔍 Quick Search</label>
         <input type="text" id="search" placeholder="Start typing a drug name (e.g., Amox, Epi)..." oninput="handleSearch()" autocomplete="off">
         <div id="autocomplete-list" class="autocomplete-items"></div>
@@ -87,6 +131,8 @@
         <option value="cardio">Cardiovascular & Diuretics</option>
         <option value="emergency">Emergency, Resuscitation & PALS</option>
         <option value="fluids">IV Fluids, Electrolytes & Blood</option>
+        <option value="surgical">Surgical & Perioperative</option>
+        <option value="endocrine">Endocrine & Metabolic</option>
     </select>
 
     <label for="medication">2. Select Medication & Concentration</label>
@@ -280,7 +326,12 @@
             { name: "Diazepam Rectal Gel (5 mg/ml)", rx: "Diazepam Rectal (5 mg/ml) {dose} ml PR x 1 dose for active seizure", note: "0.5 mg/kg. Max 20 mg (4 ml) per dose.", calc: w => Math.min(((w * 0.5) / 5), 4).toFixed(1) },
             { name: "Diazepam IV (5 mg/ml)", rx: "Diazepam IV (5 mg/ml) {dose} ml IV slow push for active seizure", note: "0.2 mg/kg. Max 10 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.2) / 5), 2).toFixed(2) },
             { name: "Lorazepam IV (2 mg/ml)", rx: "Lorazepam IV (2 mg/ml) {dose} ml IV slow push for active seizure", note: "0.1 mg/kg. Max 4 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.1) / 2), 2).toFixed(2) },
-            { name: "Midazolam IN/Buccal (5 mg/ml)", rx: "Midazolam (5 mg/ml) {dose} ml Intranasal/Buccal x 1 dose", note: "0.2 mg/kg. Max 10 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.2) / 5), 2).toFixed(2) }
+            { name: "Midazolam IN/Buccal (5 mg/ml)", rx: "Midazolam (5 mg/ml) {dose} ml Intranasal/Buccal x 1 dose", note: "0.2 mg/kg. Max 10 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.2) / 5), 2).toFixed(2) },
+            { name: "Phenobarbital IV (Loading Dose)", rx: "Phenobarbital {dose} mg IV slow push over 15-30 mins", note: "15 mg/kg loading dose. Max 1000 mg. Causes respiratory depression and hypotension — have airway ready.", calc: w => Math.min(w * 15, 1000).toFixed(0) },
+            { name: "Levetiracetam IV/PO (100mg/ml)", rx: "Levetiracetam (100 mg/ml) {dose} ml IV/PO BID", note: "10 mg/kg/dose BID. Max 1500 mg (15 ml) per dose. Adjust in renal failure. Behavioral side effects.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 30], maxMg: 1500, decimals: 1, concMgMl: 100, defaultVolume: 100, calc: w => Math.min((w * 10) / 100, 15).toFixed(1) },
+            { name: "Valproic Acid PO/IV", rx: "Valproic Acid {dose} mg PO/IV q 8 hr", note: "10 mg/kg/dose q8h (starting). Max 500 mg/dose. Monitor levels. Hepatotoxicity; pancreatitis; teratogenic.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [5, 20], maxMg: 500, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 10, 500, 0, "mg/kg/dose", 1) },
+            { name: "Chloral Hydrate PO (500mg/5ml)", rx: "Chloral Hydrate (500 mg/5 ml) {dose} ml PO x 1 dose pre-procedure", note: "50 mg/kg/dose. Max 1000 mg (10 ml) per dose. Requires monitoring. Do NOT use without airway equipment bedside.", calc: w => Math.min((w * 50) / 100, 10).toFixed(1) },
+            { name: "Clonidine PO", rx: "Clonidine {dose} mg PO BID (starting dose — titrate up)", note: "Starting 0.025 mg/kg/dose BID. Max 0.2 mg/dose. Rebound hypertension if stopped abruptly. Sedation.", calc: w => Math.min(w * 0.025, 0.2).toFixed(3) }
         ],
         respiratory: [
             { name: "Cetirizine Syrup (5mg/5ml)", rx: "Cetirizine Syrup (5 mg/5 ml) {dose} ml PO OD HS", note: "0.25 mg/kg. Max 10 mg (10 ml) per day.", calc: w => Math.min(((w * 0.25) / 1), 10).toFixed(1) },
@@ -290,18 +341,24 @@
             { name: "Ipratropium Nebulizer (250 mcg/ml)", rx: "Ipratropium Bromide {dose} ml Nebulized q 6 hr", note: "<20kg: 1ml (250mcg). >20kg: 2ml (500mcg max).", calc: w => (w < 20 ? 1 : 2).toFixed(1) },
             { name: "Budesonide Nebulizer (0.5 mg/2ml respule)", rx: "Budesonide {dose} respule(s) Nebulized BID", note: "1 to 2 respules based on severity. Max 2 mg/day.", calc: w => (w < 15 ? 1 : 2).toFixed(0) },
             { name: "Dexamethasone PO/IV (4 mg/ml)", rx: "Dexamethasone (4 mg/ml) {dose} ml PO/IV x 1 dose for Croup", note: "0.15–0.6 mg/kg x1. Standard 0.6 mg/kg. Max 16 mg (4 ml).", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 0.6, doseRange: [0.15, 0.6], maxMg: 16, decimals: 1, concMgMl: 4, calc: w => Math.min(((w * 0.6) / 4), 4).toFixed(1) },
-            { name: "Prednisolone PO (5mg/5ml)", rx: "Prednisolone Syrup (5 mg/5 ml) {dose} ml PO OD for 3-5 days", note: "Asthma: 1 mg/kg. Max 60 mg (12 ml) per day.", calc: w => Math.min(((w * 1) / 1), 12).toFixed(1) },
+            { name: "Prednisolone (5 mg/tab)", rx: "Prednisolone (5 mg/tab) {dose} tab PO OD for 3-5 days", note: "1 mg/kg/day. Max 60 mg (12 tabs) per day. Rounded to nearest half-tablet.", calc: w => (Math.round(Math.min(w / 5, 12) * 2) / 2).toFixed(1) },
             { name: "Hydrocortisone IV", rx: "Hydrocortisone {dose} mg IV q 6 hr", note: "2–4 mg/kg/dose q6 hr. Standard 4 mg/kg/dose. Max 250 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 4, doseRange: [2, 4], maxMg: 250, decimals: 0, defaultVolume: 50, calc: w => calcWithMgKg(w, 4, 250, 0, "mg/kg/dose", 1) },
             { name: "Adrenaline Nebulizer (Croup) (1:1,000)", rx: "Epinephrine 1:1,000 (1mg/ml) {dose} ml + NS to 5ml Nebulized", note: "0.5 ml/kg. Max 5 ml (5 mg) per dose.", calc: w => Math.min((w * 0.5), 5).toFixed(1) },
-            { name: "Magnesium Sulfate IV (Asthma)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV over 20 mins", note: "50 mg/kg. Max 2000 mg (4 ml) per dose.", calc: w => Math.min(((w * 50) / 500), 4).toFixed(1) }
+            { name: "Magnesium Sulfate IV (Asthma)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV over 20 mins", note: "50 mg/kg. Max 2000 mg (4 ml) per dose.", calc: w => Math.min(((w * 50) / 500), 4).toFixed(1) },
+            { name: "Loratadine PO", rx: "Loratadine {dose} mg PO OD", note: "Weight <30 kg: 5 mg OD. Weight ≥30 kg: 10 mg OD. Non-sedating antihistamine.", calc: w => (w < 30 ? 5 : 10).toFixed(0) },
+            { name: "Diphenhydramine IV/PO", rx: "Diphenhydramine {dose} mg IV/PO q 6 hr PRN", note: "1 mg/kg/dose. Max 50 mg per dose. Significant sedation and anticholinergic effects.", calc: w => Math.min(w * 1, 50).toFixed(0) },
+            { name: "Montelukast PO", rx: "Montelukast {dose} mg PO OD HS", note: "6 mo–5 yr: 4 mg. 6–14 yr: 5 mg. ≥15 yr: 10 mg. Neuropsychiatric events (black box warning).", calc: w => (w < 20 ? 4 : w < 40 ? 5 : 10).toFixed(0) }
         ],
         gi: [
-            { name: "Ondansetron PO (4mg/5ml)", rx: "Ondansetron Syrup (4 mg/5 ml) {dose} ml PO q 8 hr PRN vomiting", note: "0.15 mg/kg. Max 8 mg (10 ml) per dose.", calc: w => Math.min(((w * 0.15) / 0.8), 10).toFixed(1) },
+            { name: "Ondansetron PO (8 mg/tab)", rx: "Ondansetron (8 mg/tab) {dose} tab PO q 8 hr PRN vomiting", note: "Weight <40 kg: 0.5 tab (4 mg). Weight ≥40 kg: 1 tab (8 mg). For very small children unable to take half-tablet, use Ondansetron IV instead.", calc: w => (w >= 40 ? 1 : 0.5).toFixed(1) },
             { name: "Ondansetron IV (2 mg/ml)", rx: "Ondansetron IV (2 mg/ml) {dose} ml IV slow push q 8 hr PRN", note: "0.15 mg/kg. Max 8 mg (4 ml) per dose.", concMgMl: 2, defaultVolume: 50, calc: w => Math.min(((w * 0.15) / 2), 4).toFixed(1) },
             { name: "Domperidone PO (1mg/ml)", rx: "Domperidone Susp (1 mg/ml) {dose} ml PO TID 15 mins AC", note: "0.25 mg/kg. Max 10 mg (10 ml) per dose.", calc: w => Math.min((w * 0.25), 10).toFixed(1) },
             { name: "Omeprazole PO/IV", rx: "Omeprazole {dose} mg PO/IV OD", note: "1 mg/kg. Max 40 mg per day.", calc: w => Math.min((w * 1), 40).toFixed(0) },
             { name: "Famotidine PO/IV (10 mg/ml)", rx: "Famotidine (10 mg/ml) {dose} ml PO/IV BID", note: "0.5 mg/kg. Max 20 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.5) / 10), 2).toFixed(1) },
-            { name: "Lactulose PO (3.3g/5ml)", rx: "Lactulose {dose} ml PO OD to BID for constipation", note: "1 ml/kg. Max 30 ml per dose.", calc: w => Math.min((w * 1), 30).toFixed(1) }
+            { name: "Lactulose PO (3.3g/5ml)", rx: "Lactulose {dose} ml PO OD to BID for constipation", note: "1 ml/kg. Max 30 ml per dose.", calc: w => Math.min((w * 1), 30).toFixed(1) },
+            { name: "Metronidazole PO (200mg/5ml)", rx: "Metronidazole (200 mg/5 ml) {dose} ml PO q 8 hr", note: "10 mg/kg/dose q8h. Max 500 mg (12.5 ml) per dose. Avoid alcohol. Metallic taste.", calc: w => Math.min((w * 10) / 40, 12.5).toFixed(1) },
+            { name: "PEG 3350 PO (Maintenance)", rx: "PEG 3350 {dose} g PO OD mixed in water or juice", note: "Maintenance: 0.4 g/kg/day OD. Disimpaction: 1–1.5 g/kg/day. Max 17 g/day. Mix in 120–240 ml fluid.", calc: w => Math.min(w * 0.4, 17).toFixed(1) },
+            { name: "Ursodeoxycholic Acid PO", rx: "Ursodeoxycholic Acid {dose} mg PO BID", note: "5 mg/kg/dose BID (10 mg/kg/day). Max 300 mg/dose. For cholestatic liver disease and biliary conditions.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 10, doseRange: [10, 30], dosesPerDay: 2, maxMg: 300, decimals: 0, calc: w => calcWithMgKg(w, 10, 300, 0, "mg/kg/day", 2) }
         ],
         antimicrobial: [
             { name: "Amoxicillin Drops (50mg/ml)", rx: "Amoxicillin Drops (50 mg/ml) {dose} ml PO BID", note: "Standard: 45 mg/kg/day div BID. Max 1000 mg (20 ml) per dose.", calc: w => Math.min(((w * 22.5) / 50), 20).toFixed(1) },
@@ -320,14 +377,34 @@
             { name: "Gentamicin IV", rx: "Gentamicin {dose} mg IV OD", note: "5–7.5 mg/kg/day. Standard 7.5 mg/kg/day. Max 500 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 7.5, doseRange: [5, 7.5], maxMg: 500, decimals: 1, defaultVolume: 50, typicalFinalMgMl: 1.5, calc: w => calcWithMgKg(w, 7.5, 500, 1, "mg/kg/day", 1) },
             { name: "Acyclovir IV", rx: "Acyclovir {dose} mg IV q 8 hr", note: "10–20 mg/kg/dose q8 hr. Standard 10 mg/kg/dose. Max 800 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 20], maxMg: 800, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 5, calc: w => calcWithMgKg(w, 10, 800, 0, "mg/kg/dose", 1) },
             { name: "Fluconazole IV/PO", rx: "Fluconazole {dose} mg IV/PO OD", note: "6–12 mg/kg/day. Standard 6 mg/kg/day. Max 800 mg/day.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 6, doseRange: [6, 12], maxMg: 800, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 6, 800, 0, "mg/kg/day", 1) },
-            { name: "Oseltamivir PO (Tamiflu)", rx: "Oseltamivir {dose} mg PO BID x 5 days", note: "Weight-based bands. Max 75 mg per dose.", calc: w => { if(w<15) return 30; if(w<=23) return 45; if(w<=40) return 60; return 75; } }
+            { name: "Oseltamivir PO (Tamiflu)", rx: "Oseltamivir {dose} mg PO BID x 5 days", note: "Children >1 yr (weight bands): <15 kg → 30 mg, 15–23 kg → 45 mg, 23–40 kg → 60 mg, >40 kg → 75 mg. Infants 0–8 mo: 3 mg/kg/dose. Infants 9–11 mo: 3.5 mg/kg/dose. Neonates (term): 3 mg/kg/dose. Neonates (preterm): 1 mg/kg/dose. Start within 48 hr of symptom onset.", calc: w => { if(w<15) return 30; if(w<=23) return 45; if(w<=40) return 60; return 75; } },
+            { name: "Penicillin V PO (250mg/5ml)", rx: "Penicillin V (250 mg/5 ml) {dose} ml PO BID x 10 days", note: "20 mg/kg/dose BID (40 mg/kg/day). Max 500 mg (10 ml) per dose. Take on empty stomach.", calc: w => Math.min((w * 20) / 50, 10).toFixed(1) },
+            { name: "Ampicillin IV/IM", rx: "Ampicillin {dose} mg IV q 6 hr", note: "Standard: 50 mg/kg/dose q6h. Meningitis: 100 mg/kg/dose q6h. Max 2000 mg/dose. Preferred over ceftriaxone in neonates.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 50, doseRange: [50, 100], maxMg: 2000, decimals: 0, defaultVolume: 50, calc: w => calcWithMgKg(w, 50, 2000, 0, "mg/kg/dose", 1) },
+            { name: "Clindamycin PO (75mg/5ml)", rx: "Clindamycin (75 mg/5 ml) {dose} ml PO q 8 hr", note: "10 mg/kg/dose q8h. Max 300 mg (20 ml) per dose. C. difficile colitis risk.", calc: w => Math.min((w * 10) / 15, 20).toFixed(1) },
+            { name: "Clarithromycin PO (125mg/5ml)", rx: "Clarithromycin (125 mg/5 ml) {dose} ml PO BID x 5-7 days", note: "7.5 mg/kg/dose BID (15 mg/kg/day). Max 250 mg (10 ml) per dose. QT prolongation; metallic taste.", calc: w => Math.min((w * 7.5) / 25, 10).toFixed(1) },
+            { name: "Ceftazidime IV", rx: "Ceftazidime {dose} mg IV over 30 mins q 8 hr", note: "33 mg/kg/dose q8h (100 mg/kg/day). Max 2000 mg/dose. Excellent antipseudomonal activity.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 100, doseRange: [100, 150], dosesPerDay: 3, maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 100, 2000, 0, "mg/kg/day", 3) },
+            { name: "Cefuroxime IV", rx: "Cefuroxime {dose} mg IV over 30 mins q 8 hr", note: "33 mg/kg/dose q8h (100 mg/kg/day). Max 1500 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 100, doseRange: [100, 150], dosesPerDay: 3, maxMg: 1500, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 100, 1500, 0, "mg/kg/day", 3) },
+            { name: "Amikacin IV", rx: "Amikacin {dose} mg IV over 30 mins OD", note: "15 mg/kg/day OD. Max 1500 mg/dose. Requires TDM. Reserved for gentamicin-resistant organisms. Nephrotoxicity/ototoxicity.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 15, doseRange: [15, 22.5], maxMg: 1500, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 15, 1500, 0, "mg/kg/day", 1) },
+            { name: "Ciprofloxacin PO/IV", rx: "Ciprofloxacin {dose} mg PO/IV q 12 hr", note: "10 mg/kg/dose BID. Max 400 mg IV / 500 mg PO per dose. Use >1 yr only when benefits outweigh cartilage risk.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 15], maxMg: 400, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 10, 400, 0, "mg/kg/dose", 1) },
+            { name: "Levofloxacin PO/IV", rx: "Levofloxacin {dose} mg PO/IV OD", note: "10 mg/kg/day OD (>5 yr). Max 500 mg/day. Age >6 months only. Peripheral neuropathy and tendinopathy risk.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 10, doseRange: [8, 10], maxMg: 500, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 10, 500, 0, "mg/kg/day", 1) },
+            { name: "Linezolid PO/IV", rx: "Linezolid {dose} mg PO/IV q 8 hr", note: "10 mg/kg/dose q8h (<12 yr). Max 600 mg/dose. Monitor CBC weekly — myelosuppression. Serotonin syndrome risk with SSRIs.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 10], maxMg: 600, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 10, 600, 0, "mg/kg/dose", 1) },
+            { name: "Isoniazid PO (TB)", rx: "Isoniazid {dose} mg PO OD", note: "10 mg/kg/day OD. Max 300 mg/day. Add Pyridoxine (Vit B6) to prevent neuropathy. Monitor LFTs.", calc: w => Math.min(w * 10, 300).toFixed(0) },
+            { name: "Rifampicin PO (TB)", rx: "Rifampicin {dose} mg PO OD (empty stomach)", note: "15 mg/kg/day OD. Max 600 mg/day. Red-orange bodily fluids — warn family. Potent CYP inducer.", calc: w => Math.min(w * 15, 600).toFixed(0) },
+            { name: "Pyrazinamide PO (TB)", rx: "Pyrazinamide {dose} mg PO OD", note: "35 mg/kg/day OD. Max 2000 mg/day. Monitor uric acid and LFTs. Hyperuricemia risk.", calc: w => Math.min(w * 35, 2000).toFixed(0) },
+            { name: "Ethambutol PO (TB)", rx: "Ethambutol {dose} mg PO OD", note: "20 mg/kg/day OD. Max 2500 mg/day. Monitor visual acuity and colour vision monthly. Optic neuritis risk.", calc: w => Math.min(w * 20, 2500).toFixed(0) },
+            { name: "Nystatin Oral Suspension (100,000 U/ml)", rx: "Nystatin Susp (100,000 U/ml) {dose} ml swish and swallow QID", note: "<10 kg: 2.5 ml. ≥10 kg: 5 ml. Continue 48 hrs after symptoms resolve. Minimal systemic absorption.", calc: w => (w < 10 ? 2.5 : 5).toFixed(1) },
+            { name: "Piperacillin-Tazobactam IV", rx: "Piperacillin-Tazobactam {dose} mg (pip component) IV over 30 mins q 8 hr", note: "100 mg/kg/dose pip component q8h (300 mg/kg/day). Max 4000 mg pip/dose. Adjust in renal failure. Hypokalemia risk.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 300, doseRange: [240, 300], dosesPerDay: 3, maxMg: 4000, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 300, 4000, 0, "mg/kg/day", 3) }
         ],
         cardio: [
             { name: "Furosemide PO (10 mg/ml)", rx: "Furosemide (10 mg/ml) {dose} ml PO BID", note: "1 mg/kg. Max 40 mg (4 ml) per dose.", calc: w => Math.min(((w * 1) / 10), 4).toFixed(1) },
             { name: "Furosemide IV (10 mg/ml)", rx: "Furosemide (10 mg/ml) {dose} ml IV slow push", note: "1 mg/kg. Max 40 mg (4 ml) per dose.", calc: w => Math.min(((w * 1) / 10), 4).toFixed(1) },
             { name: "Spironolactone PO", rx: "Spironolactone {dose} mg PO OD", note: "1 mg/kg. Max 100 mg per day.", calc: w => Math.min((w * 1), 100).toFixed(1) },
             { name: "Captopril PO", rx: "Captopril {dose} mg PO TID", note: "0.1 mg/kg initially. Max 50 mg per dose.", calc: w => Math.min((w * 0.1), 50).toFixed(2) },
-            { name: "Milrinone IV Loading", rx: "Milrinone {dose} mcg IV over 15-60 mins", note: "50 mcg/kg load. Max 2500 mcg.", calc: w => Math.min((w * 50), 2500).toFixed(0) }
+            { name: "Milrinone IV Loading", rx: "Milrinone {dose} mcg IV over 15-60 mins", note: "50 mcg/kg load. Max 2500 mcg.", calc: w => Math.min((w * 50), 2500).toFixed(0) },
+            { name: "Enalapril PO", rx: "Enalapril {dose} mg PO BID (starting dose)", note: "0.04 mg/kg/dose BID (starting). Max 5 mg/dose. Titrate slowly. Monitor BP and renal function. Dry cough; hyperkalemia.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 0.04, doseRange: [0.04, 0.15], maxMg: 5, decimals: 2, calc: w => Math.min(w * 0.04, 5).toFixed(2) },
+            { name: "Amlodipine PO", rx: "Amlodipine {dose} mg PO OD (starting dose)", note: "0.1 mg/kg/day OD (starting). Max 10 mg/day. Titrate up gradually. Peripheral edema.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 0.1, doseRange: [0.1, 0.6], maxMg: 10, decimals: 2, calc: w => Math.min(w * 0.1, 10).toFixed(2) },
+            { name: "Propranolol PO", rx: "Propranolol {dose} mg PO BID-TID (starting dose)", note: "0.5 mg/kg/dose BID (1 mg/kg/day start). Max 4 mg/kg/dose. Bradycardia; bronchospasm; masks hypoglycemia.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 0.5, doseRange: [0.25, 2], maxMg: 80, decimals: 1, calc: w => Math.min(w * 0.5, 80).toFixed(1) },
+            { name: "Hydrochlorothiazide PO", rx: "Hydrochlorothiazide {dose} mg PO OD", note: "1 mg/kg/day OD. Max 37.5 mg/day. Monitor electrolytes. Hypokalemia; hyperuricemia.", calc: w => Math.min(w * 1, 37.5).toFixed(1) }
         ],
         emergency: [
             { name: "Epinephrine ARREST (1:10,000)", rx: "Epinephrine 1:10,000 (0.1 mg/ml) {dose} ml IV/IO rapid q 3-5 min", note: "0.1 ml/kg. Max 10 ml (1 mg) per dose.", calc: w => Math.min((w * 0.1), 10).toFixed(2) },
@@ -355,6 +432,21 @@
             { name: "Maintenance Fluid (D5 1/2 NS)", rx: "D5 0.45% NaCl IV Rate at {dose} ml/hr", note: "4-2-1 Rule. Max 120 ml/hr.", calc: w => calcMaintenance(w) },
             { name: "Maintenance Fluid (D5 NS)", rx: "D5 0.9% NaCl IV Rate at {dose} ml/hr", note: "4-2-1 Rule. Max 120 ml/hr.", calc: w => calcMaintenance(w) },
             { name: "Potassium Chloride (KCl)", rx: "KCl {dose} mEq added to fluids", note: "2 mEq/kg/day. Max 40 mEq/L peripherally.", calc: w => Math.min((w * 2), 40).toFixed(1) }
+        ],
+        surgical: [
+            { name: "Cefazolin IV", rx: "Cefazolin {dose} mg IV over 30 mins", note: "Prophylaxis: 25 mg/kg/dose. Infection: 25–50 mg/kg/dose q 8 hr. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 25, doseRange: [25, 50], maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 25, 2000, 0, "mg/kg/dose", 1) },
+            { name: "Metronidazole IV (5 mg/ml)", rx: "Metronidazole (5 mg/ml) {dose} ml IV over 30-60 mins q 8 hr", note: "7.5 mg/kg/dose. Max 500 mg (100 ml) per dose.", concMgMl: 5, defaultVolume: 100, calc: w => Math.min((w * 7.5) / 5, 100).toFixed(1) },
+            { name: "Tramadol IV/PO", rx: "Tramadol {dose} mg IV/PO q 6 hr PRN pain", note: "1–2 mg/kg/dose. Standard 1 mg/kg/dose. Max 100 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 1, doseRange: [1, 2], maxMg: 100, decimals: 0, defaultVolume: 50, calc: w => calcWithMgKg(w, 1, 100, 0, "mg/kg/dose", 1) },
+            { name: "Tranexamic Acid IV (TXA)", rx: "Tranexamic Acid {dose} mg IV over 10 mins", note: "15 mg/kg. Max 1000 mg/dose. Repeat q 8 hr if needed.", calc: w => Math.min(w * 15, 1000).toFixed(0), defaultVolume: 100 },
+            { name: "Metoclopramide IV (5 mg/ml)", rx: "Metoclopramide (5 mg/ml) {dose} ml IV slow push q 8 hr PRN nausea", note: "0.1 mg/kg. Max 10 mg (2 ml) per dose.", concMgMl: 5, defaultVolume: 50, calc: w => Math.min((w * 0.1) / 5, 2).toFixed(1) },
+            { name: "Bupivacaine 0.25% Local (Max safe dose)", rx: "Bupivacaine 0.25% — Max safe volume for infiltration: {dose} ml total", note: "Max 2 mg/kg. 0.25% = 2.5 mg/ml. DO NOT EXCEED. Hard cap 30 ml.", calc: w => Math.min((w * 2) / 2.5, 30).toFixed(1) },
+            { name: "Neostigmine IV (Reversal)", rx: "Neostigmine (0.5 mg/ml) {dose} ml IV + Atropine 0.02 mg/kg IV simultaneously", note: "0.05 mg/kg. Max 2.5 mg (5 ml). Always co-administer Atropine.", calc: w => Math.min((w * 0.05) / 0.5, 5).toFixed(1) }
+        ],
+        endocrine: [
+            { name: "Methylprednisolone IV", rx: "Methylprednisolone {dose} mg IV q 12 hr", note: "1 mg/kg/dose q12h (asthma/anti-inflammatory). Max 500 mg/dose. Pulse therapy (30 mg/kg/day x 3d, max 1000 mg) — consult senior.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 1, doseRange: [1, 2], maxMg: 500, decimals: 0, defaultVolume: 50, calc: w => calcWithMgKg(w, 1, 500, 0, "mg/kg/dose", 1) },
+            { name: "Vitamin K IV/IM (Phytomenadione)", rx: "Vitamin K (Phytomenadione) {dose} mg IV/IM x 1 dose", note: "Prophylaxis (neonate): 1 mg IM x1. Deficiency/Hemorrhage: 0.3 mg/kg IV/IM. Max 10 mg/dose. Risk of anaphylaxis with IV — give slowly.", calc: w => Math.min(w * 0.3, 10).toFixed(1) },
+            { name: "Cholecalciferol (Vit D3) PO", rx: "Cholecalciferol {dose} IU PO OD x 6-12 weeks", note: "Deficiency treatment: <15 kg → 2000 IU/day, ≥15 kg → 5000 IU/day. Maintenance: 400–1000 IU/day. Monitor 25-OH-D levels.", calc: w => (w < 15 ? 2000 : 5000).toFixed(0) },
+            { name: "Levothyroxine PO", rx: "Levothyroxine {dose} mcg PO OD (morning, empty stomach)", note: "Child 1–12 yr: 4–5 mcg/kg/day. Adolescent: 2–3 mcg/kg/day. Neonate: 10–15 mcg/kg/day. Max 200 mcg/day. Monitor TFTs strictly. Note: dose is in mcg.", calc: w => Math.min(Math.round(w * 4), 200).toFixed(0) }
         ]
     };
 
@@ -503,6 +595,352 @@
         return { html, plain, noteHtml };
     }
 
+    const diseasePresets = [
+        { cat: "Respiratory & Allergy", disease: "Common Cold / Viral URI",
+          notes: "Symptomatic relief only. Antibiotics NOT indicated. Avoid Ibuprofen/NSAIDs during Dengue outbreaks. Never give Aspirin (Reye's syndrome risk).",
+          meds: [
+            { label: "Paracetamol PO (120mg/5ml)", key: "neuro_pain|0" },
+            { label: "Ibuprofen PO (100mg/5ml)", key: "neuro_pain|3" }
+          ]},
+        { cat: "Respiratory & Allergy", disease: "Acute Pharyngitis / Tonsillitis",
+          notes: "Treat Group A Strep. Amoxicillin is 1st-line (10 days). Macrolides or Clindamycin for penicillin allergy. Add analgesia.",
+          meds: [
+            { label: "Amoxicillin PO — 1st line", key: "antimicrobial|1" },
+            { label: "Cephalexin PO", key: "antimicrobial|5" },
+            { label: "Azithromycin PO (PCN allergy)", key: "antimicrobial|4" },
+            { label: "Paracetamol PO (pain/fever)", key: "neuro_pain|0" },
+            { label: "Ibuprofen PO (pain/fever)", key: "neuro_pain|3" },
+            { label: "Penicillin V (consult formulary)", key: null },
+            { label: "Clindamycin (consult formulary)", key: null },
+            { label: "Clarithromycin (consult formulary)", key: null }
+          ]},
+        { cat: "Respiratory & Allergy", disease: "Acute Rhinosinusitis",
+          notes: "Amoxicillin is 1st-line. High-dose Amoxicillin-clavulanate for high resistance risk or severe/complicated cases.",
+          meds: [
+            { label: "Amoxicillin PO — 1st line", key: "antimicrobial|1" },
+            { label: "Augmentin ES (600mg/5ml) — 2nd line", key: "antimicrobial|3" },
+            { label: "Cefdinir PO", key: "antimicrobial|6" },
+            { label: "Azithromycin PO (PCN allergy)", key: "antimicrobial|4" },
+            { label: "Cefuroxime (consult formulary)", key: null },
+            { label: "Levofloxacin (consult, >12yr only)", key: null }
+          ]},
+        { cat: "Respiratory & Allergy", disease: "Acute Otitis Media (AOM)",
+          notes: "High-dose Amoxicillin (80–90 mg/kg/day) if high risk for drug-resistant S. pneumoniae. Augmentin if failed Amoxicillin. Ceftriaxone IM/IV for refractory/severe cases.",
+          meds: [
+            { label: "Amoxicillin HD — 1st line", key: "antimicrobial|1" },
+            { label: "Augmentin ES HD — 2nd line / failed Amox", key: "antimicrobial|3" },
+            { label: "Cefdinir PO (PCN allergy, non-severe)", key: "antimicrobial|6" },
+            { label: "Ceftriaxone IV — Refractory / Severe", key: "antimicrobial|8" },
+            { label: "Paracetamol PO (pain/fever)", key: "neuro_pain|0" },
+            { label: "Ibuprofen PO (pain/fever)", key: "neuro_pain|3" },
+            { label: "Cefuroxime (consult formulary)", key: null }
+          ]},
+        { cat: "Respiratory & Allergy", disease: "Allergic Rhinitis",
+          notes: "Intranasal steroids are most effective for moderate-severe or persistent symptoms. Oral antihistamines for immediate symptom relief.",
+          meds: [
+            { label: "Cetirizine Syrup — oral antihistamine", key: "respiratory|0" },
+            { label: "Chlorpheniramine Syrup", key: "respiratory|1" },
+            { label: "Budesonide nasal spray (consult formulary)", key: null },
+            { label: "Fluticasone nasal spray (consult formulary)", key: null },
+            { label: "Desloratadine (consult formulary)", key: null },
+            { label: "Levocetirizine (consult formulary)", key: null }
+          ]},
+        { cat: "Respiratory & Allergy", disease: "Viral Croup",
+          notes: "Dexamethasone 0.6 mg/kg x1 is the mainstay for all severities. Add nebulized Epinephrine for moderate-to-severe stridor at rest (effect lasts 2 hrs — observe).",
+          meds: [
+            { label: "Dexamethasone PO/IV — 1st line", key: "respiratory|6" },
+            { label: "Adrenaline Neb (Moderate-Severe)", key: "respiratory|9" },
+            { label: "Budesonide Neb (alt if unable to swallow)", key: "respiratory|5" },
+            { label: "Prednisolone PO (alt to Dexamethasone)", key: "respiratory|7" }
+          ]},
+        { cat: "Respiratory & Allergy", disease: "Asthma Exacerbation",
+          notes: "SABA alone is no longer recommended. Add oral steroids for moderate-severe exacerbations. IV Magnesium sulfate for severe/life-threatening cases unresponsive to initial therapy.",
+          meds: [
+            { label: "Salbutamol Nebulizer — 1st line", key: "respiratory|3" },
+            { label: "Ipratropium Neb (add for moderate-severe)", key: "respiratory|4" },
+            { label: "Prednisolone PO — steroids", key: "respiratory|7" },
+            { label: "Dexamethasone PO/IV — alt steroid", key: "respiratory|6" },
+            { label: "Magnesium Sulfate IV — Severe / Life-threatening", key: "respiratory|10" },
+            { label: "Budesonide Neb (maintenance)", key: "respiratory|5" },
+            { label: "ICS-Formoterol inhaler (consult formulary)", key: null },
+            { label: "Montelukast (consult formulary)", key: null }
+          ]},
+        { cat: "Respiratory & Allergy", disease: "Community-Acquired Pneumonia",
+          notes: "High-dose Amoxicillin is 1st-line for typical outpatient CAP. Add macrolide for atypical coverage. Ceftriaxone IV for hospitalized moderate-severe cases. Oseltamivir for influenza.",
+          meds: [
+            { label: "Amoxicillin HD — Outpatient 1st line", key: "antimicrobial|1" },
+            { label: "Azithromycin — Atypical / add-on", key: "antimicrobial|4" },
+            { label: "Augmentin ES — Outpatient 2nd line", key: "antimicrobial|3" },
+            { label: "Ceftriaxone IV — Hospitalized", key: "antimicrobial|8" },
+            { label: "Cefotaxime IV — Hospitalized alt", key: "antimicrobial|10" },
+            { label: "Oseltamivir — Influenza pneumonia", key: "antimicrobial|16" },
+            { label: "Clarithromycin (consult formulary)", key: null },
+            { label: "Zanamivir (consult formulary)", key: null }
+          ]},
+        { cat: "Gastrointestinal & Hepatology", disease: "Acute Diarrhea / Gastroenteritis",
+          notes: "ORS and Zinc are the cornerstone. Antibiotics only for severe/invasive cases (dysentery, Shigella, Cholera, Ameba). Probiotics (LGG, S. boulardii) may shorten duration.",
+          meds: [
+            { label: "Ondansetron PO (anti-emetic)", key: "gi|0" },
+            { label: "Ondansetron IV (anti-emetic, severe)", key: "gi|1" },
+            { label: "NS 0.9% Bolus (if dehydrated/shock)", key: "fluids|0" },
+            { label: "Maintenance Fluid D5 1/2 NS", key: "fluids|4" },
+            { label: "Ceftriaxone IV (severe/invasive)", key: "antimicrobial|8" },
+            { label: "Azithromycin PO (Shigella / Cholera)", key: "antimicrobial|4" },
+            { label: "Metronidazole IV (Ameba / Anaerobes)", key: "surgical|1" },
+            { label: "ORS — consult nursing", key: null },
+            { label: "Zinc supp (consult formulary)", key: null },
+            { label: "Probiotics (consult formulary)", key: null }
+          ]},
+        { cat: "Gastrointestinal & Hepatology", disease: "Vomiting (in Gastroenteritis)",
+          notes: "Single dose Ondansetron to facilitate ORS tolerance. Avoid routine metoclopramide in children (EPS risk).",
+          meds: [
+            { label: "Ondansetron PO — 1st line", key: "gi|0" },
+            { label: "Ondansetron IV", key: "gi|1" }
+          ]},
+        { cat: "Gastrointestinal & Hepatology", disease: "GERD",
+          notes: "PPIs are first-line for reflux esophagitis. Prokinetics have unclear benefit in infants and carry neurological/cardiac risk — use cautiously and short-term only.",
+          meds: [
+            { label: "Omeprazole PO/IV — 1st line", key: "gi|3" },
+            { label: "Famotidine PO/IV", key: "gi|4" },
+            { label: "Domperidone PO (use with caution)", key: "gi|2" },
+            { label: "Lansoprazole (consult formulary)", key: null },
+            { label: "Esomeprazole (consult formulary)", key: null }
+          ]},
+        { cat: "Infectious Diseases", disease: "Dengue Hemorrhagic Fever",
+          notes: "⚠️ AVOID Ibuprofen/NSAIDs and Aspirin — serious bleeding risk. Paracetamol ONLY for fever and pain. IV fluids for shock. Monitor CBC and haematocrit closely.",
+          meds: [
+            { label: "Paracetamol PO — ONLY approved antipyretic", key: "neuro_pain|0" },
+            { label: "Paracetamol IV (if unable to take PO)", key: "neuro_pain|2" },
+            { label: "NS 0.9% Bolus (for shock)", key: "fluids|0" },
+            { label: "Ringer's Lactate Bolus (for shock)", key: "fluids|1" }
+          ]},
+        { cat: "Infectious Diseases", disease: "HFMD / Herpangina",
+          notes: "Purely supportive. Manage pain and fever. Viscous lidocaine for oral ulcers (use with caution — risk of ingestion causing toxicity).",
+          meds: [
+            { label: "Paracetamol PO (pain/fever)", key: "neuro_pain|0" },
+            { label: "Ibuprofen PO (pain/fever)", key: "neuro_pain|3" },
+            { label: "Viscous Lidocaine (consult formulary)", key: null }
+          ]},
+        { cat: "Infectious Diseases", disease: "Influenza Pharyngitis",
+          notes: "Start Oseltamivir within 48 hours of symptom onset for maximum effect. Weight-based dose bands for children >1 yr. ⚠️ For infants <1 yr: use age-based dosing (0–8 mo: 3 mg/kg/dose; 9–11 mo: 3.5 mg/kg/dose) — calculator shows weight-band result only. Avoid Aspirin (Reye's syndrome).",
+          meds: [
+            { label: "Oseltamivir — antiviral (children >1 yr)", key: "antimicrobial|16" },
+            { label: "Paracetamol PO (fever/pain)", key: "neuro_pain|0" },
+            { label: "Paracetamol IV (if unable to take PO)", key: "neuro_pain|2" },
+            { label: "Ibuprofen PO (fever/pain)", key: "neuro_pain|3" },
+            { label: "Oseltamivir infant dosing <1 yr — consult formulary", key: null }
+          ]},
+        { cat: "Infectious Diseases", disease: "Tuberculosis (TB)",
+          notes: "Standard HRZE regimen — always confirm with ID/pulmonology before prescribing. Prednisolone added for TB meningitis, miliary TB, or massive effusions.",
+          meds: [
+            { label: "Isoniazid (H) — confirm with ID", key: "antimicrobial|27" },
+            { label: "Rifampicin (R) — confirm with ID", key: "antimicrobial|28" },
+            { label: "Pyrazinamide (Z) — confirm with ID", key: "antimicrobial|29" },
+            { label: "Ethambutol (E) — confirm with ID", key: "antimicrobial|30" },
+            { label: "Prednisolone PO (TB Meningitis / Miliary)", key: "respiratory|7" }
+          ]},
+        { cat: "Neurology & Development", disease: "Febrile Seizures",
+          notes: "Abortive therapy for seizures lasting >3–5 min. Midazolam IN preferred out-of-hospital. Diazepam PR or IV in-hospital. Treat fever after seizure stops — does NOT prevent recurrence.",
+          meds: [
+            { label: "Midazolam IN/Buccal — Out-of-hospital", key: "neuro_pain|10" },
+            { label: "Diazepam Rectal — Out-of-hospital alt", key: "neuro_pain|7" },
+            { label: "Diazepam IV — In-hospital", key: "neuro_pain|8" },
+            { label: "Lorazepam IV — In-hospital alt", key: "neuro_pain|9" },
+            { label: "Paracetamol PO (antipyretic after seizure)", key: "neuro_pain|0" },
+            { label: "Ibuprofen PO (antipyretic after seizure)", key: "neuro_pain|3" }
+          ]},
+        { cat: "Neurology & Development", disease: "Headache / Migraine",
+          notes: "NSAIDs/Paracetamol for acute attacks. Triptans for debilitating attacks. Choose prophylaxis based on comorbidities. Refer neurology for refractory cases.",
+          meds: [
+            { label: "Paracetamol PO — 1st line acute", key: "neuro_pain|0" },
+            { label: "Ibuprofen PO — 1st line acute", key: "neuro_pain|3" },
+            { label: "Ketorolac IV (ER / refractory)", key: "neuro_pain|6" },
+            { label: "Almotriptan (consult formulary)", key: null },
+            { label: "Rizatriptan (consult formulary)", key: null },
+            { label: "Topiramate — prophylaxis (consult)", key: null },
+            { label: "Propranolol — prophylaxis (consult)", key: null },
+            { label: "Amitriptyline — prophylaxis (consult)", key: null }
+          ]},
+        { cat: "Dermatology", disease: "Atopic Dermatitis (Eczema)",
+          notes: "Topical corticosteroids are the mainstay. Use low-potency on face/folds. Calcineurin inhibitors (tacrolimus/pimecrolimus) for sensitive areas. Antihistamines for pruritus and sleep.",
+          meds: [
+            { label: "Cetirizine Syrup (pruritus / sleep aid)", key: "respiratory|0" },
+            { label: "Chlorpheniramine Syrup (pruritus)", key: "respiratory|1" },
+            { label: "Hydrocortisone topical (consult formulary)", key: null },
+            { label: "Mometasone topical (consult formulary)", key: null },
+            { label: "Tacrolimus topical (consult formulary)", key: null },
+            { label: "Pimecrolimus topical (consult formulary)", key: null }
+          ]},
+        { cat: "Dermatology", disease: "Candidiasis / Diaper Dermatitis",
+          notes: "Nystatin or Clotrimazole for candidal diaper rash (topical). Oral Fluconazole for severe/systemic candidiasis or oral thrush not responding to nystatin.",
+          meds: [
+            { label: "Fluconazole IV/PO (severe/systemic)", key: "antimicrobial|15" },
+            { label: "Nystatin topical (consult formulary)", key: null },
+            { label: "Clotrimazole topical (consult formulary)", key: null },
+            { label: "Zinc oxide barrier (consult formulary)", key: null }
+          ]},
+        { cat: "Dermatology", disease: "Acne Vulgaris",
+          notes: "Combine Benzoyl peroxide with topical/oral antibiotics to prevent resistance. Refer dermatology for severe/nodular/isotretinoin candidates.",
+          meds: [
+            { label: "Benzoyl peroxide (consult formulary)", key: null },
+            { label: "Adapalene topical (consult formulary)", key: null },
+            { label: "Clindamycin topical (consult formulary)", key: null },
+            { label: "Doxycycline oral (consult formulary)", key: null },
+            { label: "Minocycline oral (consult formulary)", key: null }
+          ]},
+        { cat: "Nephrology & Genitourinary", disease: "Urinary Tract Infection (UTI)",
+          notes: "IV therapy for infants <2 months or severe illness/urosepsis. Prophylaxis (TMP/SMX or Nitrofurantoin) for high-risk (VUR). Choose empiric antibiotic based on local sensitivity patterns.",
+          meds: [
+            { label: "Ceftriaxone IV — Hospitalized 1st line", key: "antimicrobial|8" },
+            { label: "Cefotaxime IV — Hospitalized alt", key: "antimicrobial|10" },
+            { label: "Gentamicin IV (urosepsis)", key: "antimicrobial|13" },
+            { label: "Cotrimoxazole PO (TMP/SMX)", key: "antimicrobial|7" },
+            { label: "Cephalexin PO — Outpatient", key: "antimicrobial|5" },
+            { label: "Augmentin ES PO — Outpatient alt", key: "antimicrobial|3" },
+            { label: "Cefdinir PO", key: "antimicrobial|6" },
+            { label: "Nitrofurantoin (consult, >2 months)", key: null },
+            { label: "Cefixime (consult formulary)", key: null }
+          ]},
+        { cat: "Cardiovascular / Rheumatology", disease: "Kawasaki Disease",
+          notes: "IVIG + high-dose Aspirin in the acute febrile phase, then low-dose Aspirin for 6–8 weeks minimum. Echocardiogram required. Always consult cardiology.",
+          meds: [
+            { label: "IVIG 2 g/kg IV — consult cardiology", key: null },
+            { label: "Aspirin high-dose → low-dose — consult", key: null }
+          ]},
+        { cat: "Nutrition & Endocrine", disease: "Obesity / Type 2 Diabetes",
+          notes: "Lifestyle intervention is primary. Metformin initiated for Type 2 DM or significant insulin resistance. Refer endocrinology for ongoing management.",
+          meds: [
+            { label: "Metformin (consult endocrinology)", key: null },
+            { label: "Empagliflozin (consult endocrinology)", key: null }
+          ]},
+        { cat: "Nutrition & Endocrine", disease: "Iron Deficiency Anemia",
+          notes: "Treat for 3 months minimum after Hb normalizes. Iron III hydroxide polymaltose (Maltofer) for GI intolerance. Counsel on dietary sources.",
+          meds: [
+            { label: "Ferrous fumarate PO (consult formulary)", key: null },
+            { label: "Iron III hydroxide polymaltose (consult formulary)", key: null }
+          ]},
+        { cat: "Nutrition & Endocrine", disease: "Hypothyroidism",
+          notes: "Start Levothyroxine at 4–5 mcg/kg/day in children 1–12 yr. Neonates need higher dosing (10–15 mcg/kg). Monitor TSH/FT4 every 4–6 weeks until stable. Always take on empty stomach in the morning.",
+          meds: [
+            { label: "Levothyroxine PO — 1st line", key: "endocrine|3" }
+          ]},
+        { cat: "Nutrition & Endocrine", disease: "Vitamin D Deficiency / Rickets",
+          notes: "Treat deficiency with 2000–5000 IU/day for 6–12 weeks, then maintenance 400–1000 IU/day. Confirm with serum 25-OH-Vitamin D. Add calcium-rich diet.",
+          meds: [
+            { label: "Cholecalciferol (Vit D3) PO — 1st line", key: "endocrine|2" }
+          ]},
+        { cat: "Neurology & Development", disease: "Status Epilepticus",
+          notes: "Follow stepwise protocol. Benzodiazepine 1st line (within 5 min). 2nd line AED if seizure >10 min. Call senior if refractory. Maintain airway throughout.",
+          meds: [
+            { label: "Midazolam IN/Buccal — 1st line out-of-hospital", key: "neuro_pain|10" },
+            { label: "Lorazepam IV — 1st line in-hospital", key: "neuro_pain|9" },
+            { label: "Diazepam IV — 1st line alt", key: "neuro_pain|8" },
+            { label: "Diazepam PR — if no IV access", key: "neuro_pain|7" },
+            { label: "Phenobarbital IV — 2nd line", key: "neuro_pain|11" },
+            { label: "Levetiracetam IV — 2nd line alt", key: "neuro_pain|12" },
+            { label: "Valproic Acid IV — 2nd line alt", key: "neuro_pain|13" }
+          ]},
+        { cat: "Cardiovascular / Rheumatology", disease: "Pediatric Hypertension",
+          notes: "Lifestyle modification first. Pharmacotherapy for stage 2 HTN or symptomatic stage 1. CCB (Amlodipine) or ACE-I (Enalapril/Captopril) are 1st-line. Confirm secondary causes.",
+          meds: [
+            { label: "Amlodipine PO — 1st line CCB", key: "cardio|6" },
+            { label: "Enalapril PO — 1st line ACE-I", key: "cardio|5" },
+            { label: "Captopril PO — ACE-I alt", key: "cardio|3" },
+            { label: "Propranolol PO — beta-blocker", key: "cardio|7" },
+            { label: "Hydrochlorothiazide PO — diuretic", key: "cardio|8" }
+          ]},
+        { cat: "Dermatology", disease: "Scabies",
+          notes: "Permethrin 5% is 1st-line. Apply from neck to toe (include scalp in infants), leave 8–14 hours, then wash off. Treat ALL household contacts simultaneously. Repeat in 7–14 days. Pruritus may persist weeks after cure.",
+          meds: [
+            { label: "Cetirizine Syrup (pruritus relief)", key: "respiratory|0" },
+            { label: "Chlorpheniramine Syrup (pruritus relief)", key: "respiratory|1" },
+            { label: "Diphenhydramine (severe itch)", key: "respiratory|12" },
+            { label: "Permethrin 5% cream — consult formulary (topical)", key: null }
+          ]},
+        { cat: "Dermatology", disease: "Oral Thrush / Candidiasis",
+          notes: "Nystatin swish-and-swallow QID for 7–14 days is 1st-line. Fluconazole for refractory or systemic cases. Sterilise dummies and bottle teats. Check for immunosuppression if recurrent.",
+          meds: [
+            { label: "Nystatin Oral Suspension — 1st line", key: "antimicrobial|31" },
+            { label: "Fluconazole PO/IV (refractory/systemic)", key: "antimicrobial|15" }
+          ]}
+    ];
+
+    let currentDiseaseFilter = "";
+
+    function buildDiseaseGrid(query) {
+        const grid = document.getElementById("disease-grid");
+        grid.innerHTML = "";
+        const q = (query || "").toLowerCase();
+        const filtered = diseasePresets.filter(d => {
+            const matchesCat = !currentDiseaseFilter || d.cat === currentDiseaseFilter;
+            const matchesQuery = !q || d.disease.toLowerCase().includes(q);
+            return matchesCat && matchesQuery;
+        });
+        filtered.forEach(d => {
+            const chip = document.createElement("button");
+            chip.className = "disease-chip";
+            chip.textContent = d.disease;
+            chip.onclick = function() {
+                document.querySelectorAll(".disease-chip").forEach(c => c.classList.remove("active"));
+                chip.classList.add("active");
+                showDiseaseRec(d);
+            };
+            grid.appendChild(chip);
+        });
+    }
+
+    function filterDiseaseCat(cat, btn) {
+        currentDiseaseFilter = cat;
+        document.querySelectorAll(".dl-cat-chip").forEach(c => c.classList.remove("active"));
+        btn.classList.add("active");
+        buildDiseaseGrid(document.getElementById("diseaseSearch").value);
+        document.getElementById("disease-rec-panel").style.display = "none";
+    }
+
+    function handleDiseaseSearch() {
+        buildDiseaseGrid(document.getElementById("diseaseSearch").value);
+        document.getElementById("disease-rec-panel").style.display = "none";
+    }
+
+    function showDiseaseRec(d) {
+        document.getElementById("drec-title").textContent = d.disease;
+        document.getElementById("drec-note").textContent = d.notes;
+        const medGrid = document.getElementById("drec-med-grid");
+        medGrid.innerHTML = "";
+        d.meds.forEach(m => {
+            if (m.key) {
+                const btn = document.createElement("button");
+                btn.className = "drec-calc-btn";
+                btn.textContent = m.label;
+                btn.onclick = function() {
+                    document.querySelectorAll(".drec-calc-btn").forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    selectMedByKey(m.key);
+                };
+                medGrid.appendChild(btn);
+            } else {
+                const tag = document.createElement("span");
+                tag.className = "drec-no-calc";
+                tag.textContent = m.label;
+                medGrid.appendChild(tag);
+            }
+        });
+        const panel = document.getElementById("disease-rec-panel");
+        panel.style.display = "block";
+        setTimeout(() => panel.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
+    }
+
+    function selectMedByKey(key) {
+        const [catId, medIdx] = key.split("|");
+        document.getElementById("search").value = medData[catId][medIdx].name;
+        document.getElementById("autocomplete-list").innerHTML = "";
+        document.getElementById("category").value = catId;
+        updateMedList(false);
+        document.getElementById("medication").value = key;
+        showPrescription(key);
+        setTimeout(() => document.getElementById("result-box").scrollIntoView({ behavior: "smooth", block: "nearest" }), 80);
+    }
+
     // Flatten database for search
     function initSearchList() {
         allMedsList = [];
@@ -513,6 +951,7 @@
         }
     }
     initSearchList();
+    buildDiseaseGrid("");
 
     // The Autocomplete Logic
     function handleSearch() {
@@ -651,6 +1090,12 @@
         }
     }
     
+    function checkWeightRange(val) {
+        const w = parseFloat(val);
+        const warn = document.getElementById("weight-warn");
+        warn.style.display = (!isNaN(w) && w > 0 && (w < 3 || w > 100)) ? "block" : "none";
+    }
+
     // Updates live if weight is changed while a med is selected
     function recalculateCurrent() {
         if (currentSelectedValue) {
