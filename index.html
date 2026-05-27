@@ -1,76 +1,127 @@
-                <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRA Pediatric Rx & PALS Calculator</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f7f6; color: #333; }
-        .container { max-width: 850px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; text-align: center; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; }
-        .warning { background-color: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; font-size: 0.85em; text-align: center; margin-bottom: 25px; border: 1px solid #ffeeba; line-height: 1.4; }
-        .input-group { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 15px; position: relative; }
-        .search-group { background: #eef2f5; border-color: #d1d8dd; z-index: 10; }
-        label { font-weight: bold; display: block; margin-top: 10px; margin-bottom: 8px; color: #34495e; }
-        input[type="number"], input[type="text"], select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #bdc3c7; font-size: 16px; margin-bottom: 10px; background-color: #fff; box-sizing: border-box; transition: all 0.3s; }
-        input[type="number"]:focus, input[type="text"]:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.4); }
-        
-        /* Autocomplete Dropdown Styles */
-        .autocomplete-items { position: absolute; border: 1px solid #bdc3c7; border-top: none; z-index: 99; top: 100%; left: 15px; right: 15px; max-height: 250px; overflow-y: auto; background-color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-radius: 0 0 6px 6px; }
-        .autocomplete-items div { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #ecf0f1; font-size: 15px; }
-        .autocomplete-items div:hover { background-color: #3498db; color: white; }
-        .autocomplete-items div:last-child { border-bottom: none; }
-        
-        #result-box { margin-top: 25px; padding: 20px; border-left: 5px solid #27ae60; background-color: #eafaf1; display: none; border-radius: 0 8px 8px 0; position: relative; }
-        .rx-title { font-weight: bold; color: #27ae60; margin-bottom: 12px; display: block; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; }
-        .rx-content { font-family: 'Courier New', Courier, monospace; font-size: 1.2em; line-height: 1.6; color: #2c3e50; font-weight: bold; background: #fff; padding: 15px; border-radius: 6px; border: 1px dashed #27ae60; }
-        .rx-note { font-family: 'Segoe UI', sans-serif; font-size: 0.9em; color: #7f8c8d; margin-top: 12px; font-weight: normal; background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ecf0f1; }
-        .highlight { color: #e74c3c; font-weight: bold; background: #fadbd8; padding: 2px 6px; border-radius: 4px; }
-        .copy-btn { position: absolute; top: 20px; right: 20px; background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold; transition: background 0.3s; }
-        .copy-btn:hover { background: #219150; }
-        .or-divider { text-align: center; font-weight: bold; color: #95a5a6; margin: 15px 0; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 16px; background-color: #f4f7f6; color: #333; margin: 0; }
+        .container { max-width: 1180px; margin: 0 auto; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; text-align: center; border-bottom: 2px solid #ecf0f1; padding-bottom: 12px; margin-top: 0; }
+        .warning { background-color: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; font-size: 0.85em; text-align: center; margin-bottom: 20px; border: 1px solid #ffeeba; line-height: 1.4; }
+        label { font-weight: bold; display: block; margin-bottom: 6px; color: #34495e; font-size: 0.9em; }
+        input[type="number"], input[type="text"], select { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid #bdc3c7; font-size: 15px; background-color: #fff; }
+        input:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 6px rgba(52, 152, 219, 0.35); }
+        .weight-bar { background: #f8f9fa; padding: 14px; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 12px; }
+        .allergy-compact { margin-bottom: 16px; font-size: 0.9em; }
+        .allergy-yesno { display: flex; gap: 20px; margin-top: 6px; }
+        .allergy-yesno label { font-weight: normal; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; }
+        .allergy-detail { margin-top: 10px; padding: 12px; background: #fdf2f2; border: 1px solid #f5c6cb; border-radius: 8px; position: relative; }
+        .allergy-detail.hidden { display: none; }
+        .allergy-detail label { font-size: 0.85em; color: #922b21; margin-bottom: 6px; }
+        .allergy-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 0; }
+        .allergy-chip { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #e74c3c; color: #922b21; padding: 4px 8px; border-radius: 16px; font-size: 0.82em; }
+        .allergy-chip button { border: none; background: #fadbd8; color: #c0392b; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; font-size: 12px; line-height: 1; padding: 0; }
+        .allergy-chip button:hover { background: #e74c3c; color: white; }
+        .allergy-warn-inline { display: block; color: #c0392b; font-size: 0.8em; font-weight: bold; margin-top: 6px; line-height: 1.35; }
+        .suggested-item.has-allergy { background: #fdf2f2; margin: 0 -12px; padding: 8px 12px; border-radius: 6px; border: 1px solid #f5c6cb; }
+        .cart-item.has-allergy { border-left-color: #e74c3c; background: #fff5f5; }
+        .cart-allergy-warn { color: #c0392b; font-size: 0.78em; font-weight: bold; margin-top: 8px; line-height: 1.35; }
 
-        .advanced-panel { margin-top: 20px; border: 1px solid #d6e4f0; border-radius: 8px; overflow: hidden; display: none; }
-        .advanced-panel.visible { display: block; }
-        .advanced-toggle { width: 100%; padding: 14px 16px; background: #ebf5fb; border: none; cursor: pointer; text-align: left; font-size: 15px; font-weight: bold; color: #2980b9; display: flex; align-items: center; justify-content: space-between; }
-        .advanced-toggle:hover { background: #d4e6f1; }
-        .advanced-toggle .chevron { transition: transform 0.2s; font-size: 12px; }
-        .advanced-toggle.open .chevron { transform: rotate(180deg); }
-        .advanced-body { padding: 16px; background: #f8fbfd; border-top: 1px solid #d6e4f0; display: none; }
-        .advanced-body.open { display: block; }
-        .advanced-hint { font-size: 0.85em; color: #7f8c8d; margin: 0 0 12px 0; line-height: 1.4; }
-        .advanced-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        @media (max-width: 600px) { .advanced-grid { grid-template-columns: 1fr; } }
-        .advanced-grid label { margin-top: 0; font-size: 0.9em; }
-        .advanced-grid input, .advanced-grid select { margin-bottom: 0; }
-        #other-fluid-wrap { display: none; margin-top: 8px; }
-        #other-fluid-wrap.visible { display: block; }
-        .rx-subtitle { font-size: 0.8em; color: #7f8c8d; margin-bottom: 8px; font-weight: normal; text-transform: none; letter-spacing: 0; }
-        .concentration-line { color: #2980b9; font-weight: bold; margin-top: 8px; }
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
-        .dose-adjust-panel { margin-top: 15px; padding: 14px; background: #fef9e7; border: 1px solid #f9e79f; border-radius: 8px; display: none; }
-        .dose-adjust-panel.visible { display: block; }
-        .dose-adjust-panel label.inline { font-weight: normal; display: flex; align-items: center; gap: 8px; margin-top: 0; }
-        .dose-range-hint { font-size: 0.85em; color: #7f8c8d; margin: 6px 0 10px 0; }
-        #doseAdjustFields { margin-top: 10px; }
-        #doseAdjustFields label { margin-top: 0; }
-        #weight { font-size: 20px; padding: 14px; font-weight: bold; }
-        .dl-cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
-        .dl-cat-chip { padding: 5px 12px; border-radius: 20px; border: 1px solid #bdc3c7; background: white; cursor: pointer; font-size: 0.8em; font-weight: bold; color: #7f8c8d; transition: all 0.15s; }
-        .dl-cat-chip.active { background: #2980b9; color: white; border-color: #2980b9; }
-        .disease-grid { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; max-height: 150px; overflow-y: auto; padding: 4px 2px; }
-        .disease-chip { padding: 7px 15px; border-radius: 20px; border: 1px solid #2980b9; background: white; color: #2980b9; cursor: pointer; font-size: 0.83em; font-weight: bold; transition: all 0.15s; white-space: nowrap; }
-        .disease-chip:hover { background: #d6eaf8; }
-        .disease-chip.active { background: #2980b9; color: white; }
-        #disease-rec-panel { margin-bottom: 15px; padding: 16px; background: #f0f8ff; border: 1px solid #aed6f1; border-radius: 8px; display: none; }
-        .drec-title { font-weight: bold; color: #1a5276; font-size: 1.05em; margin-bottom: 8px; }
-        .drec-note { font-size: 0.84em; color: #555; margin-bottom: 14px; line-height: 1.5; background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #d6e4f0; }
-        .drec-med-label { font-size: 0.78em; font-weight: bold; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-        .drec-med-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-        .drec-calc-btn { padding: 9px 15px; border-radius: 6px; border: none; background: #27ae60; color: white; cursor: pointer; font-size: 0.86em; font-weight: bold; transition: all 0.15s; }
-        .drec-calc-btn:hover { background: #1e8449; transform: translateY(-1px); }
-        .drec-calc-btn.active { box-shadow: 0 0 0 3px rgba(39,174,96,0.4); background: #1e8449; }
-        .drec-no-calc { padding: 8px 14px; border-radius: 6px; background: #f2f3f4; color: #99a3a4; font-size: 0.84em; border: 1px dashed #d5d8dc; }
+        .col-panel { border-radius: 10px; border: 1px solid #dde4ea; overflow: visible; }
+        .col-header { padding: 12px 16px; font-weight: bold; font-size: 0.95em; }
+        .col-search .col-header { background: #ebf5fb; color: #1a5276; border-bottom: 2px solid #3498db; }
+        .col-rx .col-header { background: #eafaf1; color: #1e8449; border-bottom: 2px solid #27ae60; }
+        .col-body { padding: 16px; background: #fafbfc; min-height: 320px; }
+
+        .cart-empty { color: #95a5a6; font-size: 0.9em; text-align: center; padding: 24px 12px; }
+        .cart-item { background: #fff; border: 1px solid #d5e8d4; border-left: 4px solid #27ae60; border-radius: 6px; padding: 12px; margin-bottom: 10px; position: relative; }
+        .cart-item-rx { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 0.95em; color: #2c3e50; line-height: 1.5; }
+        .cart-item-note { font-size: 0.78em; color: #7f8c8d; margin-top: 6px; }
+        .ivmix-box { margin-top: 10px; background: #f8fbff; border: 1px solid #d6eaf8; border-radius: 6px; padding: 10px; }
+        .ivmix-title { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.4px; color: #2980b9; font-weight: bold; margin-bottom: 8px; }
+        .ivmix-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .ivmix-grid label { font-size: 0.75em; color: #566573; margin-bottom: 4px; }
+        .ivmix-grid input, .ivmix-grid select { padding: 6px 8px; font-size: 0.82em; }
+        .ivmix-readonly { padding: 6px 8px; font-size: 0.82em; background: #eef2f5; border: 1px solid #dde4ea; border-radius: 4px; color: #2c3e50; }
+        .ivmix-warn { margin-top: 6px; font-size: 0.78em; color: #c0392b; }
+        .ivmix-order { margin-top: 8px; font-size: 0.78em; color: #1f618d; background: #ebf5fb; border: 1px dashed #aed6f1; border-radius: 4px; padding: 6px 8px; line-height: 1.35; }
+        @media (max-width: 560px) { .ivmix-grid { grid-template-columns: 1fr; } }
+        .cart-item-remove { position: absolute; top: 8px; right: 8px; background: #fadbd8; color: #c0392b; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; font-size: 14px; line-height: 1; }
+        .cart-item-remove:hover { background: #e74c3c; color: white; }
+        .cart-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
+        .btn-primary { background: #27ae60; color: white; flex: 1; min-width: 120px; }
+        .btn-primary:hover { background: #219150; }
+        .btn-primary:disabled { background: #95a5a6; cursor: not-allowed; }
+        .btn-secondary { background: #ecf0f1; color: #2c3e50; }
+        .btn-secondary:hover { background: #bdc3c7; }
+        .cart-count { font-size: 0.8em; color: #7f8c8d; margin-bottom: 10px; }
+        .diag-badge { display: inline-block; background: #d5f5e3; color: #186a3b; padding: 4px 10px; border-radius: 20px; font-size: 0.8em; margin-bottom: 10px; }
+
+        .search-section { margin-bottom: 18px; position: relative; }
+        .search-section h3 { margin: 0 0 8px 0; font-size: 0.85em; color: #566573; text-transform: uppercase; letter-spacing: 0.5px; }
+        .autocomplete-items { position: absolute; border: 1px solid #bdc3c7; z-index: 99; left: 0; right: 0; max-height: 220px; overflow-y: auto; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-radius: 0 0 6px 6px; }
+        .autocomplete-items div { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #ecf0f1; font-size: 14px; }
+        .autocomplete-items div:hover { background: #3498db; color: white; }
+        .autocomplete-items div small { display: block; font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
+
+        .suggested-box { background: #fff; border: 1px solid #d6eaf8; border-radius: 8px; padding: 12px; margin-top: 12px; display: none; }
+        .suggested-box.visible { display: block; }
+        .suggested-title { font-weight: bold; color: #2980b9; margin-bottom: 10px; font-size: 0.9em; }
+        .suggested-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid #ecf0f1; font-size: 0.85em; }
+        .suggested-item small { line-height: 1.35; }
+        .suggested-item:last-child { border-bottom: none; }
+        .suggested-item.ref-only { opacity: 0.88; }
+        .suggested-item.ref-only .ref-badge { font-size: 0.72em; color: #7f8c8d; font-weight: normal; display: block; margin-top: 4px; }
+        .cart-item.ref-only .cart-item-rx { font-family: inherit; font-size: 0.88em; font-weight: 600; }
+        .btn-add { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; white-space: nowrap; }
+        .btn-add:hover { background: #2980b9; }
+        .btn-add:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+        .browse-block { background: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+        .browse-block select { margin-bottom: 10px; }
+        .browse-block .btn-browse-add { width: 100%; margin-top: 4px; padding: 10px; background: #3498db; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
+        .browse-block .btn-browse-add:hover:not(:disabled) { background: #2980b9; }
+        .browse-block .btn-browse-add:disabled { background: #bdc3c7; cursor: not-allowed; }
+        .rx-section-divider { border-top: 1px dashed #d5dbdb; margin: 4px 0 14px 0; padding-top: 4px; }
+        .rx-section-label { font-size: 0.85em; color: #566573; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; margin-bottom: 10px; }
+
+        .highlight { color: #e74c3c; font-weight: bold; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #2c3e50; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9em; opacity: 0; transition: opacity 0.3s; z-index: 999; }
+        .toast.show { opacity: 1; }
+
+        .diagnosis-panel { background: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+        .diag-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+        .diag-head .step-label { margin: 0; font-size: 0.8em; }
+        .diag-head-hint { font-size: 0.78em; color: #95a5a6; font-weight: normal; }
+        .diag-filters { display: grid; grid-template-columns: minmax(0, 38%) 1fr; gap: 8px; }
+        @media (max-width: 520px) { .diag-filters { grid-template-columns: 1fr; } }
+        .diag-filters select { margin: 0; padding: 8px 10px; font-size: 0.9em; }
+        .diag-filters input { margin: 0; padding: 8px 10px; font-size: 0.9em; }
+        .diag-results-hint { font-size: 0.8em; color: #95a5a6; margin: 8px 0 0; line-height: 1.35; }
+        .diag-results { max-height: 168px; overflow-y: auto; margin-top: 6px; border: 1px solid #ecf0f1; border-radius: 6px; background: #fafbfc; }
+        .diag-results:empty { display: none; }
+        .diag-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 8px 10px; border: none; border-bottom: 1px solid #ecf0f1; background: transparent; cursor: pointer; text-align: left; font-size: 0.88em; color: #2c3e50; }
+        .diag-row:last-child { border-bottom: none; }
+        .diag-row:hover { background: #ebf5fb; }
+        .diag-row.active { background: #d6eaf8; font-weight: 600; }
+        .diag-row-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .diag-row-sys { font-size: 0.72em; color: #7f8c8d; font-weight: normal; flex-shrink: 0; max-width: 42%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .diag-empty { font-size: 0.82em; color: #95a5a6; padding: 10px; margin: 0; text-align: center; }
+        .diag-quick { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .diag-quick-label { font-size: 0.75em; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.3px; }
+        .diag-pill { padding: 4px 10px; border-radius: 14px; border: 1px solid #d6eaf8; background: #f4f9fd; color: #1a5276; font-size: 0.78em; cursor: pointer; white-space: nowrap; }
+        .diag-pill:hover { background: #3498db; color: white; border-color: #3498db; }
+        .diag-pill.active { background: #3498db; color: white; border-color: #2980b9; }
+        .diag-pill.emerg { border-color: #fadbd8; background: #fff5f5; color: #922b21; }
+        .diag-pill.emerg:hover { background: #e74c3c; border-color: #e74c3c; color: white; }
+        .diag-pill.emerg.active { background: #e74c3c; border-color: #c0392b; color: white; }
+        .section-divider { border-top: 1px dashed #d5dbdb; margin: 18px 0 14px 0; }
     </style>
 </head>
 <body>
@@ -81,1042 +132,1563 @@
         <strong>Disclaimer:</strong> Educational tool only. Hard max-caps are implemented, but always independently verify limits, contraindications, and dilutions before prescribing.
     </div>
 
-    <div class="input-group">
-        <label for="weight">⚖️ Patient Weight (kg)</label>
-        <input type="number" id="weight" placeholder="Enter weight in kg (e.g., 14.5)" step="0.1" min="0" oninput="recalculateCurrent(); checkWeightRange(this.value)">
-        <div id="weight-warn" style="display:none; margin-top:4px; padding:8px 12px; background:#fadbd8; border:1px solid #f1948a; border-radius:6px; font-size:0.85em; color:#922b21;">
-            ⚠️ <strong>Weight out of typical pediatric range (&lt;3 kg or &gt;100 kg).</strong> Double-check before calculating.
+    <div class="weight-bar">
+        <label for="weight">Patient weight (kg)</label>
+        <input type="number" id="weight" placeholder="e.g. 14.5" step="0.1" min="0" oninput="onWeightChange()">
+    </div>
+
+    <div class="allergy-compact" id="allergy-compact">
+        <span style="font-weight:bold;color:#34495e;">Known drug allergy?</span>
+        <div class="allergy-yesno">
+            <label><input type="radio" name="hasAllergy" value="no" checked onchange="onHasAllergyChange()"> No</label>
+            <label><input type="radio" name="hasAllergy" value="yes" onchange="onHasAllergyChange()"> Yes</label>
+        </div>
+        <div id="allergy-detail" class="allergy-detail hidden">
+            <label for="allergy-search">Search and add allergy</label>
+            <input type="text" id="allergy-search" placeholder="e.g. Ceftriaxone, Cefdinir, Penicillin..." oninput="handleAllergySearch()" autocomplete="off">
+            <div id="allergy-autocomplete" class="autocomplete-items"></div>
+            <div id="allergy-chips" class="allergy-chips"></div>
         </div>
     </div>
 
-    <div class="input-group" style="background:#eaf4fb; border-color:#aed6f1; margin-bottom:0; border-bottom-left-radius:0; border-bottom-right-radius:0;">
-        <label style="margin-top:0;">🔬 Diagnosis Lookup</label>
-        <input type="text" id="diseaseSearch" placeholder="Type a diagnosis (e.g. Asthma, AOM, Croup, UTI)..." oninput="handleDiseaseSearch()" autocomplete="off" style="margin-bottom:4px;">
-        <div class="dl-cat-chips" id="dl-cat-chips">
-            <button class="dl-cat-chip active" onclick="filterDiseaseCat('', this)">All</button>
-            <button class="dl-cat-chip" onclick="filterDiseaseCat('Respiratory & Allergy', this)">Respiratory</button>
-            <button class="dl-cat-chip" onclick="filterDiseaseCat('Gastrointestinal & Hepatology', this)">GI</button>
-            <button class="dl-cat-chip" onclick="filterDiseaseCat('Infectious Diseases', this)">Infectious</button>
-            <button class="dl-cat-chip" onclick="filterDiseaseCat('Neurology & Development', this)">Neurology</button>
-            <button class="dl-cat-chip" onclick="filterDiseaseCat('Dermatology', this)">Dermatology</button>
-            <button class="dl-cat-chip" onclick="filterDiseaseCat('Nephrology & Genitourinary', this)">Nephrology</button>
-            <button class="dl-cat-chip" onclick="filterDiseaseCat('Cardiovascular / Rheumatology', this)">Cardiology</button>
-            <button class="dl-cat-chip" onclick="filterDiseaseCat('Nutrition & Endocrine', this)">Endocrine</button>
-        </div>
-        <div class="disease-grid" id="disease-grid"></div>
-    </div>
-
-    <div id="disease-rec-panel">
-        <div class="drec-title" id="drec-title"></div>
-        <div class="drec-note" id="drec-note"></div>
-        <div class="drec-med-label">Recommended medications — tap to calculate dose:</div>
-        <div class="drec-med-grid" id="drec-med-grid"></div>
-    </div>
-
-    <div class="input-group search-group" style="margin-top:15px;">
-        <label for="search">🔍 Quick Search</label>
-        <input type="text" id="search" placeholder="Start typing a drug name (e.g., Amox, Epi)..." oninput="handleSearch()" autocomplete="off">
-        <div id="autocomplete-list" class="autocomplete-items"></div>
-    </div>
-
-    <div class="or-divider">— OR BROWSE BY CATEGORY —</div>
-
-    <label for="category">1. Select Clinical Category</label>
-    <select id="category" onchange="updateMedList()">
-        <option value="">-- Choose Category --</option>
-        <option value="neuro_pain">Analgesia, Sedation & Neurology</option>
-        <option value="respiratory">Respiratory, Asthma & Allergy</option>
-        <option value="gi">Gastrointestinal</option>
-        <option value="antimicrobial">Antimicrobials (PO & IV)</option>
-        <option value="cardio">Cardiovascular & Diuretics</option>
-        <option value="emergency">Emergency, Resuscitation & PALS</option>
-        <option value="fluids">IV Fluids, Electrolytes & Blood</option>
-        <option value="surgical">Surgical & Perioperative</option>
-        <option value="endocrine">Endocrine & Metabolic</option>
-    </select>
-
-    <label for="medication">2. Select Medication & Concentration</label>
-    <select id="medication" onchange="showPrescription(this.value)" disabled>
-        <option value="">-- Select Category First --</option>
-    </select>
-
-    <div id="dose-adjust-panel" class="dose-adjust-panel">
-        <label class="inline"><input type="checkbox" id="doseAdjustEnabled" onchange="onDoseAdjustChange()"> Dose adjustment</label>
-        <p class="dose-range-hint" id="doseRangeHint"></p>
-        <div id="doseAdjustFields" style="display:none;">
-            <label for="customMgKg" id="customMgKgLabel">Custom dose (mg/kg)</label>
-            <input type="number" id="customMgKg" placeholder="e.g. 75" min="0" step="0.1" oninput="recalculateCurrent()">
-        </div>
-    </div>
-
-    <div id="result-box">
-        <button class="copy-btn" onclick="copyToClipboard()" id="copyBtn">Copy Text</button>
-        <span class="rx-title">Calculated Order:</span>
-        <span class="rx-subtitle" id="order-mode-label"></span>
-        <div id="prescription-text" class="rx-content"></div>
-        <div id="prescription-note" class="rx-note"></div>
-    </div>
-
-    <div id="advanced-panel" class="advanced-panel">
-        <button type="button" class="advanced-toggle" id="advancedToggle" onclick="toggleAdvancedPanel()">
-            <span>Advanced: IV dilution and drip order</span>
-            <span class="chevron" id="advancedChevron">▼</span>
-        </button>
-        <div class="advanced-body" id="advancedBody">
-            <p class="advanced-hint">Optional. Core dose calculation stays the same. Use this to build a dilution + drip order you can copy into the chart (e.g. drug + NSS up to volume, infusion time, and interval).</p>
-            <label><input type="checkbox" id="advancedEnabled" onchange="onAdvancedEnabledChange()"> Enable IV mixing and drip wording</label>
-
-            <div id="advancedFields" style="display:none; margin-top:14px;">
-                <label for="mixFluid">Diluent / fluid to mix with</label>
-                <select id="mixFluid" onchange="onMixFluidChange(); recalculateCurrent()">
-                    <option value="NSS">NSS (0.9% NaCl)</option>
-                    <option value="5DW">5% DW</option>
-                    <option value="other">Other (specify)</option>
-                </select>
-                <div id="other-fluid-wrap">
-                    <label for="otherFluid">Other fluid name</label>
-                    <input type="text" id="otherFluid" placeholder="e.g. D5 1/2 NS, LR" oninput="recalculateCurrent()">
+    <div class="main-grid">
+        <!-- LEFT: Search -->
+        <div class="col-panel col-search">
+            <div class="col-header">Diagnosis &amp; medications</div>
+            <div class="col-body">
+                <div class="diagnosis-panel">
+                    <div class="diag-head">
+                        <span class="step-label">Diagnosis</span>
+                        <span class="diag-head-hint">Search · filter · or tap common</span>
+                    </div>
+                    <div class="diag-filters">
+                        <select id="system-filter" onchange="onSystemFilterChange()" aria-label="Filter by body system">
+                            <option value="">All systems</option>
+                        </select>
+                        <input type="text" id="diag-search" placeholder="e.g. fever, asthma, UTI, croup…" oninput="renderDiagResults()" autocomplete="off" aria-label="Search diagnosis">
+                    </div>
+                    <p id="diag-results-hint" class="diag-results-hint">Pick a common diagnosis below, filter by system, or type to search.</p>
+                    <div id="diag-results" class="diag-results" role="listbox"></div>
+                    <div id="diag-quick" class="diag-quick"></div>
                 </div>
 
-                <div class="advanced-grid" style="margin-top:12px;">
-                    <div>
-                        <label for="totalVolume">Total volume (ml)</label>
-                        <input type="number" id="totalVolume" placeholder="e.g. 100" min="1" step="1" oninput="recalculateCurrent()">
-                    </div>
-                    <div>
-                        <label for="intervalHr">Every (hr) — q __ hr</label>
-                        <input type="number" id="intervalHr" placeholder="e.g. 24" min="1" step="1" oninput="recalculateCurrent()">
-                    </div>
-                    <div>
-                        <label for="dripMins">Drip in (minutes)</label>
-                        <input type="number" id="dripMins" placeholder="e.g. 30" min="1" step="1" oninput="recalculateCurrent()">
-                    </div>
+                <div id="suggested-box" class="suggested-box">
+                    <div class="suggested-title" id="suggested-title">Medications for this diagnosis</div>
+                    <div id="suggested-list"></div>
+                    <p id="suggested-hint" style="margin:8px 0 0 0;font-size:0.82em;color:#95a5a6;display:none;">Choose a diagnosis above to see suggested meds.</p>
+                </div>
+
+                <div class="section-divider"></div>
+                <div class="search-section">
+                    <h3>Or search medication directly</h3>
+                    <input type="text" id="med-search" placeholder="e.g. Amox, Ceftriaxone, Paracetamol..." oninput="handleMedSearch()" autocomplete="off">
+                    <div id="med-autocomplete" class="autocomplete-items"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Browse + prescription list -->
+        <div class="col-panel col-rx">
+            <div class="col-header">Prescription list (max 5)</div>
+            <div class="col-body">
+                <div class="browse-block">
+                    <h3 style="margin:0 0 8px 0;font-size:0.85em;color:#566573;text-transform:uppercase;">Browse by category</h3>
+                    <select id="category" onchange="updateMedList()">
+                        <option value="">-- Category --</option>
+                        <option value="neuro_pain">Analgesia, Sedation & Neurology</option>
+                        <option value="respiratory">Respiratory, Asthma & Allergy</option>
+                        <option value="gi">Gastrointestinal</option>
+                        <option value="antimicrobial">Antimicrobials (PO & IV)</option>
+                        <option value="cardio">Cardiovascular & Diuretics</option>
+                        <option value="emergency">Emergency, Resuscitation & PALS</option>
+                        <option value="fluids">IV Fluids, Electrolytes & Blood</option>
+                        <option value="infectious">Infectious disease</option>
+                        <option value="allergy">Allergy &amp; immunology</option>
+                        <option value="renal">Renal &amp; urology</option>
+                        <option value="hematology">Hematology &amp; oncology</option>
+                        <option value="dermatology">Dermatology</option>
+                        <option value="endocrine">Endocrine &amp; metabolic</option>
+                        <option value="infant_supp">Infant supplementation</option>
+                        <option value="pals">PALS — Pediatric Advanced Life Support</option>
+                        <option value="ncpr">NCPR / NRP — Neonatal Resuscitation</option>
+                    </select>
+                    <select id="medication" onchange="onBrowseMedSelect()" disabled>
+                        <option value="">-- Medication --</option>
+                    </select>
+                    <button type="button" class="btn-browse-add" id="browseAddBtn" onclick="addBrowseSelection()" disabled>+ Add selected to list</button>
+                </div>
+
+                <div class="rx-section-divider"></div>
+                <div class="rx-section-label">Your orders</div>
+                <div id="diag-badge-wrap"></div>
+                <div class="cart-count" id="cart-count">0 / 5 medications</div>
+                <div id="cart-empty" class="cart-empty">Search a diagnosis or drug on the left, then add up to 5 orders.</div>
+                <div id="cart-list"></div>
+                <div class="cart-actions">
+                    <button class="btn btn-primary" id="copyAllBtn" onclick="copyAllCart()" disabled>Copy all orders</button>
+                    <button class="btn btn-secondary" onclick="clearCart()">Clear</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
+<script src="thai-meds-generated.js"></script>
 <script>
-    // 4-2-1 Maintenance Fluid Rule
+    const MAX_CART = 5;
+    let rxCart = [];
+    let cartIdCounter = 0;
+    let activeDiagnosis = null;
+    let activeSystem = null;
+    let allMedsList = [];
+    const patientAllergieIds = new Set();
+
+    const allergyOptions = [
+        { id: "penicillin", label: "Penicillin / Amoxicillin / Augmentin" },
+        { id: "cephalosporin", label: "Cephalosporin (all)" },
+        { id: "ceftriaxone", label: "Ceftriaxone" },
+        { id: "cefdinir", label: "Cefdinir" },
+        { id: "cefotaxime", label: "Cefotaxime" },
+        { id: "cephalexin", label: "Cephalexin" },
+        { id: "sulfa", label: "Sulfa / Bactrim (Cotrimoxazole)" },
+        { id: "macrolide", label: "Macrolide (Azithromycin)" },
+        { id: "carbapenem", label: "Carbapenem (Meropenem)" },
+        { id: "vancomycin", label: "Vancomycin" }
+    ];
+
+    const CEPHALOSPORIN_TAGS = ["cephalosporin", "ceftriaxone", "cefdinir", "cefotaxime", "cephalexin"];
+
+    const clinicalSystems = [
+        { id: "respiratory", short: "Respiratory & Allergy" },
+        { id: "antimicrobial", short: "Antimicrobials" },
+        { id: "infectious", short: "Infectious disease" },
+        { id: "gi", short: "Gastrointestinal" },
+        { id: "allergy", short: "Allergy & immunology" },
+        { id: "neuro_pain", short: "Neuro / Pain / Sedation" },
+        { id: "emergency", short: "Emergency & PALS" },
+        { id: "cardio", short: "Cardiovascular" },
+        { id: "renal", short: "Renal & urology" },
+        { id: "hematology", short: "Hematology & oncology" },
+        { id: "dermatology", short: "Dermatology" },
+        { id: "endocrine", short: "Endocrine & metabolic" },
+        { id: "infant_supp", short: "Infant supplementation" },
+        { id: "pals", short: "PALS — Pediatric ALS" },
+        { id: "ncpr", short: "NCPR / NRP — Neonatal" },
+        { id: "fluids", short: "IV Fluids & Electrolytes" }
+    ];
+
     function calcMaintenance(wt) {
         let rate = 0;
         if (wt <= 10) rate = wt * 4;
         else if (wt <= 20) rate = 40 + ((wt - 10) * 2);
         else rate = 60 + ((wt - 20) * 1);
-        return Math.min(rate, 120).toFixed(1); 
+        return formatDoseValue(Math.min(rate, 120), { decimals: 1 });
     }
 
-    function calcWithMgKg(w, mgKg, maxMg, decimals, doseUnit, dosesPerDay) {
+    function formatMlHalf(ml) {
+        const capped = Math.max(0, ml);
+        const rounded = Math.round(capped * 2) / 2;
+        return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+    }
+
+    function calcParacetamolMl(w, mgPerMl, maxMl) {
+        const mg = Math.min(w * 12, 1000);
+        const ml = Math.min(mg / mgPerMl, maxMl);
+        return formatMlHalf(ml);
+    }
+
+    function formatDoseValue(val, med) {
+        if (val === null || val === undefined || val === "____") return "____";
+        const n = parseFloat(val);
+        if (isNaN(n)) return String(val);
+        if (med && med.roundHalfMl) return formatMlHalf(n);
+        if (med && med.roundHalf) {
+            const r = Math.round(n * 2) / 2;
+            return Number.isInteger(r) ? String(r) : r.toFixed(1);
+        }
+        const dec = med && med.decimals !== undefined ? med.decimals : (Number.isInteger(n) ? 0 : 1);
+        if (dec === 0) return String(Math.round(n));
+        const rounded = Math.round(n * Math.pow(10, dec)) / Math.pow(10, dec);
+        if (med && med.roundHalfMg) {
+            const half = Math.round(rounded * 2) / 2;
+            return Number.isInteger(half) ? String(half) : half.toFixed(1);
+        }
+        return rounded.toFixed(dec).replace(/\.?0+$/, "") || "0";
+    }
+
+    function calcWithMgKg(w, mgKg, maxMg, decimals, doseUnit, dosesPerDay, maxMgPerDay) {
+        const nDoses = dosesPerDay || 1;
         let perDoseMgKg = mgKg;
-        if (doseUnit === "mg/kg/day") {
-            perDoseMgKg = mgKg / (dosesPerDay || 1);
+        if (doseUnit === "mg/kg/day") perDoseMgKg = mgKg / nDoses;
+        let dose = w * perDoseMgKg;
+        if (maxMgPerDay != null && doseUnit === "mg/kg/day") {
+            dose = Math.min(dose, maxMgPerDay / nDoses);
+        } else if (maxMg != null) {
+            dose = Math.min(dose, maxMg);
         }
-        return Math.min(w * perDoseMgKg, maxMg).toFixed(decimals);
-    }
-
-    function getAdjustedMgKg(med) {
-        if (med.doseAdjustable && document.getElementById("doseAdjustEnabled").checked) {
-            const v = parseFloat(document.getElementById("customMgKg").value);
-            if (!isNaN(v) && v > 0) return v;
-        }
-        return med.standardMgKg;
+        return dose;
     }
 
     function calculateMedDose(med, w) {
+        if (med.refOnly) return null;
         if (!w || w <= 0) return null;
+        let raw;
         if (med.doseAdjustable) {
-            const mgKg = getAdjustedMgKg(med);
+            const mgKg = med.standardMgKg;
             if (med.concMgMl && med.rx.includes("{dose} ml")) {
                 let perDoseMgKg = mgKg;
-                if (med.doseUnit === "mg/kg/day") {
-                    perDoseMgKg = mgKg / (med.dosesPerDay || 1);
-                }
+                if (med.doseUnit === "mg/kg/day") perDoseMgKg = mgKg / (med.dosesPerDay || 1);
                 const mg = Math.min(w * perDoseMgKg, med.maxMg);
                 const maxMl = med.maxMg / med.concMgMl;
-                return Math.min(mg / med.concMgMl, maxMl).toFixed(med.decimals ?? 1);
+                raw = Math.min(mg / med.concMgMl, maxMl);
+            } else {
+                raw = calcWithMgKg(w, mgKg, med.maxMg, med.decimals ?? 0, med.doseUnit, med.dosesPerDay, med.maxMgPerDay);
             }
-            return calcWithMgKg(w, mgKg, med.maxMg, med.decimals ?? 0, med.doseUnit, med.dosesPerDay);
-        }
-        return med.calc(w);
-    }
-
-    function getDoseRangeHint(med) {
-        if (!med.doseRange) return "";
-        const unit = med.doseUnit || "mg/kg";
-        return `Usual range: ${med.doseRange[0]}–${med.doseRange[1]} ${unit}. Standard: ${med.standardMgKg} ${unit}. Max cap: ${med.maxMg} mg per dose.`;
-    }
-
-    function updateDoseAdjustUI(med) {
-        const panel = document.getElementById("dose-adjust-panel");
-        const hint = document.getElementById("doseRangeHint");
-        const fields = document.getElementById("doseAdjustFields");
-        const label = document.getElementById("customMgKgLabel");
-
-        if (med && med.doseAdjustable) {
-            panel.classList.add("visible");
-            hint.textContent = getDoseRangeHint(med);
-            label.textContent = `Custom dose (${med.doseUnit || "mg/kg"})`;
         } else {
-            panel.classList.remove("visible");
-            document.getElementById("doseAdjustEnabled").checked = false;
-            fields.style.display = "none";
-            document.getElementById("customMgKg").value = "";
-            hint.textContent = "";
+            raw = med.calc(w);
         }
+        if (typeof raw === "string" && raw !== "____" && !isNaN(parseFloat(raw))) raw = parseFloat(raw);
+        return formatDoseValue(raw, med);
     }
 
-    function resetDoseAdjustForMed(med) {
-        document.getElementById("doseAdjustEnabled").checked = false;
-        document.getElementById("doseAdjustFields").style.display = "none";
-        document.getElementById("customMgKg").value = "";
-        updateDoseAdjustUI(med);
+    function buildPlainRx(med, dose) {
+        if (med.refOnly) {
+            let line = med.rx || med.name;
+            if (med.preparation && !line.includes("Prep:")) line += " | Prep: " + med.preparation;
+            return line;
+        }
+        const doseStr = dose !== null ? String(dose) : "____";
+        return med.rx.replace("{dose}", doseStr);
     }
 
-    function onDoseAdjustChange() {
-        const enabled = document.getElementById("doseAdjustEnabled").checked;
-        document.getElementById("doseAdjustFields").style.display = enabled ? "block" : "none";
-        if (enabled && currentSelectedValue) {
-            const [catId, medIdx] = currentSelectedValue.split("|");
-            const med = medData[catId][medIdx];
-            if (med.doseAdjustable && !document.getElementById("customMgKg").value) {
-                document.getElementById("customMgKg").value = med.standardMgKg;
+    function isIvAntibiotic(med) {
+        if (!med) return false;
+        const text = (med.name + " " + med.rx).toLowerCase();
+        const isIv = /\biv\b|intraven|infusion|q\s*\d+\s*hr/i.test(text);
+        const isAbx = /cef|cillin|penem|mycin|cyclovir|conazole|gentamicin|piperacillin|tazo/i.test(text);
+        return isIv && isAbx;
+    }
+
+    function getIvAbxConcRange(med) {
+        const n = (med.name || "").toLowerCase();
+        if (n.includes("ceftriaxone")) return { min: 20, max: 40 };
+        if (n.includes("cefotaxime")) return { min: 20, max: 40 };
+        if (n.includes("meropenem")) return { min: 10, max: 20 };
+        if (n.includes("vancomycin")) return { min: 2.5, max: 5 };
+        if (n.includes("gentamicin")) return { min: 1, max: 2 };
+        if (n.includes("acyclovir")) return { min: 5, max: 7 };
+        if (n.includes("fluconazole")) return { min: 2, max: 4 };
+        if (n.includes("piperacillin")) return { min: 20, max: 40 };
+        if (n.includes("ampicillin")) return { min: 20, max: 40 };
+        const fallback = med.concMgMl || 10;
+        return { min: Math.max(1, fallback * 0.5), max: Math.max(2, fallback * 1.5) };
+    }
+
+    function getStandardIvConc(med) {
+        const range = getIvAbxConcRange(med);
+        return Number(((range.min + range.max) / 2).toFixed(2));
+    }
+
+    function buildDefaultIvMix(med, dose) {
+        const standardConc = getStandardIvConc(med);
+        const mgDose = parseFloat(dose);
+        let drugMl = 25;
+        if (!isNaN(mgDose) && standardConc > 0) {
+            drugMl = Math.round((mgDose / standardConc) * 10) / 10;
+        }
+        const totalVol = Math.max(Math.ceil(drugMl + 50), med.defaultVolume || 100);
+        return {
+            standardConcMgMl: standardConc,
+            diluent: "NSS",
+            totalVolumeMl: totalVol,
+            intervalHr: 24,
+            dripMin: 30
+        };
+    }
+
+    function computeIvMix(med, dose, ivMix) {
+        const range = getIvAbxConcRange(med);
+        const standardConc = parseFloat(ivMix.standardConcMgMl) ||
+            parseFloat(ivMix.concMgMl) ||
+            getStandardIvConc(med);
+        const mgDose = parseFloat(dose);
+        const rawVol = ivMix.totalVolumeMl;
+        let totalVol = NaN;
+        if (rawVol !== "" && rawVol != null && rawVol !== undefined) {
+            const parsed = parseFloat(String(rawVol));
+            if (!isNaN(parsed)) totalVol = parsed;
+        }
+        const interval = parseFloat(ivMix.intervalHr) || 24;
+        const dripMin = parseFloat(ivMix.dripMin) || 30;
+        const drugMl = (!isNaN(mgDose) && standardConc > 0)
+            ? Math.round((mgDose / standardConc) * 10) / 10
+            : NaN;
+        const diluentMl = (!isNaN(drugMl))
+            ? Math.round((totalVol - drugMl) * 10) / 10
+            : NaN;
+        const finalBagConc = (!isNaN(mgDose) && totalVol > 0)
+            ? Math.round((mgDose / totalVol) * 100) / 100
+            : NaN;
+        return {
+            range, standardConc, totalVol, drugMl, diluentMl, finalBagConc,
+            interval, dripMin, diluent: ivMix.diluent || "NSS",
+            volumeTooLow: !isNaN(drugMl) && totalVol < drugMl
+        };
+    }
+
+    function updateIvMix(itemId, field, value) {
+        const item = rxCart.find(x => x.id === itemId);
+        if (!item) return;
+        if (!item.ivMix) item.ivMix = {};
+        if (field === "concMgMl") return;
+        item.ivMix[field] = value;
+        refreshIvMixUI(itemId);
+    }
+
+    function refreshIvMixUI(itemId) {
+        const item = rxCart.find(x => x.id === itemId);
+        if (!item || !item.ivMix) return;
+        const med = getMed(item.catId, item.medIdx);
+        if (!med || !isIvAntibiotic(med)) return;
+
+        const box = document.querySelector(`.cart-item[data-cart-id="${itemId}"] .ivmix-box`);
+        if (!box) {
+            renderCart();
+            return;
+        }
+
+        const w = getWeight();
+        const dose = w ? calculateMedDose(med, w) : null;
+        const mix = w && dose != null ? computeIvMix(med, dose, item.ivMix) : null;
+
+        const setText = (sel, text) => {
+            const el = box.querySelector(sel);
+            if (el) el.textContent = text;
+        };
+
+        setText('[data-ivmix="drugMl"]', mix && !isNaN(mix.drugMl) ? String(mix.drugMl) : "—");
+        const diluentTxt = mix && !isNaN(mix.diluentMl) ? String(Math.max(0, mix.diluentMl)) : "—";
+        setText('[data-ivmix="diluentMl"]', diluentTxt);
+        setText('[data-ivmix="finalBagConc"]', mix && !isNaN(mix.finalBagConc) ? String(mix.finalBagConc) : "—");
+
+        let warnEl = box.querySelector('[data-ivmix="warn"]');
+        if (mix && mix.volumeTooLow) {
+            if (!warnEl) {
+                warnEl = document.createElement("p");
+                warnEl.className = "ivmix-warn";
+                warnEl.setAttribute("data-ivmix", "warn");
+                const grid = box.querySelector(".ivmix-grid");
+                if (grid) grid.after(warnEl);
             }
+            warnEl.textContent = "Total volume is less than drug volume — increase total bag volume.";
+            warnEl.style.display = "";
+        } else if (warnEl) {
+            warnEl.style.display = "none";
         }
-        recalculateCurrent();
+
+        const orderEl = box.querySelector(".ivmix-order");
+        if (orderEl) {
+            const mixLine = w && dose != null ? buildIvMixOrderLine(med, dose, item.ivMix) : null;
+            orderEl.textContent = mixLine || "Enter weight to calculate IV mix volume and order line.";
+        }
     }
 
-    function applyDefaultPremixVolume(med) {
-        if (med.defaultVolume && !document.getElementById("totalVolume").value) {
-            document.getElementById("totalVolume").value = med.defaultVolume;
-        }
+    function buildIvMixOrderLine(med, dose, ivMix) {
+        if (!isIvAntibiotic(med) || !ivMix) return null;
+        const mgDose = parseFloat(dose);
+        if (isNaN(mgDose)) return null;
+        const mix = computeIvMix(med, dose, ivMix);
+        if (isNaN(mix.drugMl) || isNaN(mix.totalVol)) return null;
+        const label = med.name.replace(/\s*\(.*\)$/, "").trim();
+        return `${label}: ${mgDose} mg; drug + ${mix.diluent} to total ${mix.totalVol} ml; infuse over ${mix.dripMin} min q ${mix.interval} hr.`;
     }
 
-    function buildDosingNote(med) {
-        let note = med.note;
-        if (med.doseAdjustable && document.getElementById("doseAdjustEnabled").checked) {
-            const mgKg = getAdjustedMgKg(med);
-            note = `Adjusted: ${mgKg} ${med.doseUnit} (max ${med.maxMg} mg/dose enforced). ${note}`;
-        }
-        if (med.typicalFinalMgMl && med.defaultVolume) {
-            note = `Typical dilution: ${med.defaultVolume} ml bag (~${med.typicalFinalMgMl} mg/ml when using standard volume). ${note}`;
-        }
-        return note;
+    function medKey(catId, medIdx) { return `${catId}|${parseInt(medIdx, 10)}`; }
+
+    function getMed(catId, medIdx) {
+        const idx = parseInt(medIdx, 10);
+        if (!medData[catId] || medData[catId][idx] == null) return null;
+        return medData[catId][idx];
     }
 
-    function getMedConcentration(med) {
-        if (med.concMgMl) return med.concMgMl;
-        const mgPerMl = med.name.match(/\(([\d.]+)\s*mg\/ml\)/i);
-        if (mgPerMl) return parseFloat(mgPerMl[1]);
-        const mgPer5 = med.name.match(/\(([\d.]+)\s*mg\/5\s*ml\)/i);
-        if (mgPer5) return parseFloat(mgPer5[1]) / 5;
-        return null;
-    }
-
-    // Database
     const medData = {
         neuro_pain: [
-            { name: "Paracetamol PO (120mg/5ml)", rx: "Paracetamol Syrup (120 mg/5 ml) {dose} ml PO PRN q 4-6 hr for fever/pain", note: "15 mg/kg. Max 1000 mg (41.6 ml) per dose.", calc: w => Math.min(((w * 15) / 24), 41.6).toFixed(1) },
-            { name: "Paracetamol PO (250mg/5ml)", rx: "Paracetamol Syrup (250 mg/5 ml) {dose} ml PO PRN q 4-6 hr for fever/pain", note: "15 mg/kg. Max 1000 mg (20 ml) per dose.", calc: w => Math.min(((w * 15) / 50), 20).toFixed(1) },
-            { name: "Paracetamol IV (10 mg/ml)", rx: "Paracetamol IV (10 mg/ml) {dose} ml IV infusion over 15 mins q 6 hr", note: "15 mg/kg. Max 1000 mg (100 ml) per dose.", concMgMl: 10, defaultVolume: 100, calc: w => Math.min(((w * 15) / 10), 100).toFixed(1) },
-            { name: "Ibuprofen PO (100mg/5ml)", rx: "Ibuprofen Susp (100 mg/5 ml) {dose} ml PO q 6-8 hr PC for fever/pain", note: "10 mg/kg. Max 400 mg (20 ml) per dose.", calc: w => Math.min(((w * 10) / 20), 20).toFixed(1) },
-            { name: "Morphine IV (1 mg/ml)", rx: "Morphine IV (1 mg/ml) {dose} ml IV slow push q 2-4 hr PRN severe pain", note: "0.1 mg/kg. Max 10 mg (10 ml) per dose.", concMgMl: 1, defaultVolume: 10, calc: w => Math.min((w * 0.1), 10).toFixed(2) },
-            { name: "Fentanyl IV (50 mcg/ml)", rx: "Fentanyl (50 mcg/ml) {dose} ml IV slow push q 1-2 hr PRN", note: "1 mcg/kg. Max 100 mcg (2 ml) per dose.", concMcgMl: 50, defaultVolume: 10, calc: w => Math.min(((w * 1) / 50), 2).toFixed(2) },
-            { name: "Ketorolac IV (30 mg/ml)", rx: "Ketorolac (30 mg/ml) {dose} ml IV q 6 hr", note: "0.5 mg/kg. Max 30 mg (1 ml) per dose.", concMgMl: 30, defaultVolume: 50, calc: w => Math.min(((w * 0.5) / 30), 1).toFixed(2) },
-            { name: "Diazepam Rectal Gel (5 mg/ml)", rx: "Diazepam Rectal (5 mg/ml) {dose} ml PR x 1 dose for active seizure", note: "0.5 mg/kg. Max 20 mg (4 ml) per dose.", calc: w => Math.min(((w * 0.5) / 5), 4).toFixed(1) },
-            { name: "Diazepam IV (5 mg/ml)", rx: "Diazepam IV (5 mg/ml) {dose} ml IV slow push for active seizure", note: "0.2 mg/kg. Max 10 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.2) / 5), 2).toFixed(2) },
-            { name: "Lorazepam IV (2 mg/ml)", rx: "Lorazepam IV (2 mg/ml) {dose} ml IV slow push for active seizure", note: "0.1 mg/kg. Max 4 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.1) / 2), 2).toFixed(2) },
-            { name: "Midazolam IN/Buccal (5 mg/ml)", rx: "Midazolam (5 mg/ml) {dose} ml Intranasal/Buccal x 1 dose", note: "0.2 mg/kg. Max 10 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.2) / 5), 2).toFixed(2) },
-            { name: "Phenobarbital IV (Loading Dose)", rx: "Phenobarbital {dose} mg IV slow push over 15-30 mins", note: "15 mg/kg loading dose. Max 1000 mg. Causes respiratory depression and hypotension — have airway ready.", calc: w => Math.min(w * 15, 1000).toFixed(0) },
-            { name: "Levetiracetam IV/PO (100mg/ml)", rx: "Levetiracetam (100 mg/ml) {dose} ml IV/PO BID", note: "10 mg/kg/dose BID. Max 1500 mg (15 ml) per dose. Adjust in renal failure. Behavioral side effects.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 30], maxMg: 1500, decimals: 1, concMgMl: 100, defaultVolume: 100, calc: w => Math.min((w * 10) / 100, 15).toFixed(1) },
-            { name: "Valproic Acid PO/IV", rx: "Valproic Acid {dose} mg PO/IV q 8 hr", note: "10 mg/kg/dose q8h (starting). Max 500 mg/dose. Monitor levels. Hepatotoxicity; pancreatitis; teratogenic.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [5, 20], maxMg: 500, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 10, 500, 0, "mg/kg/dose", 1) },
-            { name: "Chloral Hydrate PO (500mg/5ml)", rx: "Chloral Hydrate (500 mg/5 ml) {dose} ml PO x 1 dose pre-procedure", note: "50 mg/kg/dose. Max 1000 mg (10 ml) per dose. Requires monitoring. Do NOT use without airway equipment bedside.", calc: w => Math.min((w * 50) / 100, 10).toFixed(1) },
-            { name: "Clonidine PO", rx: "Clonidine {dose} mg PO BID (starting dose — titrate up)", note: "Starting 0.025 mg/kg/dose BID. Max 0.2 mg/dose. Rebound hypertension if stopped abruptly. Sedation.", calc: w => Math.min(w * 0.025, 0.2).toFixed(3) }
+            { name: "Paracetamol PO (120mg/5ml)", rx: "Paracetamol Syrup (120 mg/5 ml) {dose} ml PO PRN q 4-6 hr for fever/pain", note: "12 mg/kg/dose. Max 1000 mg/dose. Rounded to nearest 0.5 ml.", roundHalfMl: true, calc: w => calcParacetamolMl(w, 24, 41.6) },
+            { name: "Paracetamol PO (250mg/5ml)", rx: "Paracetamol Syrup (250 mg/5 ml) {dose} ml PO PRN q 4-6 hr for fever/pain", note: "12 mg/kg/dose. Max 1000 mg/dose. Rounded to nearest 0.5 ml.", roundHalfMl: true, calc: w => calcParacetamolMl(w, 50, 20) },
+            { name: "Paracetamol Drops PO (100mg/ml)", rx: "Paracetamol Drops (100 mg/ml) {dose} ml PO PRN q 4-6 hr for fever/pain", note: "12 mg/kg/dose (e.g. 60 mg = 0.6 ml). Max 1000 mg (10 ml)/dose. Rounded to 0.5 ml.", roundHalfMl: true, calc: w => calcParacetamolMl(w, 100, 10) },
+            { name: "Paracetamol IV (10 mg/ml)", rx: "Paracetamol IV (10 mg/ml) {dose} ml IV infusion over 15 mins q 6 hr", note: "12 mg/kg/dose. Max 1000 mg (100 ml)/dose.", roundHalfMl: true, concMgMl: 10, defaultVolume: 100, calc: w => calcParacetamolMl(w, 10, 100) },
+            { name: "Ibuprofen PO (100mg/5ml)", rx: "Ibuprofen Susp (100 mg/5 ml) {dose} ml PO q 6-8 hr PC for fever/pain", note: "10 mg/kg. Max 400 mg (20 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 10) / 20, 20)) },
+            { name: "Morphine IV (1 mg/ml)", rx: "Morphine IV (1 mg/ml) {dose} ml IV slow push q 2-4 hr PRN severe pain", note: "0.1 mg/kg. Max 10 mg (10 ml)/dose.", concMgMl: 1, decimals: 2, calc: w => formatDoseValue(Math.min((w * 0.1), 10), { decimals: 2 }) },
+            { name: "Fentanyl IV (50 mcg/ml)", rx: "Fentanyl (50 mcg/ml) {dose} ml IV slow push q 1-2 hr PRN", note: "1 mcg/kg. Max 100 mcg (2 ml)/dose.", concMcgMl: 50, decimals: 2, calc: w => formatDoseValue(Math.min((w * 1) / 50, 2), { decimals: 2 }) },
+            { name: "Ketorolac IV (30 mg/ml)", rx: "Ketorolac (30 mg/ml) {dose} ml IV q 6 hr", note: "0.5 mg/kg. Max 30 mg (1 ml)/dose.", concMgMl: 30, decimals: 2, calc: w => formatDoseValue(Math.min((w * 0.5) / 30, 1), { decimals: 2 }) },
+            { name: "Diazepam Rectal Gel (5 mg/ml)", rx: "Diazepam Rectal (5 mg/ml) {dose} ml PR x 1 dose for active seizure", note: "0.5 mg/kg. Max 20 mg (4 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 0.5) / 5, 4)) },
+            { name: "Diazepam IV (5 mg/ml)", rx: "Diazepam IV (5 mg/ml) {dose} ml IV slow push for active seizure", note: "0.2 mg/kg. Max 10 mg (2 ml)/dose.", decimals: 2, calc: w => formatDoseValue(Math.min((w * 0.2) / 5, 2), { decimals: 2 }) },
+            { name: "Lorazepam IV (2 mg/ml)", rx: "Lorazepam IV (2 mg/ml) {dose} ml IV slow push for active seizure", note: "0.1 mg/kg. Max 4 mg (2 ml)/dose.", decimals: 2, calc: w => formatDoseValue(Math.min((w * 0.1) / 2, 2), { decimals: 2 }) },
+            { name: "Midazolam IN/Buccal (5 mg/ml)", rx: "Midazolam (5 mg/ml) {dose} ml Intranasal/Buccal x 1 dose", note: "0.2 mg/kg. Max 10 mg (2 ml)/dose.", decimals: 2, calc: w => formatDoseValue(Math.min((w * 0.2) / 5, 2), { decimals: 2 }) }
         ],
         respiratory: [
-            { name: "Cetirizine Syrup (5mg/5ml)", rx: "Cetirizine Syrup (5 mg/5 ml) {dose} ml PO OD HS", note: "0.25 mg/kg. Max 10 mg (10 ml) per day.", calc: w => Math.min(((w * 0.25) / 1), 10).toFixed(1) },
-            { name: "Chlorpheniramine Syrup (2mg/5ml)", rx: "Chlorpheniramine Syrup (2 mg/5 ml) {dose} ml PO q 6 hr PRN", note: "0.08 mg/kg/dose. Max 4 mg (10 ml) per dose.", calc: w => Math.min(((w * 0.08) / 0.4), 10).toFixed(1) },
-            { name: "Salbutamol Syrup (2mg/5ml)", rx: "Salbutamol Syrup (2 mg/5 ml) {dose} ml PO q 6-8 hr PRN wheezing", note: "0.15 mg/kg. Max 4 mg (10 ml) per dose.", calc: w => Math.min(((w * 0.15) / 0.4), 10).toFixed(1) },
-            { name: "Salbutamol Nebulizer (5 mg/ml)", rx: "Salbutamol Respirator Sol (5 mg/ml) {dose} ml + 2.5 ml NS Nebulized q 4 hr", note: "0.03 ml/kg. Min 0.5 ml, Max 1 ml (5mg) per dose.", calc: w => { let d = w * 0.03; if(d < 0.5) d = 0.5; if(d > 1) d = 1; return d.toFixed(2); } },
-            { name: "Ipratropium Nebulizer (250 mcg/ml)", rx: "Ipratropium Bromide {dose} ml Nebulized q 6 hr", note: "<20kg: 1ml (250mcg). >20kg: 2ml (500mcg max).", calc: w => (w < 20 ? 1 : 2).toFixed(1) },
-            { name: "Budesonide Nebulizer (0.5 mg/2ml respule)", rx: "Budesonide {dose} respule(s) Nebulized BID", note: "1 to 2 respules based on severity. Max 2 mg/day.", calc: w => (w < 15 ? 1 : 2).toFixed(0) },
-            { name: "Dexamethasone PO/IV (4 mg/ml)", rx: "Dexamethasone (4 mg/ml) {dose} ml PO/IV x 1 dose for Croup", note: "0.15–0.6 mg/kg x1. Standard 0.6 mg/kg. Max 16 mg (4 ml).", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 0.6, doseRange: [0.15, 0.6], maxMg: 16, decimals: 1, concMgMl: 4, calc: w => Math.min(((w * 0.6) / 4), 4).toFixed(1) },
-            { name: "Prednisolone (5 mg/tab)", rx: "Prednisolone (5 mg/tab) {dose} tab PO OD for 3-5 days", note: "1 mg/kg/day. Max 60 mg (12 tabs) per day. Rounded to nearest half-tablet.", calc: w => (Math.round(Math.min(w / 5, 12) * 2) / 2).toFixed(1) },
-            { name: "Hydrocortisone IV", rx: "Hydrocortisone {dose} mg IV q 6 hr", note: "2–4 mg/kg/dose q6 hr. Standard 4 mg/kg/dose. Max 250 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 4, doseRange: [2, 4], maxMg: 250, decimals: 0, defaultVolume: 50, calc: w => calcWithMgKg(w, 4, 250, 0, "mg/kg/dose", 1) },
-            { name: "Adrenaline Nebulizer (Croup) (1:1,000)", rx: "Epinephrine 1:1,000 (1mg/ml) {dose} ml + NS to 5ml Nebulized", note: "0.5 ml/kg. Max 5 ml (5 mg) per dose.", calc: w => Math.min((w * 0.5), 5).toFixed(1) },
-            { name: "Magnesium Sulfate IV (Asthma)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV over 20 mins", note: "50 mg/kg. Max 2000 mg (4 ml) per dose.", calc: w => Math.min(((w * 50) / 500), 4).toFixed(1) },
-            { name: "Loratadine PO", rx: "Loratadine {dose} mg PO OD", note: "Weight <30 kg: 5 mg OD. Weight ≥30 kg: 10 mg OD. Non-sedating antihistamine.", calc: w => (w < 30 ? 5 : 10).toFixed(0) },
-            { name: "Diphenhydramine IV/PO", rx: "Diphenhydramine {dose} mg IV/PO q 6 hr PRN", note: "1 mg/kg/dose. Max 50 mg per dose. Significant sedation and anticholinergic effects.", calc: w => Math.min(w * 1, 50).toFixed(0) },
-            { name: "Montelukast PO", rx: "Montelukast {dose} mg PO OD HS", note: "6 mo–5 yr: 4 mg. 6–14 yr: 5 mg. ≥15 yr: 10 mg. Neuropsychiatric events (black box warning).", calc: w => (w < 20 ? 4 : w < 40 ? 5 : 10).toFixed(0) }
+            { name: "Cetirizine Syrup (5mg/5ml)", rx: "Cetirizine Syrup (5 mg/5 ml) {dose} ml PO OD HS", note: "0.25 mg/kg. Max 10 mg (10 ml)/day.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 0.25, 10)) },
+            { name: "Chlorpheniramine Syrup (2mg/5ml)", rx: "Chlorpheniramine Syrup (2 mg/5 ml) {dose} ml PO q 6 hr PRN", note: "0.08 mg/kg/dose. Max 4 mg (10 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 0.08) / 0.4, 10)) },
+            { name: "Salbutamol Syrup (2mg/5ml)", rx: "Salbutamol Syrup (2 mg/5 ml) {dose} ml PO q 6-8 hr PRN wheezing", note: "0.15 mg/kg. Max 4 mg (10 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 0.15) / 0.4, 10)) },
+            { name: "Salbutamol Nebulizer (2.5 mg/nebule)", rx: "Salbutamol {dose} nebule(s) (2.5 mg/nebule) Nebulized q 4-6 hr PRN wheezing", note: "1 nebule (2.5 mg) per dose. Standard unit-dose nebule.", calc: w => "1" },
+            { name: "Ipratropium Nebulizer (250 mcg/ml)", rx: "Ipratropium Bromide {dose} ml Nebulized q 6 hr", note: "<20 kg: 1 ml (250 mcg). ≥20 kg: 2 ml (500 mcg max).", calc: w => (w < 20 ? "1" : "2") },
+            { name: "Budesonide Nebulizer (0.5 mg/2ml respule)", rx: "Budesonide {dose} respule(s) Nebulized BID", note: "1–2 respules by severity. Max 2 mg/day.", calc: w => (w < 15 ? "1" : "2") },
+            { name: "Dexamethasone PO/IV (4 mg/ml)", rx: "Dexamethasone (4 mg/ml) {dose} ml PO/IV x 1 dose for Croup", note: "0.6 mg/kg x1. Max 16 mg (4 ml).", roundHalfMl: true, concMgMl: 4, doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 0.6, doseRange: [0.15, 0.6], maxMg: 16, calc: w => formatMlHalf(Math.min((w * 0.6) / 4, 4)) },
+            { name: "Prednisolone PO (5mg/5ml)", rx: "Prednisolone Syrup (5 mg/5 ml) {dose} ml PO OD for 3-5 days", note: "Asthma: 1 mg/kg. Max 60 mg (12 ml)/day.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w, 12)) },
+            { name: "Hydrocortisone IV", rx: "Hydrocortisone {dose} mg IV q 6 hr", note: "4 mg/kg/dose. Max 250 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 4, doseRange: [2, 4], maxMg: 250, decimals: 0, defaultVolume: 50, calc: w => formatDoseValue(Math.min(w * 4, 250), { decimals: 0 }) },
+            { name: "Adrenaline Nebulizer (Croup) (1:1,000)", rx: "Epinephrine 1:1,000 (1 mg/ml) {dose} ml + NS to 5 ml Nebulized", note: "0.5 ml/kg. Max 5 ml (5 mg)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 0.5, 5)) },
+            { name: "Magnesium Sulfate IV (Asthma)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV over 20 mins", note: "50 mg/kg. Max 2000 mg (4 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 50) / 500, 4)) }
         ],
         gi: [
-            { name: "Ondansetron PO (8 mg/tab)", rx: "Ondansetron (8 mg/tab) {dose} tab PO q 8 hr PRN vomiting", note: "Weight <40 kg: 0.5 tab (4 mg). Weight ≥40 kg: 1 tab (8 mg). For very small children unable to take half-tablet, use Ondansetron IV instead.", calc: w => (w >= 40 ? 1 : 0.5).toFixed(1) },
-            { name: "Ondansetron IV (2 mg/ml)", rx: "Ondansetron IV (2 mg/ml) {dose} ml IV slow push q 8 hr PRN", note: "0.15 mg/kg. Max 8 mg (4 ml) per dose.", concMgMl: 2, defaultVolume: 50, calc: w => Math.min(((w * 0.15) / 2), 4).toFixed(1) },
-            { name: "Domperidone PO (1mg/ml)", rx: "Domperidone Susp (1 mg/ml) {dose} ml PO TID 15 mins AC", note: "0.25 mg/kg. Max 10 mg (10 ml) per dose.", calc: w => Math.min((w * 0.25), 10).toFixed(1) },
-            { name: "Omeprazole PO/IV", rx: "Omeprazole {dose} mg PO/IV OD", note: "1 mg/kg. Max 40 mg per day.", calc: w => Math.min((w * 1), 40).toFixed(0) },
-            { name: "Famotidine PO/IV (10 mg/ml)", rx: "Famotidine (10 mg/ml) {dose} ml PO/IV BID", note: "0.5 mg/kg. Max 20 mg (2 ml) per dose.", calc: w => Math.min(((w * 0.5) / 10), 2).toFixed(1) },
-            { name: "Lactulose PO (3.3g/5ml)", rx: "Lactulose {dose} ml PO OD to BID for constipation", note: "1 ml/kg. Max 30 ml per dose.", calc: w => Math.min((w * 1), 30).toFixed(1) },
-            { name: "Metronidazole PO (200mg/5ml)", rx: "Metronidazole (200 mg/5 ml) {dose} ml PO q 8 hr", note: "10 mg/kg/dose q8h. Max 500 mg (12.5 ml) per dose. Avoid alcohol. Metallic taste.", calc: w => Math.min((w * 10) / 40, 12.5).toFixed(1) },
-            { name: "PEG 3350 PO (Maintenance)", rx: "PEG 3350 {dose} g PO OD mixed in water or juice", note: "Maintenance: 0.4 g/kg/day OD. Disimpaction: 1–1.5 g/kg/day. Max 17 g/day. Mix in 120–240 ml fluid.", calc: w => Math.min(w * 0.4, 17).toFixed(1) },
-            { name: "Ursodeoxycholic Acid PO", rx: "Ursodeoxycholic Acid {dose} mg PO BID", note: "5 mg/kg/dose BID (10 mg/kg/day). Max 300 mg/dose. For cholestatic liver disease and biliary conditions.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 10, doseRange: [10, 30], dosesPerDay: 2, maxMg: 300, decimals: 0, calc: w => calcWithMgKg(w, 10, 300, 0, "mg/kg/day", 2) }
+            { name: "Ondansetron PO (4mg/5ml)", rx: "Ondansetron Syrup (4 mg/5 ml) {dose} ml PO q 8 hr PRN vomiting", note: "0.15 mg/kg. Max 8 mg (10 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 0.15) / 0.8, 10)) },
+            { name: "Ondansetron IV (2 mg/ml)", rx: "Ondansetron IV (2 mg/ml) {dose} ml IV slow push q 8 hr PRN", note: "0.15 mg/kg. Max 8 mg (4 ml)/dose.", roundHalfMl: true, concMgMl: 2, defaultVolume: 50, calc: w => formatMlHalf(Math.min((w * 0.15) / 2, 4)) },
+            { name: "Domperidone PO (1mg/ml)", rx: "Domperidone Susp (1 mg/ml) {dose} ml PO TID 15 mins AC", note: "0.25 mg/kg. Max 10 mg (10 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 0.25, 10)) },
+            { name: "Omeprazole PO/IV", rx: "Omeprazole {dose} mg PO/IV OD", note: "1 mg/kg. Max 40 mg/day.", decimals: 0, calc: w => formatDoseValue(Math.min(w, 40), { decimals: 0 }) },
+            { name: "Famotidine PO/IV (10 mg/ml)", rx: "Famotidine (10 mg/ml) {dose} ml PO/IV BID", note: "0.5 mg/kg. Max 20 mg (2 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 0.5) / 10, 2)) },
+            { name: "Lactulose PO (3.3g/5ml)", rx: "Lactulose {dose} ml PO OD to BID for constipation", note: "1 ml/kg. Max 30 ml/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w, 30)) },
+            { name: "Lidocaine Oral Gel 2% (topical — mouth ulcers)", rx: "Lidocaine Oral Gel 2% — apply small amount to mouth ulcers PRN (max Q3–4h)", note: "Topical mucosal analgesia for HFMD/herpangina ulcers. Apply sparingly with cotton tip. Do not swallow large amounts. Not weight-based.", calc: w => null },
+            { name: "Eurofer PO (10 mg iron/ml)", rx: "Eurofer Syrup (10 mg elemental iron/ml) {dose} ml PO BID", note: "6 mg elemental iron/kg/day ÷ BID (range 3–6 mg/kg/day). Per dose max 100 mg iron (10 ml). Rounded to 0.5 ml.", roundHalfMl: true, concMgMl: 10, doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 6, doseRange: [3, 6], dosesPerDay: 2, maxMg: 100, calc: w => formatMlHalf(Math.min((w * 3) / 10, 10)) }
         ],
         antimicrobial: [
-            { name: "Amoxicillin Drops (50mg/ml)", rx: "Amoxicillin Drops (50 mg/ml) {dose} ml PO BID", note: "Standard: 45 mg/kg/day div BID. Max 1000 mg (20 ml) per dose.", calc: w => Math.min(((w * 22.5) / 50), 20).toFixed(1) },
-            { name: "Amoxicillin PO (250mg/5ml) - HIGH DOSE", rx: "Amoxicillin Syrup (250 mg/5 ml) {dose} ml PO BID", note: "AOM High Dose: 90 mg/kg/day div BID. Max 1000 mg (20 ml) per dose.", calc: w => Math.min(((w * 45) / 50), 20).toFixed(1) },
-            { name: "Augmentin (Amoxicillin/Clavulanic acid) PO (457mg/5ml) - HIGH DOSE", rx: "Amoxicillin/Clavulanate (457 mg/5 ml) {dose} ml PO BID", note: "90 mg/kg/day Amox component. Max 1000 mg Amox (11 ml) per dose.", calc: w => Math.min(((w * 45) / 80), 11).toFixed(1) },
-            { name: "Augmentin ES (Amoxicillin/Clavulanic acid) PO (600mg/5ml) - HIGH DOSE", rx: "Amoxicillin/Clavulanate ES (600 mg/5 ml) {dose} ml PO BID", note: "90 mg/kg/day Amox. Max 1000 mg (8.4 ml) per dose.", calc: w => Math.min(((w * 45) / 120), 8.4).toFixed(1) },
-            { name: "Azithromycin PO (200mg/5ml)", rx: "Azithromycin Susp (200 mg/5 ml) {dose} ml PO OD x 3-5 days", note: "10 mg/kg. Max 500 mg (12.5 ml) per dose.", calc: w => Math.min(((w * 10) / 40), 12.5).toFixed(1) },
-            { name: "Cephalexin PO (250mg/5ml)", rx: "Cephalexin Syrup (250 mg/5 ml) {dose} ml PO BID", note: "50 mg/kg/day div BID. Max 1000 mg (20 ml) per dose.", calc: w => Math.min(((w * 25) / 50), 20).toFixed(1) },
-            { name: "Cefdinir PO (125mg/5ml)", rx: "Cefdinir Susp (125 mg/5 ml) {dose} ml PO OD", note: "14 mg/kg. Max 600 mg (24 ml) per day.", calc: w => Math.min(((w * 14) / 25), 24).toFixed(1) },
-            { name: "Cotrimoxazole/Bactrim PO (200/40mg/5ml)", rx: "Cotrimoxazole Susp {dose} ml PO BID", note: "8 mg/kg/day TMP div BID. Max 160 mg TMP (20 ml) per dose.", calc: w => Math.min(((w * 4) / 8), 20).toFixed(1) },
-            { name: "Ceftriaxone IV (Standard)", rx: "Ceftriaxone {dose} mg IV OD", note: "50–100 mg/kg/day. Standard 50 mg/kg/day. Max 2000 mg/day.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 50, doseRange: [50, 100], maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 50, 2000, 0, "mg/kg/day", 1) },
-            { name: "Ceftriaxone IV (Meningitis)", rx: "Ceftriaxone {dose} mg IV BID", note: "50–100 mg/kg/day div BID. Standard 100 mg/kg/day. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 100, doseRange: [50, 100], dosesPerDay: 2, maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 100, 2000, 0, "mg/kg/day", 2) },
-            { name: "Cefotaxime IV", rx: "Cefotaxime {dose} mg IV q 8 hr", note: "100–200 mg/kg/day div q8 hr. Standard 150 mg/kg/day. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 150, doseRange: [100, 200], dosesPerDay: 3, maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 150, 2000, 0, "mg/kg/day", 3) },
-            { name: "Meropenem IV", rx: "Meropenem {dose} mg IV q 8 hr", note: "20–40 mg/kg/dose q8 hr. Standard 20 mg/kg/dose. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 20, doseRange: [20, 40], maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 20, 2000, 0, "mg/kg/dose", 1) },
-            { name: "Vancomycin IV", rx: "Vancomycin {dose} mg IV q 6 hr", note: "10–15 mg/kg/dose q6 hr. Standard 15 mg/kg/dose. Max 1000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 15, doseRange: [10, 15], maxMg: 1000, decimals: 0, defaultVolume: 250, typicalFinalMgMl: 5, calc: w => calcWithMgKg(w, 15, 1000, 0, "mg/kg/dose", 1) },
-            { name: "Gentamicin IV", rx: "Gentamicin {dose} mg IV OD", note: "5–7.5 mg/kg/day. Standard 7.5 mg/kg/day. Max 500 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 7.5, doseRange: [5, 7.5], maxMg: 500, decimals: 1, defaultVolume: 50, typicalFinalMgMl: 1.5, calc: w => calcWithMgKg(w, 7.5, 500, 1, "mg/kg/day", 1) },
-            { name: "Acyclovir IV", rx: "Acyclovir {dose} mg IV q 8 hr", note: "10–20 mg/kg/dose q8 hr. Standard 10 mg/kg/dose. Max 800 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 20], maxMg: 800, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 5, calc: w => calcWithMgKg(w, 10, 800, 0, "mg/kg/dose", 1) },
-            { name: "Fluconazole IV/PO", rx: "Fluconazole {dose} mg IV/PO OD", note: "6–12 mg/kg/day. Standard 6 mg/kg/day. Max 800 mg/day.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 6, doseRange: [6, 12], maxMg: 800, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 6, 800, 0, "mg/kg/day", 1) },
-            { name: "Oseltamivir PO (Tamiflu)", rx: "Oseltamivir {dose} mg PO BID x 5 days", note: "Children >1 yr (weight bands): <15 kg → 30 mg, 15–23 kg → 45 mg, 23–40 kg → 60 mg, >40 kg → 75 mg. Infants 0–8 mo: 3 mg/kg/dose. Infants 9–11 mo: 3.5 mg/kg/dose. Neonates (term): 3 mg/kg/dose. Neonates (preterm): 1 mg/kg/dose. Start within 48 hr of symptom onset.", calc: w => { if(w<15) return 30; if(w<=23) return 45; if(w<=40) return 60; return 75; } },
-            { name: "Penicillin V PO (250mg/5ml)", rx: "Penicillin V (250 mg/5 ml) {dose} ml PO BID x 10 days", note: "20 mg/kg/dose BID (40 mg/kg/day). Max 500 mg (10 ml) per dose. Take on empty stomach.", calc: w => Math.min((w * 20) / 50, 10).toFixed(1) },
-            { name: "Ampicillin IV/IM", rx: "Ampicillin {dose} mg IV q 6 hr", note: "Standard: 50 mg/kg/dose q6h. Meningitis: 100 mg/kg/dose q6h. Max 2000 mg/dose. Preferred over ceftriaxone in neonates.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 50, doseRange: [50, 100], maxMg: 2000, decimals: 0, defaultVolume: 50, calc: w => calcWithMgKg(w, 50, 2000, 0, "mg/kg/dose", 1) },
-            { name: "Clindamycin PO (75mg/5ml)", rx: "Clindamycin (75 mg/5 ml) {dose} ml PO q 8 hr", note: "10 mg/kg/dose q8h. Max 300 mg (20 ml) per dose. C. difficile colitis risk.", calc: w => Math.min((w * 10) / 15, 20).toFixed(1) },
-            { name: "Clarithromycin PO (125mg/5ml)", rx: "Clarithromycin (125 mg/5 ml) {dose} ml PO BID x 5-7 days", note: "7.5 mg/kg/dose BID (15 mg/kg/day). Max 250 mg (10 ml) per dose. QT prolongation; metallic taste.", calc: w => Math.min((w * 7.5) / 25, 10).toFixed(1) },
-            { name: "Ceftazidime IV", rx: "Ceftazidime {dose} mg IV over 30 mins q 8 hr", note: "33 mg/kg/dose q8h (100 mg/kg/day). Max 2000 mg/dose. Excellent antipseudomonal activity.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 100, doseRange: [100, 150], dosesPerDay: 3, maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 100, 2000, 0, "mg/kg/day", 3) },
-            { name: "Cefuroxime IV", rx: "Cefuroxime {dose} mg IV over 30 mins q 8 hr", note: "33 mg/kg/dose q8h (100 mg/kg/day). Max 1500 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 100, doseRange: [100, 150], dosesPerDay: 3, maxMg: 1500, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 100, 1500, 0, "mg/kg/day", 3) },
-            { name: "Amikacin IV", rx: "Amikacin {dose} mg IV over 30 mins OD", note: "15 mg/kg/day OD. Max 1500 mg/dose. Requires TDM. Reserved for gentamicin-resistant organisms. Nephrotoxicity/ototoxicity.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 15, doseRange: [15, 22.5], maxMg: 1500, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 15, 1500, 0, "mg/kg/day", 1) },
-            { name: "Ciprofloxacin PO/IV", rx: "Ciprofloxacin {dose} mg PO/IV q 12 hr", note: "10 mg/kg/dose BID. Max 400 mg IV / 500 mg PO per dose. Use >1 yr only when benefits outweigh cartilage risk.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 15], maxMg: 400, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 10, 400, 0, "mg/kg/dose", 1) },
-            { name: "Levofloxacin PO/IV", rx: "Levofloxacin {dose} mg PO/IV OD", note: "10 mg/kg/day OD (>5 yr). Max 500 mg/day. Age >6 months only. Peripheral neuropathy and tendinopathy risk.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 10, doseRange: [8, 10], maxMg: 500, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 10, 500, 0, "mg/kg/day", 1) },
-            { name: "Linezolid PO/IV", rx: "Linezolid {dose} mg PO/IV q 8 hr", note: "10 mg/kg/dose q8h (<12 yr). Max 600 mg/dose. Monitor CBC weekly — myelosuppression. Serotonin syndrome risk with SSRIs.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 10], maxMg: 600, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 10, 600, 0, "mg/kg/dose", 1) },
-            { name: "Isoniazid PO (TB)", rx: "Isoniazid {dose} mg PO OD", note: "10 mg/kg/day OD. Max 300 mg/day. Add Pyridoxine (Vit B6) to prevent neuropathy. Monitor LFTs.", calc: w => Math.min(w * 10, 300).toFixed(0) },
-            { name: "Rifampicin PO (TB)", rx: "Rifampicin {dose} mg PO OD (empty stomach)", note: "15 mg/kg/day OD. Max 600 mg/day. Red-orange bodily fluids — warn family. Potent CYP inducer.", calc: w => Math.min(w * 15, 600).toFixed(0) },
-            { name: "Pyrazinamide PO (TB)", rx: "Pyrazinamide {dose} mg PO OD", note: "35 mg/kg/day OD. Max 2000 mg/day. Monitor uric acid and LFTs. Hyperuricemia risk.", calc: w => Math.min(w * 35, 2000).toFixed(0) },
-            { name: "Ethambutol PO (TB)", rx: "Ethambutol {dose} mg PO OD", note: "20 mg/kg/day OD. Max 2500 mg/day. Monitor visual acuity and colour vision monthly. Optic neuritis risk.", calc: w => Math.min(w * 20, 2500).toFixed(0) },
-            { name: "Nystatin Oral Suspension (100,000 U/ml)", rx: "Nystatin Susp (100,000 U/ml) {dose} ml swish and swallow QID", note: "<10 kg: 2.5 ml. ≥10 kg: 5 ml. Continue 48 hrs after symptoms resolve. Minimal systemic absorption.", calc: w => (w < 10 ? 2.5 : 5).toFixed(1) },
-            { name: "Piperacillin-Tazobactam IV", rx: "Piperacillin-Tazobactam {dose} mg (pip component) IV over 30 mins q 8 hr", note: "100 mg/kg/dose pip component q8h (300 mg/kg/day). Max 4000 mg pip/dose. Adjust in renal failure. Hypokalemia risk.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 300, doseRange: [240, 300], dosesPerDay: 3, maxMg: 4000, decimals: 0, defaultVolume: 100, calc: w => calcWithMgKg(w, 300, 4000, 0, "mg/kg/day", 3) }
+            { name: "Amoxicillin Drops (50mg/ml)", rx: "Amoxicillin Drops (50 mg/ml) {dose} ml PO BID", note: "45 mg/kg/day div BID. Max 1000 mg (20 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 22.5) / 50, 20)) },
+            { name: "Amoxicillin PO (250mg/5ml) - HIGH DOSE", rx: "Amoxicillin Syrup (250 mg/5 ml) {dose} ml PO BID", note: "90 mg/kg/day div BID. Max 1000 mg (20 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 45) / 50, 20)) },
+            { name: "Augmentin PO (457mg/5ml) - HIGH DOSE", rx: "Amoxicillin/Clavulanate (457 mg/5 ml) {dose} ml PO BID", note: "90 mg/kg/day Amox. Max 1000 mg Amox (11 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 45) / 80, 11)) },
+            { name: "Augmentin ES PO (600mg/5ml) - HIGH DOSE", rx: "Amoxicillin/Clavulanate ES (600 mg/5 ml) {dose} ml PO BID", note: "90 mg/kg/day Amox. Max 1000 mg (8.4 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 45) / 120, 8.4)) },
+            { name: "Azithromycin PO (200mg/5ml)", rx: "Azithromycin Susp (200 mg/5 ml) {dose} ml PO OD x 3-5 days", note: "10 mg/kg. Max 500 mg (12.5 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 10) / 40, 12.5)) },
+            { name: "Cephalexin PO (250mg/5ml)", rx: "Cephalexin Syrup (250 mg/5 ml) {dose} ml PO BID", note: "50 mg/kg/day div BID. Max 1000 mg (20 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 25) / 50, 20)) },
+            { name: "Cefdinir PO (125mg/5ml)", rx: "Cefdinir Susp (125 mg/5 ml) {dose} ml PO OD", note: "14 mg/kg. Max 600 mg (24 ml)/day.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 14) / 25, 24)) },
+            { name: "Cotrimoxazole/Bactrim PO (200/40mg/5ml)", rx: "Cotrimoxazole Susp {dose} ml PO BID", note: "8 mg/kg/day TMP div BID. Max 160 mg TMP (20 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 4) / 8, 20)) },
+            { name: "Ceftriaxone IV (Standard)", rx: "Ceftriaxone {dose} mg IV OD", note: "70 mg/kg/day. Max 2000 mg/day.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 70, doseRange: [50, 100], maxMg: 2000, decimals: 0, defaultVolume: 100, calc: w => formatDoseValue(Math.min(w * 70, 2000), { decimals: 0 }) },
+            { name: "Ceftriaxone IV (Meningitis)", rx: "Ceftriaxone {dose} mg IV BID", note: "100 mg/kg/day ÷ BID. Max 4000 mg/day (4 g/day; 2000 mg/dose).", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 100, doseRange: [50, 100], dosesPerDay: 2, maxMgPerDay: 4000, decimals: 0, defaultVolume: 100, calc: w => formatDoseValue(Math.min(w * 50, 2000), { decimals: 0 }) },
+            { name: "Cefotaxime IV", rx: "Cefotaxime {dose} mg IV q 8 hr", note: "150 mg/kg/day div q8 hr. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 150, doseRange: [100, 200], dosesPerDay: 3, maxMg: 2000, decimals: 0, defaultVolume: 100, calc: w => formatDoseValue(Math.min(w * 50, 2000), { decimals: 0 }) },
+            { name: "Meropenem IV", rx: "Meropenem {dose} mg IV q 8 hr", note: "20 mg/kg/dose q8 hr. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 20, doseRange: [20, 40], maxMg: 2000, decimals: 0, defaultVolume: 100, calc: w => formatDoseValue(Math.min(w * 20, 2000), { decimals: 0 }) },
+            { name: "Vancomycin IV", rx: "Vancomycin {dose} mg IV q 6 hr", note: "15 mg/kg/dose q6 hr. Max 1000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 15, doseRange: [10, 15], maxMg: 1000, decimals: 0, defaultVolume: 250, calc: w => formatDoseValue(Math.min(w * 15, 1000), { decimals: 0 }) },
+            { name: "Gentamicin IV", rx: "Gentamicin {dose} mg IV OD", note: "7.5 mg/kg/day. Max 500 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 7.5, doseRange: [5, 7.5], maxMg: 500, decimals: 0, defaultVolume: 50, calc: w => formatDoseValue(Math.min(w * 7.5, 500), { decimals: 0 }) },
+            { name: "Acyclovir IV", rx: "Acyclovir {dose} mg IV q 8 hr", note: "10 mg/kg/dose q8 hr. Max 800 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 20], maxMg: 800, decimals: 0, defaultVolume: 100, calc: w => formatDoseValue(Math.min(w * 10, 800), { decimals: 0 }) },
+            { name: "Fluconazole IV/PO", rx: "Fluconazole {dose} mg IV/PO OD", note: "6 mg/kg/day. Max 800 mg/day.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 6, doseRange: [6, 12], maxMg: 800, decimals: 0, defaultVolume: 100, calc: w => formatDoseValue(Math.min(w * 6, 800), { decimals: 0 }) },
+            { name: "Oseltamivir PO (Tamiflu)", rx: "Oseltamivir {dose} mg PO BID x 5 days", note: "Weight-based bands. Max 75 mg/dose.", decimals: 0, calc: w => { if (w < 15) return "30"; if (w <= 23) return "45"; if (w <= 40) return "60"; return "75"; } }
         ],
         cardio: [
-            { name: "Furosemide PO (10 mg/ml)", rx: "Furosemide (10 mg/ml) {dose} ml PO BID", note: "1 mg/kg. Max 40 mg (4 ml) per dose.", calc: w => Math.min(((w * 1) / 10), 4).toFixed(1) },
-            { name: "Furosemide IV (10 mg/ml)", rx: "Furosemide (10 mg/ml) {dose} ml IV slow push", note: "1 mg/kg. Max 40 mg (4 ml) per dose.", calc: w => Math.min(((w * 1) / 10), 4).toFixed(1) },
-            { name: "Spironolactone PO", rx: "Spironolactone {dose} mg PO OD", note: "1 mg/kg. Max 100 mg per day.", calc: w => Math.min((w * 1), 100).toFixed(1) },
-            { name: "Captopril PO", rx: "Captopril {dose} mg PO TID", note: "0.1 mg/kg initially. Max 50 mg per dose.", calc: w => Math.min((w * 0.1), 50).toFixed(2) },
-            { name: "Milrinone IV Loading", rx: "Milrinone {dose} mcg IV over 15-60 mins", note: "50 mcg/kg load. Max 2500 mcg.", calc: w => Math.min((w * 50), 2500).toFixed(0) },
-            { name: "Enalapril PO", rx: "Enalapril {dose} mg PO BID (starting dose)", note: "0.04 mg/kg/dose BID (starting). Max 5 mg/dose. Titrate slowly. Monitor BP and renal function. Dry cough; hyperkalemia.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 0.04, doseRange: [0.04, 0.15], maxMg: 5, decimals: 2, calc: w => Math.min(w * 0.04, 5).toFixed(2) },
-            { name: "Amlodipine PO", rx: "Amlodipine {dose} mg PO OD (starting dose)", note: "0.1 mg/kg/day OD (starting). Max 10 mg/day. Titrate up gradually. Peripheral edema.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 0.1, doseRange: [0.1, 0.6], maxMg: 10, decimals: 2, calc: w => Math.min(w * 0.1, 10).toFixed(2) },
-            { name: "Propranolol PO", rx: "Propranolol {dose} mg PO BID-TID (starting dose)", note: "0.5 mg/kg/dose BID (1 mg/kg/day start). Max 4 mg/kg/dose. Bradycardia; bronchospasm; masks hypoglycemia.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 0.5, doseRange: [0.25, 2], maxMg: 80, decimals: 1, calc: w => Math.min(w * 0.5, 80).toFixed(1) },
-            { name: "Hydrochlorothiazide PO", rx: "Hydrochlorothiazide {dose} mg PO OD", note: "1 mg/kg/day OD. Max 37.5 mg/day. Monitor electrolytes. Hypokalemia; hyperuricemia.", calc: w => Math.min(w * 1, 37.5).toFixed(1) }
+            { name: "Furosemide PO (10 mg/ml)", rx: "Furosemide (10 mg/ml) {dose} ml PO BID", note: "1 mg/kg. Max 40 mg (4 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w / 10, 4)) },
+            { name: "Furosemide IV (10 mg/ml)", rx: "Furosemide (10 mg/ml) {dose} ml IV slow push", note: "1 mg/kg. Max 40 mg (4 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w / 10, 4)) },
+            { name: "Spironolactone PO", rx: "Spironolactone {dose} mg PO OD", note: "1 mg/kg. Max 100 mg/day.", roundHalf: true, calc: w => formatDoseValue(Math.min(w, 100), { roundHalf: true }) },
+            { name: "Captopril PO", rx: "Captopril {dose} mg PO TID", note: "0.1 mg/kg. Max 50 mg/dose.", decimals: 2, calc: w => formatDoseValue(Math.min(w * 0.1, 50), { decimals: 2 }) },
+            { name: "Milrinone IV Loading", rx: "Milrinone {dose} mcg IV over 15-60 mins", note: "50 mcg/kg load. Max 2500 mcg.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 50, 2500), { decimals: 0 }) }
         ],
         emergency: [
-            { name: "Epinephrine ARREST (1:10,000)", rx: "Epinephrine 1:10,000 (0.1 mg/ml) {dose} ml IV/IO rapid q 3-5 min", note: "0.1 ml/kg. Max 10 ml (1 mg) per dose.", calc: w => Math.min((w * 0.1), 10).toFixed(2) },
-            { name: "Epinephrine ANAPHYLAXIS (1:1,000)", rx: "Epinephrine 1:1,000 (1 mg/ml) {dose} ml IM in anterolateral thigh", note: "0.01 ml/kg. Max 0.5 ml (0.5 mg) per dose.", calc: w => Math.min((w * 0.01), 0.5).toFixed(2) },
-            { name: "Amiodarone IV (50mg/ml)", rx: "Amiodarone (50 mg/ml) {dose} ml IV/IO rapid bolus", note: "5 mg/kg. Max 300 mg (6 ml) per dose.", calc: w => Math.min(((w * 5) / 50), 6).toFixed(1) },
-            { name: "Adenosine IV (3mg/ml) - 1st Dose", rx: "Adenosine (3 mg/ml) {dose} ml rapid IV/IO push", note: "0.1 mg/kg. Max 1st dose 6 mg (2 ml).", calc: w => Math.min(((w * 0.1) / 3), 2).toFixed(2) },
-            { name: "Atropine IV (0.1 mg/ml)", rx: "Atropine (0.1 mg/ml) {dose} ml IV/IO", note: "0.02 mg/kg. Min 1 ml, Max 5 ml (0.5 mg) per dose.", calc: w => { let d = w * 0.02; if(d < 0.1) d = 0.1; if(d > 0.5) d = 0.5; return (d / 0.1).toFixed(1); } },
-            { name: "Calcium Gluconate (10%)", rx: "Calcium Gluconate 10% (100mg/ml) {dose} ml IV/IO slow push", note: "60 mg/kg (0.6 ml/kg). Max 20 ml (2g) per dose.", calc: w => Math.min((w * 0.6), 20).toFixed(1) },
-            { name: "Calcium Chloride (10%)", rx: "Calcium Chloride 10% (100mg/ml) {dose} ml IV/IO slow push", note: "20 mg/kg (0.2 ml/kg). Max 20 ml (2g) per dose.", calc: w => Math.min((w * 0.2), 20).toFixed(1) },
-            { name: "Dextrose: D10W (Hypoglycemia)", rx: "D10W {dose} ml IV/IO bolus", note: "5 ml/kg. Max 250 ml per dose.", calc: w => Math.min((w * 5), 250).toFixed(0) },
-            { name: "Dextrose: D25W (Hypoglycemia)", rx: "D25W {dose} ml IV/IO bolus", note: "2 ml/kg. Max 100 ml per dose.", calc: w => Math.min((w * 2), 100).toFixed(0) },
-            { name: "Lidocaine 2% (20mg/ml)", rx: "Lidocaine 2% (20 mg/ml) {dose} ml IV/IO bolus", note: "1 mg/kg. Max 100 mg (5 ml) per dose.", calc: w => Math.min(((w * 1) / 20), 5).toFixed(1) },
-            { name: "Magnesium Sulfate 50% (500mg/ml)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV/IO over 10-20 mins", note: "50 mg/kg. Max 2000 mg (4 ml) per dose.", calc: w => Math.min(((w * 50) / 500), 4).toFixed(1) },
-            { name: "Naloxone IV/IM (0.4mg/ml)", rx: "Naloxone (0.4 mg/ml) {dose} ml IV/IO/IM", note: "0.1 mg/kg. Max 2 mg (5 ml) per dose.", calc: w => Math.min(((w * 0.1) / 0.4), 5).toFixed(2) },
-            { name: "Sodium Bicarbonate 8.4% (1mEq/ml)", rx: "Sodium Bicarbonate 8.4% {dose} ml IV/IO slow push", note: "1 mEq/kg. Max 50 mEq (50 ml) per dose.", calc: w => Math.min((w * 1), 50).toFixed(1) },
-            { name: "Ketamine IV (RSI)", rx: "Ketamine (10 mg/ml) {dose} ml IV slow push", note: "1.5 mg/kg. Max 100 mg (10 ml) per dose.", calc: w => Math.min(((w * 1.5) / 10), 10).toFixed(1) },
-            { name: "Rocuronium IV (RSI)", rx: "Rocuronium (10 mg/ml) {dose} ml IV rapid push", note: "1 mg/kg. Max 100 mg (10 ml) per dose.", calc: w => Math.min(((w * 1) / 10), 10).toFixed(1) },
-            { name: "Defibrillation Shock", rx: "Defibrillate at {dose} Joules", note: "2 J/kg. Max 200 Joules.", calc: w => Math.min((w * 2), 200).toFixed(0) }
+            { name: "Epinephrine ARREST (1:10,000)", rx: "Epinephrine 1:10,000 (0.1 mg/ml) {dose} ml IV/IO rapid q 3-5 min", note: "0.1 ml/kg. Max 10 ml (1 mg)/dose.", decimals: 2, calc: w => formatDoseValue(Math.min(w * 0.1, 10), { decimals: 2 }) },
+            { name: "Epinephrine ANAPHYLAXIS (1:1,000)", rx: "Epinephrine 1:1,000 (1 mg/ml) {dose} ml IM in anterolateral thigh", note: "0.01 ml/kg. Max 0.5 ml (0.5 mg)/dose.", decimals: 2, calc: w => formatDoseValue(Math.min(w * 0.01, 0.5), { decimals: 2 }) },
+            { name: "Amiodarone IV (50mg/ml)", rx: "Amiodarone (50 mg/ml) {dose} ml IV/IO rapid bolus", note: "5 mg/kg. Max 300 mg (6 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 5) / 50, 6)) },
+            { name: "Adenosine IV (3mg/ml) - 1st Dose", rx: "Adenosine (3 mg/ml) {dose} ml rapid IV/IO push", note: "0.1 mg/kg. Max 6 mg (2 ml) 1st dose.", decimals: 2, calc: w => formatDoseValue(Math.min((w * 0.1) / 3, 2), { decimals: 2 }) },
+            { name: "Atropine IV (0.1 mg/ml)", rx: "Atropine (0.1 mg/ml) {dose} ml IV/IO", note: "0.02 mg/kg. Min 1 ml, max 5 ml/dose.", calc: w => { let d = w * 0.02; if (d < 0.1) d = 0.1; if (d > 0.5) d = 0.5; return formatDoseValue(d / 0.1, { decimals: 1 }); } },
+            { name: "Calcium Gluconate (10%)", rx: "Calcium Gluconate 10% (100 mg/ml) {dose} ml IV/IO slow push", note: "0.6 ml/kg. Max 20 ml/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 0.6, 20)) },
+            { name: "Calcium Chloride (10%)", rx: "Calcium Chloride 10% (100 mg/ml) {dose} ml IV/IO slow push", note: "0.2 ml/kg. Max 20 ml/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 0.2, 20)) },
+            { name: "Dextrose: D10W (Hypoglycemia)", rx: "D10W {dose} ml IV/IO bolus", note: "5 ml/kg. Max 250 ml/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 5, 250), { decimals: 0 }) },
+            { name: "Dextrose: D25W (Hypoglycemia)", rx: "D25W {dose} ml IV/IO bolus", note: "2 ml/kg. Max 100 ml/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 2, 100), { decimals: 0 }) },
+            { name: "Lidocaine 2% (20mg/ml)", rx: "Lidocaine 2% (20 mg/ml) {dose} ml IV/IO bolus", note: "1 mg/kg. Max 100 mg (5 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w / 20, 5)) },
+            { name: "Magnesium Sulfate 50% (500mg/ml)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV/IO over 10-20 mins", note: "50 mg/kg. Max 2000 mg (4 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 50) / 500, 4)) },
+            { name: "Naloxone IV/IM (0.4mg/ml)", rx: "Naloxone (0.4 mg/ml) {dose} ml IV/IO/IM", note: "0.1 mg/kg. Max 2 mg (5 ml)/dose.", decimals: 2, calc: w => formatDoseValue(Math.min((w * 0.1) / 0.4, 5), { decimals: 2 }) },
+            { name: "Sodium Bicarbonate 8.4% (1mEq/ml)", rx: "Sodium Bicarbonate 8.4% {dose} ml IV/IO slow push", note: "1 mEq/kg. Max 50 mEq (50 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w, 50)) },
+            { name: "Ketamine IV (RSI)", rx: "Ketamine (10 mg/ml) {dose} ml IV slow push", note: "1.5 mg/kg. Max 100 mg (10 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 1.5) / 10, 10)) },
+            { name: "Rocuronium IV (RSI)", rx: "Rocuronium (10 mg/ml) {dose} ml IV rapid push", note: "1 mg/kg. Max 100 mg (10 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w / 10, 10)) },
+            { name: "Defibrillation Shock", rx: "Defibrillate at {dose} Joules", note: "2 J/kg. Max 200 J.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 2, 200), { decimals: 0 }) }
+        ],
+        pals: [
+            /* Vasopressors / Inotropes — infusions (note-only; weight noted for reference) */
+            { name: "Dopamine Infusion", rx: "Dopamine infusion {dose} mcg/kg/min IV (start 5–10 mcg/kg/min; titrate)", note: "5–20 mcg/kg/min. Start 5 mcg/kg/min; titrate to HR/BP. Central/IO line.", decimals: 0, calc: w => "5" },
+            { name: "Norepinephrine Infusion", rx: "Norepinephrine infusion {dose} mcg/kg/min IV (start 0.05–0.1 mcg/kg/min)", note: "0.01–2 mcg/kg/min. Central line preferred. Distributive/septic shock.", decimals: 2, calc: w => "0.05" },
+            { name: "Dobutamine Infusion", rx: "Dobutamine infusion {dose} mcg/kg/min IV (titrate to cardiac output)", note: "5–20 mcg/kg/min. Inotrope for cardiogenic shock / low CO. May cause hypotension.", decimals: 0, calc: w => "5" },
+            { name: "Milrinone Infusion (PALS)", rx: "Milrinone infusion {dose} mcg/kg/min IV (no loading dose in children)", note: "0.25–0.75 mcg/kg/min. Inodilator. Avoid loading dose; watch hypotension; renally dosed.", decimals: 2, calc: w => "0.25" },
+            { name: "Vasopressin Infusion", rx: "Vasopressin infusion {dose} milliunits/kg/min IV (0.0003–0.002 units/kg/min)", note: "0.3–2 milliunits/kg/min. Second vasopressor; do NOT titrate >0.04 units/min. Central line.", decimals: 2, calc: w => "0.3" },
+            { name: "Epinephrine Infusion (shock)", rx: "Epinephrine infusion {dose} mcg/kg/min IV (start 0.01–0.05 mcg/kg/min; titrate)", note: "0.01–1 mcg/kg/min. Escalate if no dopamine response. Central line required.", decimals: 3, calc: w => "0.05" },
+            /* RSI NMBs */
+            { name: "Succinylcholine IV (RSI)", rx: "Succinylcholine {dose} mg IV rapid push", note: "1–2 mg/kg. Infant: 2 mg/kg; child: 1.5 mg/kg; IM 4–5 mg/kg. Contraindicated: hyperkalemia, burns >24h, myopathy.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1.5, 200), { decimals: 0 }) },
+            { name: "Vecuronium IV (post-intubation paralysis)", rx: "Vecuronium {dose} mg IV", note: "0.1 mg/kg. Not for RSI — for post-intubation maintenance paralysis. Max 10 mg.", decimals: 1, calc: w => formatDoseValue(Math.min(w * 0.1, 10), { decimals: 1 }) },
+            { name: "Sugammadex IV (rocuronium reversal)", rx: "Sugammadex {dose} mg IV — immediate reversal of 1.2 mg/kg rocuronium", note: "16 mg/kg for immediate (RSI) reversal. Give if cannot intubate-cannot ventilate. Max 200 mg.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 16, 200), { decimals: 0 }) },
+            /* Sedation/Induction */
+            { name: "Propofol IV (induction)", rx: "Propofol (10 mg/ml) {dose} ml IV induction", note: "1–2 mg/kg (0.1–0.2 ml/kg). Reduce dose in shock. Apnea/hypotension risk. >3 yr only. Max 200 mg.", decimals: 1, calc: w => formatDoseValue(Math.min((w * 1.5) / 10, 20), { decimals: 1 }) },
+            { name: "Dexmedetomidine Infusion", rx: "Dexmedetomidine infusion {dose} mcg/kg/h IV (loading 0.5–1 mcg/kg over 10 min optional)", note: "0.2–1 mcg/kg/h. Minimal respiratory depression. Watch bradycardia/hypotension. ICU/procedural sedation.", decimals: 1, calc: w => "0.5" },
+            /* Antidotes */
+            { name: "Mannitol 20% (ICP)", rx: "Mannitol 20% {dose} ml IV over 20–30 mins", note: "0.5–1 g/kg (2.5–5 ml/kg of 20%). Monitor serum osm <320 mOsm/kg. Foley required. Max 250 ml.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 3.75, 250)) },
+            { name: "Flumazenil IV (benzo reversal)", rx: "Flumazenil (0.1 mg/ml) {dose} ml IV over 30 sec — titrate; repeat Q1 min PRN", note: "0.01 mg/kg (0.1 ml/kg) per dose. Max 0.2 mg/dose; total max 1 mg. CONTRAINDICATED: benzo-dependent, co-TCA, seizure risk.", decimals: 1, calc: w => formatDoseValue(Math.min(w * 0.1, 0.2) / 0.1, { decimals: 1 }) },
+            { name: "Pralidoxime (2-PAM) IV (organophosphate)", rx: "Pralidoxime (2-PAM) {dose} mg IV over 15–30 mins; then 10–20 mg/kg/h infusion", note: "25–50 mg/kg loading (max 2 g). Use with atropine. Give within 48h; ineffective after aging.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 25, 2000), { decimals: 0 }) },
+            { name: "Hydroxocobalamin IV (cyanide)", rx: "Hydroxocobalamin {dose} mg IV over 15 mins", note: "70 mg/kg (max 5 g = 5000 mg). First-line cyanide antidote. Turns body fluids red. Safe in smoke inhalation.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 70, 5000), { decimals: 0 }) },
+            { name: "Glucagon IV (beta-blocker OD)", rx: "Glucagon {dose} mg IV/IM bolus; then 0.05–0.1 mg/kg/h infusion", note: "0.05–0.15 mg/kg bolus (max 5 mg). Antidote: beta-blocker/CCB OD. Watch vomiting; have antiemetic ready.", decimals: 2, calc: w => formatDoseValue(Math.min(w * 0.05, 5), { decimals: 2 }) },
+            /* Post-arrest */
+            { name: "Fosphenytoin IV (2nd line seizure)", rx: "Fosphenytoin {dose} mg PE IV over 10–20 mins", note: "20 mg PE/kg (max 1500 mg PE). Monitor ECG. Do NOT exceed 3 mg PE/kg/min.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 20, 1500), { decimals: 0 }) },
+            { name: "Procainamide IV (SVT/VT)", rx: "Procainamide {dose} mg IV over 30–60 mins", note: "15 mg/kg (max 1000 mg). Do NOT use with amiodarone. Monitor QRS widening and hypotension.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 15, 1000), { decimals: 0 }) },
+            { name: "Septic Shock Fluid Bolus (PALS)", rx: "0.9% NaCl OR Ringer's Lactate {dose} ml IV/IO bolus over 5–10 mins", note: "10–20 ml/kg/bolus. Reassess after each. Avoid >60 ml/kg unless ICU. Preferred: LR (less hyperchloremia).", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 500), { decimals: 0 }) },
+            { name: "5% Albumin Bolus (fluid-refractory shock)", rx: "5% Albumin {dose} ml IV over 15–30 mins", note: "10–20 ml/kg. Consider after 40–60 ml/kg crystalloid. Avoid in TBI.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 500), { decimals: 0 }) },
+            { name: "Piperacillin-Tazobactam IV (sepsis — HAI)", rx: "Piperacillin-Tazobactam {dose} mg pip IV q 6–8 hr", note: "300 mg pip/kg/day ÷ Q6–8h (max 16 g pip/day). HAI/broad-spectrum coverage. First hour of sepsis recognition.", decimals: 0, calc: w => formatDoseValue(Math.min((w * 300) / 4, 4000), { decimals: 0 }) },
+            { name: "Hydrocortisone IV (septic shock adjunct)", rx: "Hydrocortisone {dose} mg IV q 6–8 hr (stress dose)", note: "1–2 mg/kg/day ÷ Q6–8h (max 50 mg/m²/day). Only if fluid + vasopressor refractory. Do not routine-use.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1, 50), { decimals: 0 }) },
+            { name: "Sildenafil PO (pulmonary HTN)", rx: "Sildenafil {dose} mg PO q 6–8 hr", note: "0.5–1 mg/kg/dose Q6–8h (max 10 mg/dose). Avoid in hypotension. IV formulation available.", decimals: 1, calc: w => formatDoseValue(Math.min(w * 0.5, 10), { decimals: 1 }) }
+        ],
+        ncpr: [
+            /* Drugs */
+            { name: "Epinephrine IV/IO — NCPR (1:10,000)", rx: "Epinephrine 1:10,000 (0.1 mg/ml) {dose} ml IV/IO (UVC preferred) — repeat Q3–5 min", note: "0.01–0.03 mg/kg (0.1–0.3 ml/kg of 1:10,000). NCPR 1st-line drug. HR <60 after adequate PPV + 30s compressions.", decimals: 2, calc: w => formatDoseValue(Math.min(w * 0.1, 3), { decimals: 2 }) },
+            { name: "Epinephrine ETT — NCPR (temporary only)", rx: "Epinephrine 1:10,000 (0.1 mg/ml) {dose} ml via ETT (temporary — establish IV/IO ASAP)", note: "0.05–0.1 mg/kg (0.5–1 ml/kg of 1:10,000) via ETT. HIGHER dose via ETT; unreliable — IV/IO ASAP.", decimals: 2, calc: w => formatDoseValue(Math.min(w * 0.5, 10), { decimals: 2 }) },
+            { name: "Normal Saline 10 ml/kg — NCPR volume", rx: "0.9% NaCl {dose} ml IV/IO over 5–10 mins (volume expansion)", note: "10 ml/kg over 5–10 min. Repeat x1–2 PRN. Use O-neg pRBCs if hemorrhagic shock (abruption/vasa previa).", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 500), { decimals: 0 }) },
+            { name: "Sodium Bicarbonate 4.2% — NCPR (0.5 mEq/ml)", rx: "Sodium Bicarbonate 4.2% (0.5 mEq/ml) {dose} ml IV slow infusion ≥5 mins via UVC", note: "1–2 mEq/kg. ONLY after adequate ventilation established. CO2 must be clearing. Dilute to 0.5 mEq/ml (4.2%). Slow ≥5 min.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 2, 40)) },
+            { name: "D10W Bolus — Neonate (Hypoglycemia)", rx: "D10W {dose} ml IV/UVC bolus (200 mg/kg)", note: "2 ml/kg D10W (200 mg/kg). AVOID D25W/D50W in neonates (hyperosmolar sclerosis). Follow with D10W infusion. Monitor BGL Q30–60 min.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 2, 50), { decimals: 0 }) },
+            { name: "Naloxone — NCPR (opioid reversal)", rx: "Naloxone (0.4 mg/ml) {dose} ml IV/IM/SC/ETT", note: "0.1 mg/kg. ONLY if known maternal opioid within 4h AND HR >100 after PPV. NOT for general resuscitation of birth depression.", decimals: 2, calc: w => formatDoseValue(Math.min((w * 0.1) / 0.4, 5), { decimals: 2 }) },
+            { name: "Calcium Gluconate 10% — Neonate (hypocalcemia)", rx: "Calcium Gluconate 10% (100 mg/ml) {dose} ml IV slow infusion (100–200 mg/kg/day)", note: "1–2 ml/kg/day as infusion. Monitor ECG. Do NOT bolus fast. Extravasation causes necrosis.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 1, 10)) },
+            { name: "Prostaglandin E1 / Alprostadil (duct-dependent CHD)", rx: "Alprostadil (PGE1) {dose} mcg/kg/min IV infusion (start 0.01; titrate to duct opening)", note: "Start 0.01 mcg/kg/min; titrate 0.01–0.1 mcg/kg/min. HIGH apnea risk — have ETT ready before starting. Reduce to 0.01 once duct open.", decimals: 3, calc: w => "0.010" },
+            { name: "Phenobarbital IV — Neonate (seizure / HIE)", rx: "Phenobarbital {dose} mg IV loading dose (over 20–30 min)", note: "20 mg/kg loading. Repeat 10 mg/kg Q20 min (max 40 mg/kg total). 1st line neonatal seizures in HIE. Monitor respiratory depression.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 20, 400), { decimals: 0 }) },
+            { name: "Levetiracetam IV — Neonate (seizure alternative)", rx: "Levetiracetam {dose} mg IV loading dose (over 10–15 min)", note: "40–60 mg/kg loading. Increasingly preferred over phenobarbital — fewer respiratory side effects.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 40, 1500), { decimals: 0 }) },
+            { name: "Dopamine Infusion — Neonate (hypotension)", rx: "Dopamine infusion {dose} mcg/kg/min IV/UVC (start 5 mcg/kg/min; titrate)", note: "5–20 mcg/kg/min. First vasopressor for neonatal hypotension. UVC preferred.", decimals: 0, calc: w => "5" },
+            { name: "Dobutamine Infusion — Neonate (low CO)", rx: "Dobutamine infusion {dose} mcg/kg/min IV (preferred if low CO + normal BP)", note: "5–20 mcg/kg/min. Preferred for low cardiac output with normal BP. May cause hypotension.", decimals: 0, calc: w => "5" },
+            { name: "Hydrocortisone IV — Neonate (vasopressor-refractory)", rx: "Hydrocortisone {dose} mg IV q 8 hr (stress dose)", note: "1 mg/kg/dose Q8h. Add if vasopressor-refractory. Relative adrenal insufficiency especially in preterm.", decimals: 1, calc: w => formatDoseValue(Math.min(w * 1, 25), { decimals: 1 }) },
+            { name: "Caffeine Citrate IV/PO (apnea of prematurity)", rx: "Caffeine Citrate {dose} mg IV over 30 mins (loading), then 5–10 mg/kg/day maintenance", note: "Loading: 20 mg/kg IV over 30 min. Maintenance: 5–10 mg/kg/day. Start within 3 days in <32 wk. Reduces extubation failure. Monitor HR.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 20, 400), { decimals: 0 }) },
+            { name: "Vitamin K1 (Phytonadione) IM — All Newborns", rx: "Vitamin K1 (Phytonadione) {dose} mg IM single dose at birth", note: "0.5 mg IM for <1500 g; 1 mg IM for ≥1500 g. Give at birth. Essential for all newborns (hemorrhagic disease prevention).", decimals: 1, calc: w => (w < 1.5 ? "0.5" : "1.0") },
+            { name: "Poractant Alfa (Curosurf) — Surfactant (RDS)", rx: "Poractant Alfa (Curosurf) {dose} mg/kg intratracheal via ETT (first dose)", note: "100–200 mg/kg first dose (1.25–2.5 ml/kg). Repeat 100 mg/kg Q12h PRN. Give within 2h (rescue) or prophylactic <27 wk. Reduce FiO2 as tolerated.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 100, 200), { decimals: 0 }) },
+            { name: "Ampicillin IV — Neonate (early-onset sepsis)", rx: "Ampicillin {dose} mg IV q 8–12 hr (early-onset sepsis empiric)", note: "100–200 mg/kg/day ÷ Q8–12h (term); Q12h (preterm). Cover GBS + Listeria. Combine with gentamicin.", decimals: 0, calc: w => formatDoseValue(Math.min((w * 200) / 3, 500), { decimals: 0 }) }
         ],
         fluids: [
-            { name: "0.9% Normal Saline (Fluid Bolus)", rx: "0.9% NaCl {dose} ml IV/IO Bolus", note: "20 ml/kg. Max 1000 ml per bolus.", calc: w => Math.min((w * 20), 1000).toFixed(0) },
-            { name: "Ringer's Lactate (Fluid Bolus)", rx: "Ringer's Lactate {dose} ml IV/IO Bolus", note: "20 ml/kg. Max 1000 ml per bolus.", calc: w => Math.min((w * 20), 1000).toFixed(0) },
-            { name: "3% Hypertonic Saline", rx: "3% NaCl {dose} ml IV/IO over 10-20 mins", note: "3 ml/kg. Max 250 ml.", calc: w => Math.min((w * 3), 250).toFixed(0) },
-            { name: "Packed Red Blood Cells (PRBCs)", rx: "PRBCs {dose} ml IV Transfusion", note: "10 ml/kg. Max 350 ml per unit.", calc: w => Math.min((w * 10), 350).toFixed(0) },
+            { name: "0.9% Normal Saline (Fluid Bolus)", rx: "0.9% NaCl {dose} ml IV/IO Bolus", note: "20 ml/kg. Max 1000 ml/bolus.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 20, 1000), { decimals: 0 }) },
+            { name: "Ringer's Lactate (Fluid Bolus)", rx: "Ringer's Lactate {dose} ml IV/IO Bolus", note: "20 ml/kg. Max 1000 ml/bolus.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 20, 1000), { decimals: 0 }) },
+            { name: "3% Hypertonic Saline", rx: "3% NaCl {dose} ml IV/IO over 10-20 mins", note: "3 ml/kg. Max 250 ml.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 3, 250), { decimals: 0 }) },
+            { name: "Packed Red Blood Cells (PRBCs)", rx: "PRBCs {dose} ml IV Transfusion", note: "10 ml/kg. Max 350 ml/unit.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 350), { decimals: 0 }) },
             { name: "Maintenance Fluid (D5 1/2 NS)", rx: "D5 0.45% NaCl IV Rate at {dose} ml/hr", note: "4-2-1 Rule. Max 120 ml/hr.", calc: w => calcMaintenance(w) },
             { name: "Maintenance Fluid (D5 NS)", rx: "D5 0.9% NaCl IV Rate at {dose} ml/hr", note: "4-2-1 Rule. Max 120 ml/hr.", calc: w => calcMaintenance(w) },
-            { name: "Potassium Chloride (KCl)", rx: "KCl {dose} mEq added to fluids", note: "2 mEq/kg/day. Max 40 mEq/L peripherally.", calc: w => Math.min((w * 2), 40).toFixed(1) }
+            { name: "Potassium Chloride (KCl)", rx: "KCl {dose} mEq added to fluids", note: "2 mEq/kg/day. Max 40 mEq/L peripherally.", roundHalf: true, calc: w => formatDoseValue(Math.min(w * 2, 40), { roundHalf: true }) }
         ],
-        surgical: [
-            { name: "Cefazolin IV", rx: "Cefazolin {dose} mg IV over 30 mins", note: "Prophylaxis: 25 mg/kg/dose. Infection: 25–50 mg/kg/dose q 8 hr. Max 2000 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 25, doseRange: [25, 50], maxMg: 2000, decimals: 0, defaultVolume: 100, typicalFinalMgMl: 10, calc: w => calcWithMgKg(w, 25, 2000, 0, "mg/kg/dose", 1) },
-            { name: "Metronidazole IV (5 mg/ml)", rx: "Metronidazole (5 mg/ml) {dose} ml IV over 30-60 mins q 8 hr", note: "7.5 mg/kg/dose. Max 500 mg (100 ml) per dose.", concMgMl: 5, defaultVolume: 100, calc: w => Math.min((w * 7.5) / 5, 100).toFixed(1) },
-            { name: "Tramadol IV/PO", rx: "Tramadol {dose} mg IV/PO q 6 hr PRN pain", note: "1–2 mg/kg/dose. Standard 1 mg/kg/dose. Max 100 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 1, doseRange: [1, 2], maxMg: 100, decimals: 0, defaultVolume: 50, calc: w => calcWithMgKg(w, 1, 100, 0, "mg/kg/dose", 1) },
-            { name: "Tranexamic Acid IV (TXA)", rx: "Tranexamic Acid {dose} mg IV over 10 mins", note: "15 mg/kg. Max 1000 mg/dose. Repeat q 8 hr if needed.", calc: w => Math.min(w * 15, 1000).toFixed(0), defaultVolume: 100 },
-            { name: "Metoclopramide IV (5 mg/ml)", rx: "Metoclopramide (5 mg/ml) {dose} ml IV slow push q 8 hr PRN nausea", note: "0.1 mg/kg. Max 10 mg (2 ml) per dose.", concMgMl: 5, defaultVolume: 50, calc: w => Math.min((w * 0.1) / 5, 2).toFixed(1) },
-            { name: "Bupivacaine 0.25% Local (Max safe dose)", rx: "Bupivacaine 0.25% — Max safe volume for infiltration: {dose} ml total", note: "Max 2 mg/kg. 0.25% = 2.5 mg/ml. DO NOT EXCEED. Hard cap 30 ml.", calc: w => Math.min((w * 2) / 2.5, 30).toFixed(1) },
-            { name: "Neostigmine IV (Reversal)", rx: "Neostigmine (0.5 mg/ml) {dose} ml IV + Atropine 0.02 mg/kg IV simultaneously", note: "0.05 mg/kg. Max 2.5 mg (5 ml). Always co-administer Atropine.", calc: w => Math.min((w * 0.05) / 0.5, 5).toFixed(1) }
-        ],
-        endocrine: [
-            { name: "Methylprednisolone IV", rx: "Methylprednisolone {dose} mg IV q 12 hr", note: "1 mg/kg/dose q12h (asthma/anti-inflammatory). Max 500 mg/dose. Pulse therapy (30 mg/kg/day x 3d, max 1000 mg) — consult senior.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 1, doseRange: [1, 2], maxMg: 500, decimals: 0, defaultVolume: 50, calc: w => calcWithMgKg(w, 1, 500, 0, "mg/kg/dose", 1) },
-            { name: "Vitamin K IV/IM (Phytomenadione)", rx: "Vitamin K (Phytomenadione) {dose} mg IV/IM x 1 dose", note: "Prophylaxis (neonate): 1 mg IM x1. Deficiency/Hemorrhage: 0.3 mg/kg IV/IM. Max 10 mg/dose. Risk of anaphylaxis with IV — give slowly.", calc: w => Math.min(w * 0.3, 10).toFixed(1) },
-            { name: "Cholecalciferol (Vit D3) PO", rx: "Cholecalciferol {dose} IU PO OD x 6-12 weeks", note: "Deficiency treatment: <15 kg → 2000 IU/day, ≥15 kg → 5000 IU/day. Maintenance: 400–1000 IU/day. Monitor 25-OH-D levels.", calc: w => (w < 15 ? 2000 : 5000).toFixed(0) },
-            { name: "Levothyroxine PO", rx: "Levothyroxine {dose} mcg PO OD (morning, empty stomach)", note: "Child 1–12 yr: 4–5 mcg/kg/day. Adolescent: 2–3 mcg/kg/day. Neonate: 10–15 mcg/kg/day. Max 200 mcg/day. Monitor TFTs strictly. Note: dose is in mcg.", calc: w => Math.min(Math.round(w * 4), 200).toFixed(0) }
+        infant_supp: [
+            /* ── Preterm ─────────────────────────────────────────────────────── */
+            {
+                name: "Vitamin E Drops — Preterm (Aqua-E 50 IU/ml)",
+                rx: "Vitamin E (Aqua-E 50 IU/ml) {dose} ml PO OD",
+                note: "Preterm: 15–25 IU/day. Aqua-E ≈50 IU/ml → 0.3–0.5 ml/day. Give if unfortified human milk; HMF/preterm formula usually sufficient. Max 25 IU/day.",
+                decimals: 1,
+                calc: w => "0.3"   /* fixed 15 IU/day starting dose; clinician adjusts */
+            },
+            {
+                name: "Ferrous Sulfate Drops — Preterm (15 mg Fe/0.6 ml)",
+                rx: "Ferrous Sulfate Drops (15 mg elemental iron per 0.6 ml) {dose} ml PO OD",
+                note: "Preterm: 2–4 mg elemental iron/kg/day. Max 15 mg/day. Start at 2–4 wk of age (or at full enteral feeds ~100 ml/kg/day). Continue to 6–12 mo corrected age. Conc = 25 mg Fe/ml.",
+                roundHalfMl: false,
+                decimals: 2,
+                calc: w => {
+                    /* 2 mg/kg/day ÷ 25 mg Fe/ml; cap 15 mg/day = 0.6 ml */
+                    const ml = Math.min((w * 2) / 25, 0.6);
+                    return Math.round(ml * 100) / 100;
+                }
+            },
+            {
+                name: "Multivitamin (MTV) Drops — Preterm",
+                rx: "Multivitamin (MTV) Drops {dose} ml PO OD",
+                note: "Preterm: 0.5–1 ml/day once tolerating full enteral feeds. Ensure formulation covers Vit A, C, D without exceeding upper limits with HMF.",
+                decimals: 1,
+                calc: w => "0.5"   /* standard starting dose; adjust per local formulary */
+            },
+            /* ── Term / General infant ───────────────────────────────────────── */
+        {
+            name: "Iron Drops — Term Breastfed (15 mg Fe/0.6 ml)",
+            rx: "Ferrous Sulfate Drops (15 mg elemental iron per 0.6 ml) {dose} ml PO OD",
+            note: "Term exclusively/partially breastfed: 1 mg elemental iron/kg/day (start per guideline). Continue until adequate iron-rich complementary foods introduced. Conc = 25 mg Fe/ml. Max 15 mg/day.",
+                decimals: 2,
+                calc: w => {
+                    /* 1 mg/kg/day ÷ 25 mg Fe/ml; cap 0.6 ml (15 mg) */
+                    const ml = Math.min((w * 1) / 25, 0.6);
+                    return Math.round(ml * 100) / 100;
+                }
+            },
+        {
+            name: "Ferrous Sulfate Tablet — Term Breastfed (65 mg elemental/tab)",
+            rx: "Ferrous Sulfate Tablet (65 mg elemental Fe/tab) {dose} tab PO OD",
+            note: "Term exclusively/partially breastfed iron prophylaxis: 1 mg elemental iron/kg/day (start per guideline). Max 15 mg/day elemental Fe. Tab contains 65 mg elemental Fe. Dose calculated as elemental mg/day ÷ 65.",
+            decimals: 2,
+            calc: w => {
+                const elementalMg = Math.min(w * 1, 15);
+                return formatDoseValue(elementalMg / 65, { decimals: 2 });
+            }
+        },
+        {
+            name: "Ferrous Gluconate Tablet — Term Breastfed (35 mg elemental/tab)",
+            rx: "Ferrous Gluconate Tablet (35 mg elemental Fe/tab) {dose} tab PO OD",
+            note: "Term exclusively/partially breastfed iron prophylaxis: 1 mg elemental iron/kg/day (start per guideline). Max 15 mg/day elemental Fe. Tab contains 35 mg elemental Fe. Dose calculated as elemental mg/day ÷ 35.",
+            decimals: 2,
+            calc: w => {
+                const elementalMg = Math.min(w * 1, 15);
+                return formatDoseValue(elementalMg / 35, { decimals: 2 });
+            }
+        },
+            {
+                name: "Vitamin D3 Drops — Infant (400 IU/drop or 400 IU/ml)",
+                rx: "Vitamin D3 (Cholecalciferol) drops {dose} IU PO OD",
+                note: "All breastfed & partially breastfed infants from first days of life. Also formula-fed infants taking <1 L/day of fortified formula. Dose: 400 IU/day (1 drop if 400 IU/drop, or 1 ml if 400 IU/ml).",
+                decimals: 0,
+                calc: w => "400"   /* fixed 400 IU — not weight-based */
+            }
         ]
     };
 
-    let allMedsList = [];
-    let currentSelectedValue = ""; // Keeps track of what is currently displaying
-    let advancedPanelOpen = false;
+    const thaiExtKeyMap = {};
 
-    function toggleAdvancedPanel() {
-        const body = document.getElementById("advancedBody");
-        const btn = document.getElementById("advancedToggle");
-        advancedPanelOpen = !advancedPanelOpen;
-        body.classList.toggle("open", advancedPanelOpen);
-        btn.classList.toggle("open", advancedPanelOpen);
+    function mergeThaiCatalog() {
+        if (typeof THAI_MED_EXTENSIONS === "undefined") return;
+        for (const cat of Object.keys(THAI_MED_EXTENSIONS)) {
+            if (!medData[cat]) medData[cat] = [];
+            THAI_MED_EXTENSIONS[cat].forEach((med, i) => {
+                thaiExtKeyMap[`${cat}|ext${i}`] = medKey(cat, medData[cat].length);
+                medData[cat].push(med);
+            });
+        }
     }
 
-    function onAdvancedEnabledChange() {
-        const enabled = document.getElementById("advancedEnabled").checked;
-        document.getElementById("advancedFields").style.display = enabled ? "block" : "none";
-        if (enabled && currentSelectedValue) {
-            const [catId, medIdx] = currentSelectedValue.split("|");
-            const med = medData[catId][medIdx];
-            if (!document.getElementById("intervalHr").value) {
-                document.getElementById("intervalHr").value = inferIntervalFromRx(med.rx);
+    function resolveMedKey(key) {
+        return thaiExtKeyMap[key] || key;
+    }
+
+    function mergeThaiDiagnoses() {
+        if (typeof THAI_DIAGNOSIS_DATA === "undefined") return;
+        THAI_DIAGNOSIS_DATA.forEach(d => {
+            const keys = d.medKeys.map(resolveMedKey);
+            const existing = diagnosisData.find(x => x.name === d.name && x.system === d.system);
+            if (existing) {
+                keys.forEach(k => { if (!existing.medKeys.includes(k)) existing.medKeys.push(k); });
+                existing.keywords = [...new Set([...(existing.keywords || []), ...(d.keywords || [])])];
+            } else {
+                diagnosisData.push({
+                    name: d.name,
+                    system: d.system,
+                    keywords: d.keywords || [],
+                    medKeys: keys
+                });
             }
-            if (!document.getElementById("dripMins").value) {
-                document.getElementById("dripMins").value = 30;
-            }
-            applyDefaultPremixVolume(med);
+        });
+    }
+
+    mergeThaiCatalog();
+
+  /* Diagnosis → medication keys (catId|index). Multiple concentrations listed where relevant. */
+    const diagnosisData = [
+        {
+            name: "Viral URI / Fever",
+            system: "respiratory",
+            keywords: ["viral", "uri", "fever", "cold", "upper respiratory", "urti", "flu", "influenza"],
+            medKeys: [
+                "neuro_pain|0", "neuro_pain|1", "neuro_pain|2",
+                "neuro_pain|4",
+                "respiratory|0", "respiratory|1",
+                "antimicrobial|16"
+            ]
+        },
+        {
+            name: "Acute Otitis Media",
+            system: "antimicrobial",
+            keywords: ["aom", "otitis", "ear", "ear infection"],
+            medKeys: [
+                "neuro_pain|0", "neuro_pain|1", "neuro_pain|2",
+                "antimicrobial|0", "antimicrobial|1", "antimicrobial|2", "antimicrobial|3"
+            ]
+        },
+        {
+            name: "Asthma / Bronchospasm",
+            system: "respiratory",
+            keywords: ["asthma", "wheeze", "wheezing", "bronchospasm", "reactive airway"],
+            medKeys: [
+                "respiratory|2", "respiratory|3", "respiratory|4", "respiratory|5",
+                "respiratory|7", "respiratory|10"
+            ]
+        },
+        {
+            name: "Croup",
+            system: "respiratory",
+            keywords: ["croup", "laryngotracheitis", "stridor"],
+            medKeys: [
+                "respiratory|6", "respiratory|9",
+                "neuro_pain|0", "neuro_pain|1", "neuro_pain|2"
+            ]
+        },
+        {
+            name: "Bacterial Bronchitis",
+            system: "respiratory",
+            keywords: ["bacterial bronchitis", "bronchitis", "bacterial", "productive", "purulent", "sputum"],
+            medKeys: [
+                /* Empiric antibiotic choices (teaching reference; verify local guidelines) */
+                "antimicrobial|1",   /* Amoxicillin PO high-dose */
+                "antimicrobial|2",   /* Augmentin 457 mg/5ml */
+                "antimicrobial|4",   /* Azithromycin */
+                /* Supportive (fever/pain + airway symptoms) */
+                "neuro_pain|0", "neuro_pain|1", "neuro_pain|2",
+                "respiratory|3"     /* Salbutamol neb */
+            ]
+        },
+        {
+            name: "Gastroenteritis / Vomiting",
+            system: "gi",
+            keywords: ["gastroenteritis", "ge", "vomiting", "diarrhea", "diarrhoea", "dehydration"],
+            medKeys: [
+                "gi|0", "gi|1", "gi|2",
+                "fluids|0", "fluids|4", "fluids|5",
+                "neuro_pain|0", "neuro_pain|1", "neuro_pain|2"
+            ]
+        },
+        {
+            name: "Cellulitis / Skin infection",
+            system: "antimicrobial",
+            keywords: ["cellulitis", "skin infection", "abscess", "impetigo"],
+            medKeys: [
+                "antimicrobial|5", "antimicrobial|8", "antimicrobial|1",
+                "neuro_pain|0", "neuro_pain|1", "neuro_pain|2"
+            ]
+        },
+        {
+            name: "Pneumonia (community)",
+            system: "antimicrobial",
+            keywords: ["pneumonia", "cap", "chest infection"],
+            medKeys: [
+                "antimicrobial|1", "antimicrobial|2", "antimicrobial|8",
+                "neuro_pain|0", "neuro_pain|1", "neuro_pain|2",
+                "respiratory|3"
+            ]
+        },
+        {
+            name: "Pneumonia (Hospital-Acquired)",
+            system: "antimicrobial",
+            keywords: ["pneumonia", "hap", "hospital acquired", "nosocomial", "ventilator associated", "vap"],
+            medKeys: [
+                "pals|20",       /* Pip-Tazo — broad Gram-neg + anaerobe */
+                "antimicrobial|11", /* Meropenem — MDR/severe */
+                "antimicrobial|12", /* Vancomycin — MRSA cover */
+                "antimicrobial|8",  /* Ceftriaxone — mild HAP / step-down */
+                "antimicrobial|13", /* Gentamicin — synergy / Gram-neg */
+                "neuro_pain|0", "neuro_pain|1", "neuro_pain|3", /* paracetamol */
+                "respiratory|3"  /* Salbutamol neb — wheeze/secretions */
+            ]
+        },
+        {
+            name: "Anaphylaxis",
+            system: "emergency",
+            keywords: ["anaphylaxis", "anaphylactic", "allergy severe"],
+            medKeys: ["emergency|1", "fluids|0", "neuro_pain|0", "neuro_pain|1"]
+        },
+        {
+            name: "Active Seizure",
+            system: "neuro_pain",
+            keywords: ["seizure", "convulsion", "status", "epilepsy acute"],
+            medKeys: ["neuro_pain|11", "neuro_pain|9", "neuro_pain|10", "neuro_pain|8"]
+        },
+        /* PALS diagnoses — medKeys verified against pals[] array indices:
+           pals: 0=Dopamine 1=Norepi 2=Dobutamine 3=Milrinone-inf 4=Vasopressin 5=EpiInf
+                 6=Succinylcholine 7=Vecuronium 8=Sugammadex 9=Propofol 10=Dexmedetomidine
+                 11=Mannitol 12=Flumazenil 13=Pralidoxime 14=Hydroxocobalamin 15=Glucagon
+                 16=Fosphenytoin 17=Procainamide 18=SepticShockFluid 19=Albumin5%
+                 20=Pip-Tazo 21=Hydrocortisone-sepsis 22=Sildenafil
+           emergency: 0=EpiArrest 1=EpiAnaph 2=Amiodarone 3=Adenosine 4=Atropine
+                      5=CaGluconate 6=CaChlor 7=D10W 8=D25W 9=Lido2%IV 10=MgSO4
+                      11=Naloxone 12=NaHCO3 13=Ketamine 14=Rocuronium 15=Defib */
+        { name: "Cardiac Arrest (PEA / Asystole)", system: "pals", keywords: ["cardiac arrest", "pea", "asystole", "arrest", "cpr", "pals"],
+          medKeys: ["emergency|0","emergency|2","emergency|5","emergency|6","emergency|7","emergency|12","pals|0","pals|2"] },
+        { name: "Cardiac Arrest (VF / pulseless VT)", system: "pals", keywords: ["vf", "ventricular fibrillation", "vt", "pulseless vt", "shockable", "defibrillation"],
+          medKeys: ["emergency|15","emergency|0","emergency|2","emergency|10","pals|16"] },
+        { name: "Septic Shock", system: "pals", keywords: ["septic shock", "sepsis", "shock", "fluid resuscitation", "vasopressor"],
+          medKeys: ["pals|18","pals|0","pals|1","pals|2","pals|19","pals|20","antimicrobial|8","antimicrobial|11","antimicrobial|12","pals|21","pals|5"] },
+        { name: "Anaphylaxis / Anaphylactic Shock", system: "pals", keywords: ["anaphylaxis", "anaphylactic", "allergic shock"],
+          medKeys: ["emergency|1","fluids|0","respiratory|3","pals|5","emergency|5"] },
+        { name: "Status Epilepticus (PALS)", system: "pals", keywords: ["status epilepticus", "seizure", "convulsion", "refractory seizure", "se", "rse"],
+          medKeys: ["neuro_pain|11","neuro_pain|10","neuro_pain|9","neuro_pain|8","pals|16","pals|13"] },
+        { name: "SVT (PALS)", system: "pals", keywords: ["svt", "supraventricular tachycardia", "tachycardia stable"],
+          medKeys: ["emergency|3","pals|17","pals|2"] },
+        { name: "Bradycardia (symptomatic)", system: "pals", keywords: ["bradycardia", "slow heart rate", "av block", "vagal"],
+          medKeys: ["emergency|4","pals|5","pals|0"] },
+        { name: "Rapid Sequence Intubation (RSI)", system: "pals", keywords: ["rsi", "rapid sequence intubation", "intubation", "nmb", "paralysis"],
+          medKeys: ["emergency|13","emergency|14","pals|6","pals|9","pals|8","pals|7","pals|10"] },
+        { name: "Post-Resuscitation Care (PALS)", system: "pals", keywords: ["post resuscitation", "rosc", "post arrest", "vasopressor infusion", "inotrope"],
+          medKeys: ["pals|0","pals|1","pals|2","pals|3","pals|4","pals|5"] },
+        { name: "Increased ICP / Cerebral Herniation", system: "pals", keywords: ["icp", "intracranial pressure", "herniation", "cerebral edema", "mannitol"],
+          medKeys: ["pals|11","fluids|2","respiratory|6"] },
+        { name: "Hyperkalemia (cardiac emergency)", system: "pals", keywords: ["hyperkalemia", "high potassium", "peaked t waves", "kayexalate"],
+          medKeys: ["emergency|5","emergency|6","emergency|12","emergency|11"] },
+        { name: "Toxicology — Beta-blocker / CCB OD", system: "pals", keywords: ["beta blocker overdose", "ccb overdose", "toxicology", "glucagon", "antidote"],
+          medKeys: ["emergency|5","pals|15","emergency|12"] },
+        { name: "Toxicology — Organophosphate / Nerve Agent", system: "pals", keywords: ["organophosphate", "nerve agent", "cholinergic", "pralidoxime", "atropine"],
+          medKeys: ["emergency|4","pals|13"] },
+        { name: "Opioid Overdose / Respiratory Depression", system: "pals", keywords: ["opioid overdose", "naloxone", "respiratory depression", "narcotic"],
+          medKeys: ["emergency|11"] },
+        { name: "Pulmonary Hypertension Crisis (PALS)", system: "pals", keywords: ["pulmonary hypertension", "pulmonary ht", "pphn", "sildenafil", "milrinone"],
+          medKeys: ["pals|3","pals|22","pals|4"] },
+        /* NCPR / NRP diagnoses */
+        { name: "Neonatal Cardiac Arrest (NCPR)", system: "ncpr", keywords: ["ncpr", "nrp", "neonatal resuscitation", "newborn arrest", "compressions", "hr <60"],
+          medKeys: ["ncpr|0","ncpr|1","ncpr|2","ncpr|3"] },
+        { name: "Neonatal Hypoglycemia (NCPR)", system: "ncpr", keywords: ["neonatal hypoglycemia", "low glucose newborn", "d10w neonate", "blood glucose neonate"],
+          medKeys: ["ncpr|4"] },
+        { name: "Neonatal Opioid Reversal (NCPR)", system: "ncpr", keywords: ["naloxone neonate", "neonatal opioid", "maternal opioid", "birth depression opioid"],
+          medKeys: ["ncpr|5"] },
+        { name: "Neonatal Hypocalcemia", system: "ncpr", keywords: ["neonatal hypocalcemia", "calcium gluconate neonate", "digeorge", "idm"],
+          medKeys: ["ncpr|6"] },
+        { name: "Duct-Dependent Cyanotic CHD (NCPR)", system: "ncpr", keywords: ["pge1", "alprostadil", "duct dependent", "tga", "coarctation", "critical as", "ductus arteriosus"],
+          medKeys: ["ncpr|7"] },
+        { name: "Neonatal Seizures / HIE", system: "ncpr", keywords: ["neonatal seizure", "hie", "hypoxic ischemic", "phenobarbital neonate", "levetiracetam neonate"],
+          medKeys: ["ncpr|8","ncpr|9"] },
+        { name: "Neonatal Hypotension (post-resuscitation)", system: "ncpr", keywords: ["neonatal hypotension", "vasopressor neonate", "dopamine neonate", "dobutamine neonate"],
+          medKeys: ["ncpr|10","ncpr|11","ncpr|12"] },
+        { name: "Apnea of Prematurity", system: "ncpr", keywords: ["apnea prematurity", "apnea preterm", "caffeine citrate", "aop"],
+          medKeys: ["ncpr|13"] },
+        { name: "Newborn Vitamin K Prophylaxis", system: "ncpr", keywords: ["vitamin k", "phytonadione", "hemorrhagic disease newborn", "all newborns"],
+          medKeys: ["ncpr|14"] },
+        { name: "RDS — Surfactant Therapy (Preterm)", system: "ncpr", keywords: ["rds", "respiratory distress syndrome", "surfactant", "curosurf", "poractant"],
+          medKeys: ["ncpr|15"] },
+        { name: "Neonatal Early-Onset Sepsis", system: "ncpr", keywords: ["early onset sepsis", "eos", "gbs", "listeria", "neonatal sepsis", "ampicillin gentamicin"],
+          medKeys: ["ncpr|16","antimicrobial|13"] },
+        {
+            name: "Preterm Infant Supplementation",
+            system: "infant_supp",
+            keywords: ["preterm", "premature", "neonate", "neonatal", "supplement", "vitamin", "iron", "multivitamin", "mtv"],
+            medKeys: ["infant_supp|0", "infant_supp|1", "infant_supp|2"]
+        },
+        {
+            name: "Term Infant Supplementation (breastfed)",
+            system: "infant_supp",
+            keywords: ["term", "infant", "breastfed", "breastfeed", "iron", "vitamin d", "supplement"],
+            medKeys: ["infant_supp|3", "infant_supp|4", "infant_supp|5", "infant_supp|6"]
         }
-        recalculateCurrent();
-    }
-
-    function onMixFluidChange() {
-        const isOther = document.getElementById("mixFluid").value === "other";
-        document.getElementById("other-fluid-wrap").classList.toggle("visible", isOther);
-    }
-
-    function isIvMed(med) {
-        return /\bIV\b|IV\/IO|IV\/IM/i.test(med.rx);
-    }
-
-    function resetAdvancedPanel() {
-        document.getElementById("advancedEnabled").checked = false;
-        document.getElementById("advancedFields").style.display = "none";
-        document.getElementById("advancedBody").classList.remove("open");
-        document.getElementById("advancedToggle").classList.remove("open");
-        advancedPanelOpen = false;
-    }
-
-    function getDrugBaseName(med) {
-        let base = med.rx.split("{dose}")[0].trim();
-        const ivIdx = base.indexOf(" IV");
-        if (ivIdx > 0) base = base.substring(0, ivIdx);
-        const parenIdx = base.indexOf(" (");
-        if (parenIdx > 0) base = base.substring(0, parenIdx);
-        return base;
-    }
-
-    function getDoseInMg(med, doseValue) {
-        if (doseValue === null || doseValue === undefined || doseValue === "") return null;
-        const dose = parseFloat(doseValue);
-        if (isNaN(dose)) return null;
-        if (med.rx.includes("{dose} mg")) return dose;
-        const mgPerMl = getMedConcentration(med);
-        if (med.rx.includes("{dose} ml") && mgPerMl) {
-            return dose * mgPerMl;
-        }
-        if (med.concMcgMl && med.rx.includes("{dose} ml")) {
-            return (dose * med.concMcgMl) / 1000;
-        }
-        const mcgPerMl = med.name.match(/\(([\d.]+)\s*mcg\/ml\)/i);
-        if (med.rx.includes("{dose} ml") && mcgPerMl) {
-            return (dose * parseFloat(mcgPerMl[1])) / 1000;
-        }
-        return null;
-    }
-
-    function inferIntervalFromRx(rx) {
-        if (/\bOD\b|once daily/i.test(rx)) return 24;
-        if (/\bBID\b/i.test(rx)) return 12;
-        if (/\bTID\b/i.test(rx)) return 8;
-        const m = rx.match(/q\s*(\d+(?:\.\d+)?)\s*hr/i);
-        if (m) return parseFloat(m[1]);
-        if (/q\s*6-8\s*hr/i.test(rx)) return 8;
-        if (/q\s*4-6\s*hr/i.test(rx)) return 6;
-        if (/q\s*2-4\s*hr/i.test(rx)) return 4;
-        return 24;
-    }
-
-    function getFluidLabel() {
-        const sel = document.getElementById("mixFluid").value;
-        if (sel === "NSS") return "NSS";
-        if (sel === "5DW") return "5% DW";
-        const other = document.getElementById("otherFluid").value.trim();
-        return other || "Other fluid";
-    }
-
-    function formatMg(mg) {
-        if (mg === null || isNaN(mg)) return "____";
-        const rounded = Math.round(mg * 100) / 100;
-        return Number.isInteger(rounded) ? String(rounded) : String(rounded);
-    }
-
-    function highlightVal(val) {
-        return val === "____" ? "____" : `<span class="highlight">${val}</span>`;
-    }
-
-    function buildBasicRx(med, calculatedDose) {
-        const doseStr = calculatedDose !== null ? String(calculatedDose) : "____";
-        let html = med.rx;
-        if (calculatedDose !== null) {
-            html = html.replace("{dose}", `<span class="highlight">${calculatedDose}</span>`);
-        } else {
-            html = html.replace("{dose}", "____");
-        }
-        return { html, plain: med.rx.replace("{dose}", doseStr) };
-    }
-
-    function buildAdvancedRx(med, calculatedDose) {
-        const drugName = getDrugBaseName(med);
-        const mg = getDoseInMg(med, calculatedDose);
-        const mgDisplay = formatMg(mg);
-        const fluid = getFluidLabel();
-        const vol = document.getElementById("totalVolume").value || "____";
-        const interval = document.getElementById("intervalHr").value || "____";
-        const drip = document.getElementById("dripMins").value || "____";
-
-        const plain = `${drugName} ${mgDisplay} mg + ${fluid} up to ${vol} ml IV drip in ${drip} mins q ${interval} hr`;
-        const html = `${drugName} ${highlightVal(mgDisplay)} mg + ${fluid} up to ${highlightVal(vol)} ml IV drip in ${highlightVal(drip)} mins q ${highlightVal(interval)} hr`;
-
-        let concLine = "";
-        if (mg !== null && vol !== "____") {
-            const volNum = parseFloat(vol);
-            if (!isNaN(volNum) && volNum > 0) {
-                const conc = mg / volNum;
-                const concStr = conc >= 1 ? conc.toFixed(2) : conc.toFixed(3);
-                concLine = `Final concentration: ${concStr} mg/ml (${mgDisplay} mg in ${vol} ml total volume).`;
-            }
-        }
-
-        let noteHtml = buildDosingNote(med);
-        if (concLine) {
-            noteHtml = '<div class="concentration-line">' + concLine + '</div><br>' + noteHtml;
-        }
-
-        return { html, plain, noteHtml };
-    }
-
-    const diseasePresets = [
-        { cat: "Respiratory & Allergy", disease: "Common Cold / Viral URI",
-          notes: "Symptomatic relief only. Antibiotics NOT indicated. Avoid Ibuprofen/NSAIDs during Dengue outbreaks. Never give Aspirin (Reye's syndrome risk).",
-          meds: [
-            { label: "Paracetamol PO (120mg/5ml)", key: "neuro_pain|0" },
-            { label: "Ibuprofen PO (100mg/5ml)", key: "neuro_pain|3" }
-          ]},
-        { cat: "Respiratory & Allergy", disease: "Acute Pharyngitis / Tonsillitis",
-          notes: "Treat Group A Strep. Amoxicillin is 1st-line (10 days). Macrolides or Clindamycin for penicillin allergy. Add analgesia.",
-          meds: [
-            { label: "Amoxicillin PO — 1st line", key: "antimicrobial|1" },
-            { label: "Cephalexin PO", key: "antimicrobial|5" },
-            { label: "Azithromycin PO (PCN allergy)", key: "antimicrobial|4" },
-            { label: "Paracetamol PO (pain/fever)", key: "neuro_pain|0" },
-            { label: "Ibuprofen PO (pain/fever)", key: "neuro_pain|3" },
-            { label: "Penicillin V (consult formulary)", key: null },
-            { label: "Clindamycin (consult formulary)", key: null },
-            { label: "Clarithromycin (consult formulary)", key: null }
-          ]},
-        { cat: "Respiratory & Allergy", disease: "Acute Rhinosinusitis",
-          notes: "Amoxicillin is 1st-line. High-dose Amoxicillin-clavulanate for high resistance risk or severe/complicated cases.",
-          meds: [
-            { label: "Amoxicillin PO — 1st line", key: "antimicrobial|1" },
-            { label: "Augmentin ES (600mg/5ml) — 2nd line", key: "antimicrobial|3" },
-            { label: "Cefdinir PO", key: "antimicrobial|6" },
-            { label: "Azithromycin PO (PCN allergy)", key: "antimicrobial|4" },
-            { label: "Cefuroxime (consult formulary)", key: null },
-            { label: "Levofloxacin (consult, >12yr only)", key: null }
-          ]},
-        { cat: "Respiratory & Allergy", disease: "Acute Otitis Media (AOM)",
-          notes: "High-dose Amoxicillin (80–90 mg/kg/day) if high risk for drug-resistant S. pneumoniae. Augmentin if failed Amoxicillin. Ceftriaxone IM/IV for refractory/severe cases.",
-          meds: [
-            { label: "Amoxicillin HD — 1st line", key: "antimicrobial|1" },
-            { label: "Augmentin ES HD — 2nd line / failed Amox", key: "antimicrobial|3" },
-            { label: "Cefdinir PO (PCN allergy, non-severe)", key: "antimicrobial|6" },
-            { label: "Ceftriaxone IV — Refractory / Severe", key: "antimicrobial|8" },
-            { label: "Paracetamol PO (pain/fever)", key: "neuro_pain|0" },
-            { label: "Ibuprofen PO (pain/fever)", key: "neuro_pain|3" },
-            { label: "Cefuroxime (consult formulary)", key: null }
-          ]},
-        { cat: "Respiratory & Allergy", disease: "Allergic Rhinitis",
-          notes: "Intranasal steroids are most effective for moderate-severe or persistent symptoms. Oral antihistamines for immediate symptom relief.",
-          meds: [
-            { label: "Cetirizine Syrup — oral antihistamine", key: "respiratory|0" },
-            { label: "Chlorpheniramine Syrup", key: "respiratory|1" },
-            { label: "Budesonide nasal spray (consult formulary)", key: null },
-            { label: "Fluticasone nasal spray (consult formulary)", key: null },
-            { label: "Desloratadine (consult formulary)", key: null },
-            { label: "Levocetirizine (consult formulary)", key: null }
-          ]},
-        { cat: "Respiratory & Allergy", disease: "Viral Croup",
-          notes: "Dexamethasone 0.6 mg/kg x1 is the mainstay for all severities. Add nebulized Epinephrine for moderate-to-severe stridor at rest (effect lasts 2 hrs — observe).",
-          meds: [
-            { label: "Dexamethasone PO/IV — 1st line", key: "respiratory|6" },
-            { label: "Adrenaline Neb (Moderate-Severe)", key: "respiratory|9" },
-            { label: "Budesonide Neb (alt if unable to swallow)", key: "respiratory|5" },
-            { label: "Prednisolone PO (alt to Dexamethasone)", key: "respiratory|7" }
-          ]},
-        { cat: "Respiratory & Allergy", disease: "Asthma Exacerbation",
-          notes: "SABA alone is no longer recommended. Add oral steroids for moderate-severe exacerbations. IV Magnesium sulfate for severe/life-threatening cases unresponsive to initial therapy.",
-          meds: [
-            { label: "Salbutamol Nebulizer — 1st line", key: "respiratory|3" },
-            { label: "Ipratropium Neb (add for moderate-severe)", key: "respiratory|4" },
-            { label: "Prednisolone PO — steroids", key: "respiratory|7" },
-            { label: "Dexamethasone PO/IV — alt steroid", key: "respiratory|6" },
-            { label: "Magnesium Sulfate IV — Severe / Life-threatening", key: "respiratory|10" },
-            { label: "Budesonide Neb (maintenance)", key: "respiratory|5" },
-            { label: "ICS-Formoterol inhaler (consult formulary)", key: null },
-            { label: "Montelukast (consult formulary)", key: null }
-          ]},
-        { cat: "Respiratory & Allergy", disease: "Community-Acquired Pneumonia",
-          notes: "High-dose Amoxicillin is 1st-line for typical outpatient CAP. Add macrolide for atypical coverage. Ceftriaxone IV for hospitalized moderate-severe cases. Oseltamivir for influenza.",
-          meds: [
-            { label: "Amoxicillin HD — Outpatient 1st line", key: "antimicrobial|1" },
-            { label: "Azithromycin — Atypical / add-on", key: "antimicrobial|4" },
-            { label: "Augmentin ES — Outpatient 2nd line", key: "antimicrobial|3" },
-            { label: "Ceftriaxone IV — Hospitalized", key: "antimicrobial|8" },
-            { label: "Cefotaxime IV — Hospitalized alt", key: "antimicrobial|10" },
-            { label: "Oseltamivir — Influenza pneumonia", key: "antimicrobial|16" },
-            { label: "Clarithromycin (consult formulary)", key: null },
-            { label: "Zanamivir (consult formulary)", key: null }
-          ]},
-        { cat: "Gastrointestinal & Hepatology", disease: "Acute Diarrhea / Gastroenteritis",
-          notes: "ORS and Zinc are the cornerstone. Antibiotics only for severe/invasive cases (dysentery, Shigella, Cholera, Ameba). Probiotics (LGG, S. boulardii) may shorten duration.",
-          meds: [
-            { label: "Ondansetron PO (anti-emetic)", key: "gi|0" },
-            { label: "Ondansetron IV (anti-emetic, severe)", key: "gi|1" },
-            { label: "NS 0.9% Bolus (if dehydrated/shock)", key: "fluids|0" },
-            { label: "Maintenance Fluid D5 1/2 NS", key: "fluids|4" },
-            { label: "Ceftriaxone IV (severe/invasive)", key: "antimicrobial|8" },
-            { label: "Azithromycin PO (Shigella / Cholera)", key: "antimicrobial|4" },
-            { label: "Metronidazole IV (Ameba / Anaerobes)", key: "surgical|1" },
-            { label: "ORS — consult nursing", key: null },
-            { label: "Zinc supp (consult formulary)", key: null },
-            { label: "Probiotics (consult formulary)", key: null }
-          ]},
-        { cat: "Gastrointestinal & Hepatology", disease: "Vomiting (in Gastroenteritis)",
-          notes: "Single dose Ondansetron to facilitate ORS tolerance. Avoid routine metoclopramide in children (EPS risk).",
-          meds: [
-            { label: "Ondansetron PO — 1st line", key: "gi|0" },
-            { label: "Ondansetron IV", key: "gi|1" }
-          ]},
-        { cat: "Gastrointestinal & Hepatology", disease: "GERD",
-          notes: "PPIs are first-line for reflux esophagitis. Prokinetics have unclear benefit in infants and carry neurological/cardiac risk — use cautiously and short-term only.",
-          meds: [
-            { label: "Omeprazole PO/IV — 1st line", key: "gi|3" },
-            { label: "Famotidine PO/IV", key: "gi|4" },
-            { label: "Domperidone PO (use with caution)", key: "gi|2" },
-            { label: "Lansoprazole (consult formulary)", key: null },
-            { label: "Esomeprazole (consult formulary)", key: null }
-          ]},
-        { cat: "Infectious Diseases", disease: "Dengue Hemorrhagic Fever",
-          notes: "⚠️ AVOID Ibuprofen/NSAIDs and Aspirin — serious bleeding risk. Paracetamol ONLY for fever and pain. IV fluids for shock. Monitor CBC and haematocrit closely.",
-          meds: [
-            { label: "Paracetamol PO — ONLY approved antipyretic", key: "neuro_pain|0" },
-            { label: "Paracetamol IV (if unable to take PO)", key: "neuro_pain|2" },
-            { label: "NS 0.9% Bolus (for shock)", key: "fluids|0" },
-            { label: "Ringer's Lactate Bolus (for shock)", key: "fluids|1" }
-          ]},
-        { cat: "Infectious Diseases", disease: "HFMD / Herpangina",
-          notes: "Purely supportive. Manage pain and fever. Viscous lidocaine for oral ulcers (use with caution — risk of ingestion causing toxicity).",
-          meds: [
-            { label: "Paracetamol PO (pain/fever)", key: "neuro_pain|0" },
-            { label: "Ibuprofen PO (pain/fever)", key: "neuro_pain|3" },
-            { label: "Viscous Lidocaine (consult formulary)", key: null }
-          ]},
-        { cat: "Infectious Diseases", disease: "Influenza Pharyngitis",
-          notes: "Start Oseltamivir within 48 hours of symptom onset for maximum effect. Weight-based dose bands for children >1 yr. ⚠️ For infants <1 yr: use age-based dosing (0–8 mo: 3 mg/kg/dose; 9–11 mo: 3.5 mg/kg/dose) — calculator shows weight-band result only. Avoid Aspirin (Reye's syndrome).",
-          meds: [
-            { label: "Oseltamivir — antiviral (children >1 yr)", key: "antimicrobial|16" },
-            { label: "Paracetamol PO (fever/pain)", key: "neuro_pain|0" },
-            { label: "Paracetamol IV (if unable to take PO)", key: "neuro_pain|2" },
-            { label: "Ibuprofen PO (fever/pain)", key: "neuro_pain|3" },
-            { label: "Oseltamivir infant dosing <1 yr — consult formulary", key: null }
-          ]},
-        { cat: "Infectious Diseases", disease: "Tuberculosis (TB)",
-          notes: "Standard HRZE regimen — always confirm with ID/pulmonology before prescribing. Prednisolone added for TB meningitis, miliary TB, or massive effusions.",
-          meds: [
-            { label: "Isoniazid (H) — confirm with ID", key: "antimicrobial|27" },
-            { label: "Rifampicin (R) — confirm with ID", key: "antimicrobial|28" },
-            { label: "Pyrazinamide (Z) — confirm with ID", key: "antimicrobial|29" },
-            { label: "Ethambutol (E) — confirm with ID", key: "antimicrobial|30" },
-            { label: "Prednisolone PO (TB Meningitis / Miliary)", key: "respiratory|7" }
-          ]},
-        { cat: "Neurology & Development", disease: "Febrile Seizures",
-          notes: "Abortive therapy for seizures lasting >3–5 min. Midazolam IN preferred out-of-hospital. Diazepam PR or IV in-hospital. Treat fever after seizure stops — does NOT prevent recurrence.",
-          meds: [
-            { label: "Midazolam IN/Buccal — Out-of-hospital", key: "neuro_pain|10" },
-            { label: "Diazepam Rectal — Out-of-hospital alt", key: "neuro_pain|7" },
-            { label: "Diazepam IV — In-hospital", key: "neuro_pain|8" },
-            { label: "Lorazepam IV — In-hospital alt", key: "neuro_pain|9" },
-            { label: "Paracetamol PO (antipyretic after seizure)", key: "neuro_pain|0" },
-            { label: "Ibuprofen PO (antipyretic after seizure)", key: "neuro_pain|3" }
-          ]},
-        { cat: "Neurology & Development", disease: "Headache / Migraine",
-          notes: "NSAIDs/Paracetamol for acute attacks. Triptans for debilitating attacks. Choose prophylaxis based on comorbidities. Refer neurology for refractory cases.",
-          meds: [
-            { label: "Paracetamol PO — 1st line acute", key: "neuro_pain|0" },
-            { label: "Ibuprofen PO — 1st line acute", key: "neuro_pain|3" },
-            { label: "Ketorolac IV (ER / refractory)", key: "neuro_pain|6" },
-            { label: "Almotriptan (consult formulary)", key: null },
-            { label: "Rizatriptan (consult formulary)", key: null },
-            { label: "Topiramate — prophylaxis (consult)", key: null },
-            { label: "Propranolol — prophylaxis (consult)", key: null },
-            { label: "Amitriptyline — prophylaxis (consult)", key: null }
-          ]},
-        { cat: "Dermatology", disease: "Atopic Dermatitis (Eczema)",
-          notes: "Topical corticosteroids are the mainstay. Use low-potency on face/folds. Calcineurin inhibitors (tacrolimus/pimecrolimus) for sensitive areas. Antihistamines for pruritus and sleep.",
-          meds: [
-            { label: "Cetirizine Syrup (pruritus / sleep aid)", key: "respiratory|0" },
-            { label: "Chlorpheniramine Syrup (pruritus)", key: "respiratory|1" },
-            { label: "Hydrocortisone topical (consult formulary)", key: null },
-            { label: "Mometasone topical (consult formulary)", key: null },
-            { label: "Tacrolimus topical (consult formulary)", key: null },
-            { label: "Pimecrolimus topical (consult formulary)", key: null }
-          ]},
-        { cat: "Dermatology", disease: "Candidiasis / Diaper Dermatitis",
-          notes: "Nystatin or Clotrimazole for candidal diaper rash (topical). Oral Fluconazole for severe/systemic candidiasis or oral thrush not responding to nystatin.",
-          meds: [
-            { label: "Fluconazole IV/PO (severe/systemic)", key: "antimicrobial|15" },
-            { label: "Nystatin topical (consult formulary)", key: null },
-            { label: "Clotrimazole topical (consult formulary)", key: null },
-            { label: "Zinc oxide barrier (consult formulary)", key: null }
-          ]},
-        { cat: "Dermatology", disease: "Acne Vulgaris",
-          notes: "Combine Benzoyl peroxide with topical/oral antibiotics to prevent resistance. Refer dermatology for severe/nodular/isotretinoin candidates.",
-          meds: [
-            { label: "Benzoyl peroxide (consult formulary)", key: null },
-            { label: "Adapalene topical (consult formulary)", key: null },
-            { label: "Clindamycin topical (consult formulary)", key: null },
-            { label: "Doxycycline oral (consult formulary)", key: null },
-            { label: "Minocycline oral (consult formulary)", key: null }
-          ]},
-        { cat: "Nephrology & Genitourinary", disease: "Urinary Tract Infection (UTI)",
-          notes: "IV therapy for infants <2 months or severe illness/urosepsis. Prophylaxis (TMP/SMX or Nitrofurantoin) for high-risk (VUR). Choose empiric antibiotic based on local sensitivity patterns.",
-          meds: [
-            { label: "Ceftriaxone IV — Hospitalized 1st line", key: "antimicrobial|8" },
-            { label: "Cefotaxime IV — Hospitalized alt", key: "antimicrobial|10" },
-            { label: "Gentamicin IV (urosepsis)", key: "antimicrobial|13" },
-            { label: "Cotrimoxazole PO (TMP/SMX)", key: "antimicrobial|7" },
-            { label: "Cephalexin PO — Outpatient", key: "antimicrobial|5" },
-            { label: "Augmentin ES PO — Outpatient alt", key: "antimicrobial|3" },
-            { label: "Cefdinir PO", key: "antimicrobial|6" },
-            { label: "Nitrofurantoin (consult, >2 months)", key: null },
-            { label: "Cefixime (consult formulary)", key: null }
-          ]},
-        { cat: "Cardiovascular / Rheumatology", disease: "Kawasaki Disease",
-          notes: "IVIG + high-dose Aspirin in the acute febrile phase, then low-dose Aspirin for 6–8 weeks minimum. Echocardiogram required. Always consult cardiology.",
-          meds: [
-            { label: "IVIG 2 g/kg IV — consult cardiology", key: null },
-            { label: "Aspirin high-dose → low-dose — consult", key: null }
-          ]},
-        { cat: "Nutrition & Endocrine", disease: "Obesity / Type 2 Diabetes",
-          notes: "Lifestyle intervention is primary. Metformin initiated for Type 2 DM or significant insulin resistance. Refer endocrinology for ongoing management.",
-          meds: [
-            { label: "Metformin (consult endocrinology)", key: null },
-            { label: "Empagliflozin (consult endocrinology)", key: null }
-          ]},
-        { cat: "Nutrition & Endocrine", disease: "Iron Deficiency Anemia",
-          notes: "Treat for 3 months minimum after Hb normalizes. Iron III hydroxide polymaltose (Maltofer) for GI intolerance. Counsel on dietary sources.",
-          meds: [
-            { label: "Ferrous fumarate PO (consult formulary)", key: null },
-            { label: "Iron III hydroxide polymaltose (consult formulary)", key: null }
-          ]},
-        { cat: "Nutrition & Endocrine", disease: "Hypothyroidism",
-          notes: "Start Levothyroxine at 4–5 mcg/kg/day in children 1–12 yr. Neonates need higher dosing (10–15 mcg/kg). Monitor TSH/FT4 every 4–6 weeks until stable. Always take on empty stomach in the morning.",
-          meds: [
-            { label: "Levothyroxine PO — 1st line", key: "endocrine|3" }
-          ]},
-        { cat: "Nutrition & Endocrine", disease: "Vitamin D Deficiency / Rickets",
-          notes: "Treat deficiency with 2000–5000 IU/day for 6–12 weeks, then maintenance 400–1000 IU/day. Confirm with serum 25-OH-Vitamin D. Add calcium-rich diet.",
-          meds: [
-            { label: "Cholecalciferol (Vit D3) PO — 1st line", key: "endocrine|2" }
-          ]},
-        { cat: "Neurology & Development", disease: "Status Epilepticus",
-          notes: "Follow stepwise protocol. Benzodiazepine 1st line (within 5 min). 2nd line AED if seizure >10 min. Call senior if refractory. Maintain airway throughout.",
-          meds: [
-            { label: "Midazolam IN/Buccal — 1st line out-of-hospital", key: "neuro_pain|10" },
-            { label: "Lorazepam IV — 1st line in-hospital", key: "neuro_pain|9" },
-            { label: "Diazepam IV — 1st line alt", key: "neuro_pain|8" },
-            { label: "Diazepam PR — if no IV access", key: "neuro_pain|7" },
-            { label: "Phenobarbital IV — 2nd line", key: "neuro_pain|11" },
-            { label: "Levetiracetam IV — 2nd line alt", key: "neuro_pain|12" },
-            { label: "Valproic Acid IV — 2nd line alt", key: "neuro_pain|13" }
-          ]},
-        { cat: "Cardiovascular / Rheumatology", disease: "Pediatric Hypertension",
-          notes: "Lifestyle modification first. Pharmacotherapy for stage 2 HTN or symptomatic stage 1. CCB (Amlodipine) or ACE-I (Enalapril/Captopril) are 1st-line. Confirm secondary causes.",
-          meds: [
-            { label: "Amlodipine PO — 1st line CCB", key: "cardio|6" },
-            { label: "Enalapril PO — 1st line ACE-I", key: "cardio|5" },
-            { label: "Captopril PO — ACE-I alt", key: "cardio|3" },
-            { label: "Propranolol PO — beta-blocker", key: "cardio|7" },
-            { label: "Hydrochlorothiazide PO — diuretic", key: "cardio|8" }
-          ]},
-        { cat: "Dermatology", disease: "Scabies",
-          notes: "Permethrin 5% is 1st-line. Apply from neck to toe (include scalp in infants), leave 8–14 hours, then wash off. Treat ALL household contacts simultaneously. Repeat in 7–14 days. Pruritus may persist weeks after cure.",
-          meds: [
-            { label: "Cetirizine Syrup (pruritus relief)", key: "respiratory|0" },
-            { label: "Chlorpheniramine Syrup (pruritus relief)", key: "respiratory|1" },
-            { label: "Diphenhydramine (severe itch)", key: "respiratory|12" },
-            { label: "Permethrin 5% cream — consult formulary (topical)", key: null }
-          ]},
-        { cat: "Dermatology", disease: "Oral Thrush / Candidiasis",
-          notes: "Nystatin swish-and-swallow QID for 7–14 days is 1st-line. Fluconazole for refractory or systemic cases. Sterilise dummies and bottle teats. Check for immunosuppression if recurrent.",
-          meds: [
-            { label: "Nystatin Oral Suspension — 1st line", key: "antimicrobial|31" },
-            { label: "Fluconazole PO/IV (refractory/systemic)", key: "antimicrobial|15" }
-          ]}
     ];
 
-    let currentDiseaseFilter = "";
+    mergeThaiDiagnoses();
 
-    function buildDiseaseGrid(query) {
-        const grid = document.getElementById("disease-grid");
-        grid.innerHTML = "";
-        const q = (query || "").toLowerCase();
-        const filtered = diseasePresets.filter(d => {
-            const matchesCat = !currentDiseaseFilter || d.cat === currentDiseaseFilter;
-            const matchesQuery = !q || d.disease.toLowerCase().includes(q);
-            return matchesCat && matchesQuery;
-        });
-        filtered.forEach(d => {
-            const chip = document.createElement("button");
-            chip.className = "disease-chip";
-            chip.textContent = d.disease;
-            chip.onclick = function() {
-                document.querySelectorAll(".disease-chip").forEach(c => c.classList.remove("active"));
-                chip.classList.add("active");
-                showDiseaseRec(d);
-            };
-            grid.appendChild(chip);
-        });
-    }
+    (function linkEuroferToIronAnemia() {
+        const diag = diagnosisData.find(d => d.name === "Iron deficiency anemia");
+        const idx = medData.gi.findIndex(m => /eurofer/i.test(m.name));
+        if (diag && idx >= 0) {
+            const key = medKey("gi", idx);
+            if (!diag.medKeys.includes(key)) diag.medKeys.unshift(key);
+        }
+    })();
 
-    function filterDiseaseCat(cat, btn) {
-        currentDiseaseFilter = cat;
-        document.querySelectorAll(".dl-cat-chip").forEach(c => c.classList.remove("active"));
-        btn.classList.add("active");
-        buildDiseaseGrid(document.getElementById("diseaseSearch").value);
-        document.getElementById("disease-rec-panel").style.display = "none";
-    }
-
-    function handleDiseaseSearch() {
-        buildDiseaseGrid(document.getElementById("diseaseSearch").value);
-        document.getElementById("disease-rec-panel").style.display = "none";
-    }
-
-    function showDiseaseRec(d) {
-        document.getElementById("drec-title").textContent = d.disease;
-        document.getElementById("drec-note").textContent = d.notes;
-        const medGrid = document.getElementById("drec-med-grid");
-        medGrid.innerHTML = "";
-        d.meds.forEach(m => {
-            if (m.key) {
-                const btn = document.createElement("button");
-                btn.className = "drec-calc-btn";
-                btn.textContent = m.label;
-                btn.onclick = function() {
-                    document.querySelectorAll(".drec-calc-btn").forEach(b => b.classList.remove("active"));
-                    btn.classList.add("active");
-                    selectMedByKey(m.key);
-                };
-                medGrid.appendChild(btn);
-            } else {
-                const tag = document.createElement("span");
-                tag.className = "drec-no-calc";
-                tag.textContent = m.label;
-                medGrid.appendChild(tag);
-            }
-        });
-        const panel = document.getElementById("disease-rec-panel");
-        panel.style.display = "block";
-        setTimeout(() => panel.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
-    }
-
-    function selectMedByKey(key) {
-        const [catId, medIdx] = key.split("|");
-        document.getElementById("search").value = medData[catId][medIdx].name;
-        document.getElementById("autocomplete-list").innerHTML = "";
-        document.getElementById("category").value = catId;
-        updateMedList(false);
-        document.getElementById("medication").value = key;
-        showPrescription(key);
-        setTimeout(() => document.getElementById("result-box").scrollIntoView({ behavior: "smooth", block: "nearest" }), 80);
-    }
-
-    // Flatten database for search
     function initSearchList() {
         allMedsList = [];
         for (const cat in medData) {
             medData[cat].forEach((med, idx) => {
-                allMedsList.push({ catId: cat, medIdx: idx, ...med });
+                allMedsList.push({ catId: cat, medIdx: idx, key: medKey(cat, idx), ...med });
             });
         }
     }
     initSearchList();
-    buildDiseaseGrid("");
 
-    // The Autocomplete Logic
-    function handleSearch() {
-        const rawQuery = document.getElementById("search").value.toLowerCase().trim();
-        const searchTerms = rawQuery.split(" ");
-        const listContainer = document.getElementById("autocomplete-list");
-        
-        listContainer.innerHTML = ""; // clear list
-        
-        if (rawQuery.length < 1) return;
+    function getWeight() {
+        const w = parseFloat(document.getElementById("weight").value);
+        return (!isNaN(w) && w > 0) ? w : null;
+    }
 
-        const filtered = allMedsList.filter(m => {
-            const medName = m.name.toLowerCase();
-            return searchTerms.every(term => medName.includes(term));
+    function hasAllergyMode() {
+        const sel = document.querySelector('input[name="hasAllergy"]:checked');
+        return sel && sel.value === "yes";
+    }
+
+    function getPatientAllergyTriggers() {
+        if (!hasAllergyMode()) return new Set();
+        const set = new Set(patientAllergieIds);
+        if (CEPHALOSPORIN_TAGS.some(t => set.has(t))) set.add("cephalosporin");
+        return set;
+    }
+
+    function getMedAllergyTags(med) {
+        const n = (med.name + " " + med.rx).toLowerCase();
+        const tags = new Set();
+        if (/penicillin|amoxicillin|augmentin|amox\/clav|ampicillin/i.test(n)) tags.add("penicillin");
+        if (/cef|ceph/i.test(n)) tags.add("cephalosporin");
+        if (/ceftriaxone/i.test(n)) tags.add("ceftriaxone");
+        if (/cefdinir/i.test(n)) tags.add("cefdinir");
+        if (/cefotaxime/i.test(n)) tags.add("cefotaxime");
+        if (/cephalexin/i.test(n)) tags.add("cephalexin");
+        if (/meropenem|carbapenem/i.test(n)) tags.add("carbapenem");
+        if (/vancomycin/i.test(n)) tags.add("vancomycin");
+        if (/cotrim|bactrim|sulfa|trimethoprim/i.test(n)) tags.add("sulfa");
+        if (/azithro|macrolide|erythromycin/i.test(n)) tags.add("macrolide");
+        return [...tags];
+    }
+
+    function formatAllergyLabel(id) {
+        const opt = allergyOptions.find(o => o.id === id);
+        return opt ? opt.label : id;
+    }
+
+    function checkMedAllergy(med) {
+        if (!hasAllergyMode()) return [];
+        const triggers = getPatientAllergyTriggers();
+        if (!triggers.size) return [];
+
+        const medTags = getMedAllergyTags(med);
+        const warnings = [];
+        const seen = new Set();
+
+        function add(level, text) {
+            if (seen.has(text)) return;
+            seen.add(text);
+            warnings.push({ level, text });
+        }
+
+        medTags.forEach(tag => {
+            if (triggers.has(tag)) {
+                add("direct", "Allergy alert: patient is documented allergic to " + formatAllergyLabel(tag));
+            }
         });
+        if (warnings.length) return warnings;
 
-        filtered.forEach(m => {
-            const item = document.createElement("div");
-            item.textContent = m.name;
-            item.onclick = function() {
-                // When clicked: fill search box, close list, calculate prescription
-                document.getElementById("search").value = m.name;
-                listContainer.innerHTML = "";
-                
-                // Keep the classic dropdowns synced visually
-                document.getElementById("category").value = m.catId;
-                updateMedList(false); // Update without erasing our choice
-                document.getElementById("medication").value = `${m.catId}|${m.medIdx}`;
-                
-                // Show result
-                showPrescription(`${m.catId}|${m.medIdx}`);
-            };
-            listContainer.appendChild(item);
+        const patientCeph = CEPHALOSPORIN_TAGS.some(t => triggers.has(t));
+        const medIsCeph = medTags.some(t => CEPHALOSPORIN_TAGS.includes(t));
+
+        if (patientCeph && medIsCeph) {
+            if (triggers.has("ceftriaxone") && medTags.includes("cefdinir")) {
+                add("cross", "Cross-allergy: Ceftriaxone allergy — caution with Cefdinir (cephalosporin)");
+            }
+            if (triggers.has("cefdinir") && medTags.includes("ceftriaxone")) {
+                add("cross", "Cross-allergy: Cefdinir allergy — caution with Ceftriaxone (cephalosporin)");
+            }
+            if (triggers.has("ceftriaxone") && medTags.includes("cefotaxime")) {
+                add("cross", "Cross-allergy: Ceftriaxone allergy — caution with Cefotaxime");
+            }
+            if (triggers.has("ceftriaxone") && medTags.includes("cephalexin")) {
+                add("cross", "Cross-allergy: Ceftriaxone allergy — caution with Cephalexin");
+            }
+            const patientCephSpecific = CEPHALOSPORIN_TAGS.filter(t => triggers.has(t));
+            const medCephSpecific = CEPHALOSPORIN_TAGS.filter(t => medTags.includes(t));
+            const isDifferentCeph = patientCephSpecific.length && medCephSpecific.length &&
+                !patientCephSpecific.some(p => medCephSpecific.includes(p));
+            if (isDifferentCeph && !warnings.length) {
+                add("cross", "Cross-allergy: " + formatAllergyLabel(patientCephSpecific[0]) +
+                    " — related cephalosporin (" + med.name + ")");
+            }
+            if (triggers.has("cephalosporin") && medIsCeph && !warnings.length) {
+                add("cross", "Cross-allergy: Cephalosporin class — caution with " + med.name);
+            }
+        }
+
+        if (triggers.has("penicillin") && medTags.includes("cephalosporin")) {
+            add("cross", "Cross-allergy: Penicillin allergy — cephalosporin caution (~1–2% cross-reactivity; verify)");
+        }
+
+        return warnings;
+    }
+
+    function onHasAllergyChange() {
+        const yes = hasAllergyMode();
+        document.getElementById("allergy-detail").classList.toggle("hidden", !yes);
+        if (!yes) {
+            patientAllergieIds.clear();
+            document.getElementById("allergy-search").value = "";
+            document.getElementById("allergy-autocomplete").innerHTML = "";
+            renderAllergyChips();
+        }
+        onAllergyListChange();
+    }
+
+    function onAllergyListChange() {
+        renderCart();
+        refreshSuggestedList();
+    }
+
+    function addPatientAllergy(id) {
+        if (patientAllergieIds.has(id)) {
+            showToast("Already in allergy list");
+            return;
+        }
+        patientAllergieIds.add(id);
+        document.getElementById("allergy-search").value = "";
+        document.getElementById("allergy-autocomplete").innerHTML = "";
+        renderAllergyChips();
+        onAllergyListChange();
+    }
+
+    function removePatientAllergy(id) {
+        patientAllergieIds.delete(id);
+        renderAllergyChips();
+        onAllergyListChange();
+    }
+
+    function renderAllergyChips() {
+        const wrap = document.getElementById("allergy-chips");
+        wrap.innerHTML = "";
+        if (!patientAllergieIds.size) return;
+        patientAllergieIds.forEach(id => {
+            const chip = document.createElement("span");
+            chip.className = "allergy-chip";
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = "×";
+            btn.title = "Remove";
+            btn.onclick = () => removePatientAllergy(id);
+            chip.appendChild(document.createTextNode(formatAllergyLabel(id)));
+            chip.appendChild(btn);
+            wrap.appendChild(chip);
         });
     }
 
-    // Close autocomplete if clicking anywhere else
-    document.addEventListener("click", function (e) {
-        if (e.target.id !== "search") {
-            document.getElementById("autocomplete-list").innerHTML = "";
+    function handleAllergySearch() {
+        const q = document.getElementById("allergy-search").value.toLowerCase().trim();
+        const container = document.getElementById("allergy-autocomplete");
+        container.innerHTML = "";
+        if (q.length < 1) return;
+
+        const terms = q.split(/\s+/);
+        allergyOptions.filter(opt => {
+            const hay = (opt.label + " " + opt.id).toLowerCase();
+            return terms.every(t => hay.includes(t));
+        }).forEach(opt => {
+            if (patientAllergieIds.has(opt.id)) return;
+            const div = document.createElement("div");
+            div.textContent = opt.label;
+            div.onclick = () => addPatientAllergy(opt.id);
+            container.appendChild(div);
+        });
+    }
+
+    function refreshSuggestedList() {
+        if (!activeDiagnosis) return;
+        selectDiagnosis(activeDiagnosis);
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2200);
+    }
+
+    function isInCart(key) {
+        return rxCart.some(item => item.key === key);
+    }
+
+    function addToCart(catId, medIdx) {
+        const idx = parseInt(medIdx, 10);
+        if (!catId || isNaN(idx)) {
+            showToast("Invalid medication");
+            return;
+        }
+        const med = getMed(catId, idx);
+        if (!med) {
+            showToast("Medication not found");
+            return;
+        }
+        const key = medKey(catId, idx);
+        if (isInCart(key)) {
+            showToast("Already in list");
+            return;
+        }
+        if (rxCart.length >= MAX_CART) {
+            showToast("Maximum 5 medications");
+            return;
+        }
+        const allergyWarnings = checkMedAllergy(med);
+        if (allergyWarnings.length) {
+            const msg = allergyWarnings.map(w => w.text).join("\n\n");
+            if (!confirm(msg + "\n\nAdd this medication to the list anyway?")) {
+                showToast("Not added — review allergy");
+                return;
+            }
+        }
+
+        const w = getWeight();
+        const dose = w ? calculateMedDose(med, w) : null;
+        rxCart.push({
+            id: ++cartIdCounter,
+            key,
+            catId,
+            medIdx: idx,
+            plain: buildPlainRx(med, dose),
+            note: med.note,
+            name: med.name,
+            allergyWarnings,
+            ivMix: isIvAntibiotic(med) ? buildDefaultIvMix(med, dose) : null
+        });
+        renderCart();
+        showToast(allergyWarnings.length ? "Added with allergy warning" : "Added to list");
+    }
+
+    function removeFromCart(id) {
+        rxCart = rxCart.filter(item => item.id !== id);
+        renderCart();
+    }
+
+    function clearCart() {
+        rxCart = [];
+        activeDiagnosis = null;
+        renderCart();
+        document.getElementById("suggested-list").innerHTML = "";
+        document.getElementById("suggested-hint").style.display = "block";
+        document.getElementById("suggested-hint").textContent = "Choose a diagnosis above to see suggested meds.";
+        document.getElementById("diag-badge-wrap").innerHTML = "";
+        const df = document.getElementById("system-filter");
+        const ds = document.getElementById("diag-search");
+        if (df) df.value = "";
+        if (ds) ds.value = "";
+        activeSystem = null;
+        renderDiagResults();
+        renderDiagQuickPicks();
+    }
+
+    function resetSuggestedHint() {
+        document.getElementById("suggested-list").innerHTML = "";
+        document.getElementById("suggested-hint").style.display = "block";
+        document.getElementById("suggested-hint").textContent = "Choose a diagnosis above to see suggested meds.";
+        document.getElementById("suggested-box").classList.add("visible");
+    }
+
+    const DIAG_QUICK_NAMES = [
+        "Viral URI / Fever",
+        "Acute Otitis Media",
+        "Gastroenteritis / Vomiting",
+        "Asthma / Bronchospasm",
+        "Bronchiolitis",
+        "Bacterial Bronchitis",
+        "Anaphylaxis / Anaphylactic Shock",
+        "Cardiac Arrest (PEA / Asystole)",
+        "Rapid Sequence Intubation (RSI)",
+        "Neonatal Cardiac Arrest (NCPR)"
+    ];
+
+    function systemLabel(systemId) {
+        const s = clinicalSystems.find(x => x.id === systemId);
+        return s ? s.short : systemId;
+    }
+
+    function findDiagnosisByName(name) {
+        const exact = diagnosisData.find(d => d.name === name);
+        if (exact) return exact;
+        const lower = name.toLowerCase();
+        return diagnosisData.find(d => d.name.toLowerCase() === lower);
+    }
+
+    function initDiagnosisUI() {
+        const sel = document.getElementById("system-filter");
+        if (!sel) return;
+        sel.innerHTML = '<option value="">All systems</option>';
+        clinicalSystems.forEach(sys => {
+            const count = diagnosisData.filter(d => d.system === sys.id).length;
+            if (!count) return;
+            const opt = document.createElement("option");
+            opt.value = sys.id;
+            opt.textContent = sys.short;
+            sel.appendChild(opt);
+        });
+        renderDiagQuickPicks();
+        renderDiagResults();
+    }
+
+    function onSystemFilterChange() {
+        activeSystem = document.getElementById("system-filter").value || null;
+        activeDiagnosis = null;
+        document.getElementById("diag-badge-wrap").innerHTML = "";
+        resetSuggestedHint();
+        renderDiagResults();
+        renderDiagQuickPicks();
+        const catSelect = document.getElementById("category");
+        if (catSelect && activeSystem) {
+            catSelect.value = activeSystem;
+            updateMedList();
+        }
+    }
+
+    function renderDiagQuickPicks() {
+        const wrap = document.getElementById("diag-quick");
+        if (!wrap) return;
+        wrap.innerHTML = '<span class="diag-quick-label">Emergency</span>';
+
+        const emergencySystems = [
+            { id: "pals", label: "PALS" },
+            { id: "ncpr", label: "NCPR" }
+        ];
+        emergencySystems.forEach(s => {
+            const pill = document.createElement("button");
+            pill.type = "button";
+            pill.className = "diag-pill emerg" + (activeSystem === s.id ? " active" : "");
+            pill.textContent = s.label;
+            pill.title = s.id === "pals" ? "PALS — Pediatric Advanced Life Support" : "NCPR / NRP — Neonatal Resuscitation";
+            pill.onclick = () => {
+                document.getElementById("system-filter").value = s.id;
+                onSystemFilterChange();
+                const input = document.getElementById("diag-search");
+                if (input) input.focus();
+            };
+            wrap.appendChild(pill);
+        });
+
+        wrap.appendChild(document.createTextNode(" "));
+        const commonLabel = document.createElement("span");
+        commonLabel.className = "diag-quick-label";
+        commonLabel.textContent = "Common";
+        wrap.appendChild(commonLabel);
+
+        DIAG_QUICK_NAMES.forEach(name => {
+            const d = findDiagnosisByName(name);
+            if (!d) return;
+            if (activeSystem && d.system !== activeSystem) return;
+            const pill = document.createElement("button");
+            pill.type = "button";
+            pill.className = "diag-pill" + (activeDiagnosis === d ? " active" : "");
+            const short = d.name.split("(")[0].trim();
+            pill.textContent = short.length > 24 ? short.slice(0, 22) + "…" : short;
+            pill.title = d.name;
+            pill.onclick = () => {
+                document.getElementById("system-filter").value = d.system;
+                activeSystem = d.system;
+                selectDiagnosis(d);
+            };
+            wrap.appendChild(pill);
+        });
+    }
+
+    function renderDiagResults() {
+        const container = document.getElementById("diag-results");
+        const hint = document.getElementById("diag-results-hint");
+        if (!container) return;
+
+        const q = (document.getElementById("diag-search").value || "").toLowerCase().trim();
+        const systemId = document.getElementById("system-filter").value;
+        activeSystem = systemId || null;
+
+        container.innerHTML = "";
+
+        if (!q && !systemId) {
+            hint.style.display = "block";
+            hint.textContent = "Pick a common diagnosis below, filter by system, or type to search.";
+            return;
+        }
+
+        hint.style.display = "none";
+        let list = diagnosisData;
+        if (systemId && !q) list = list.filter(d => d.system === systemId);
+        if (q) {
+            const terms = q.split(/\s+/);
+            list = list.filter(d => {
+                const hay = (d.name + " " + (d.keywords || []).join(" ")).toLowerCase();
+                return terms.every(t => hay.includes(t));
+            });
+        }
+
+        list = list.slice(0, q ? 18 : 10);
+        if (!list.length) {
+            container.innerHTML = '<p class="diag-empty">No match — try another word</p>';
+            return;
+        }
+
+        list.forEach(d => {
+            const row = document.createElement("button");
+            row.type = "button";
+            row.className = "diag-row" + (activeDiagnosis === d ? " active" : "");
+            row.setAttribute("role", "option");
+            row.innerHTML =
+                `<span class="diag-row-name">${d.name}</span>` +
+                `<span class="diag-row-sys">${systemLabel(d.system)}</span>`;
+            row.onclick = () => {
+                document.getElementById("system-filter").value = d.system;
+                activeSystem = d.system;
+                selectDiagnosis(d);
+            };
+            container.appendChild(row);
+        });
+    }
+
+    function renderCart() {
+        const list = document.getElementById("cart-list");
+        const empty = document.getElementById("cart-empty");
+        const countEl = document.getElementById("cart-count");
+        const copyBtn = document.getElementById("copyAllBtn");
+
+        countEl.textContent = `${rxCart.length} / ${MAX_CART} medications`;
+        copyBtn.disabled = rxCart.length === 0;
+
+        list.replaceChildren();
+
+        if (rxCart.length === 0) {
+            empty.style.display = "block";
+            refreshSuggestedButtons();
+            return;
+        }
+
+        empty.style.display = "none";
+        const w = getWeight();
+        const fragment = document.createDocumentFragment();
+
+        rxCart.forEach(item => {
+            const med = getMed(item.catId, item.medIdx);
+            if (!med) return;
+
+            const dose = w ? calculateMedDose(med, w) : null;
+            item.plain = buildPlainRx(med, dose);
+
+            const allergyWarnings = item.allergyWarnings || checkMedAllergy(med);
+
+            const div = document.createElement("div");
+            div.className = "cart-item" + (med.refOnly ? " ref-only" : "") + (allergyWarnings.length ? " has-allergy" : "");
+            div.dataset.cartId = item.id;
+
+            const removeBtn = document.createElement("button");
+            removeBtn.className = "cart-item-remove";
+            removeBtn.type = "button";
+            removeBtn.title = "Remove";
+            removeBtn.textContent = "×";
+            removeBtn.onclick = () => removeFromCart(item.id);
+
+            const rxLine = document.createElement("div");
+            rxLine.className = "cart-item-rx";
+            rxLine.textContent = item.plain;
+
+            const noteLine = document.createElement("div");
+            noteLine.className = "cart-item-note";
+            noteLine.textContent = `${item.name} — ${item.note}`;
+
+            div.appendChild(removeBtn);
+            div.appendChild(rxLine);
+            div.appendChild(noteLine);
+
+            if (isIvAntibiotic(med)) {
+                if (!item.ivMix) item.ivMix = buildDefaultIvMix(med, dose);
+                if (!item.ivMix.standardConcMgMl) {
+                    item.ivMix.standardConcMgMl = getStandardIvConc(med);
+                }
+                const mix = w ? computeIvMix(med, dose, item.ivMix) : null;
+
+                const box = document.createElement("div");
+                box.className = "ivmix-box";
+                const r = mix ? mix.range : getIvAbxConcRange(med);
+                const stdConc = mix ? mix.standardConc : getStandardIvConc(med);
+                box.innerHTML = `
+                    <div class="ivmix-title">IV Mix — adjust total volume only</div>
+                    <div class="ivmix-grid">
+                        <div>
+                            <label>Standard concentration (mg/ml) [${r.min}–${r.max}]</label>
+                            <div class="ivmix-readonly">${stdConc}</div>
+                        </div>
+                        <div>
+                            <label>Drug volume needed (ml)</label>
+                            <div class="ivmix-readonly" data-ivmix="drugMl">${mix && !isNaN(mix.drugMl) ? mix.drugMl : "—"}</div>
+                        </div>
+                        <div>
+                            <label>Total bag volume (ml)</label>
+                            <input type="text" inputmode="decimal" pattern="[0-9.]*" value="${item.ivMix.totalVolumeMl != null ? item.ivMix.totalVolumeMl : (med.defaultVolume || 100)}" />
+                        </div>
+                        <div>
+                            <label>Diluent added (ml)</label>
+                            <div class="ivmix-readonly" data-ivmix="diluentMl">${mix && !isNaN(mix.diluentMl) ? Math.max(0, mix.diluentMl) : "—"}</div>
+                        </div>
+                        <div>
+                            <label>Final bag concentration (mg/ml)</label>
+                            <div class="ivmix-readonly" data-ivmix="finalBagConc">${mix && !isNaN(mix.finalBagConc) ? mix.finalBagConc : "—"}</div>
+                        </div>
+                        <div>
+                            <label>Diluent</label>
+                            <select>
+                                <option value="NSS" ${item.ivMix.diluent === "NSS" ? "selected" : ""}>NSS</option>
+                                <option value="D5W" ${item.ivMix.diluent === "D5W" ? "selected" : ""}>D5W</option>
+                                <option value="Other" ${item.ivMix.diluent === "Other" ? "selected" : ""}>Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Interval (hr)</label>
+                            <input type="number" step="1" min="1" value="${mix ? mix.interval : 24}" />
+                        </div>
+                        <div>
+                            <label>Drip over (min)</label>
+                            <input type="number" step="1" min="1" value="${mix ? mix.dripMin : 30}" />
+                        </div>
+                    </div>
+                    ${mix && mix.volumeTooLow ? '<p class="ivmix-warn" data-ivmix="warn">Total volume is less than drug volume — increase total bag volume.</p>' : ""}
+                `;
+                const inputs = box.querySelectorAll("input");
+                const sel = box.querySelector("select");
+                inputs[0].addEventListener("input", (e) => updateIvMix(item.id, "totalVolumeMl", e.target.value));
+                inputs[0].addEventListener("blur", (e) => {
+                    const v = parseFloat(e.target.value);
+                    if (isNaN(v) || v < 1) {
+                        item.ivMix.totalVolumeMl = String(med.defaultVolume || 100);
+                        e.target.value = item.ivMix.totalVolumeMl;
+                        refreshIvMixUI(item.id);
+                    }
+                });
+                sel.onchange = (e) => updateIvMix(item.id, "diluent", e.target.value);
+                inputs[1].addEventListener("input", (e) => updateIvMix(item.id, "intervalHr", e.target.value));
+                inputs[2].addEventListener("input", (e) => updateIvMix(item.id, "dripMin", e.target.value));
+
+                const order = document.createElement("div");
+                order.className = "ivmix-order";
+                const mixLine = w ? buildIvMixOrderLine(med, dose, item.ivMix) : null;
+                order.textContent = mixLine || "Enter weight to calculate IV mix volume and order line.";
+                box.appendChild(order);
+                div.appendChild(box);
+            }
+
+            if (allergyWarnings.length) {
+                const warnLine = document.createElement("div");
+                warnLine.className = "cart-allergy-warn";
+                warnLine.textContent = allergyWarnings.map(w => w.text).join(" ");
+                div.appendChild(warnLine);
+            }
+            fragment.appendChild(div);
+        });
+
+        list.appendChild(fragment);
+        refreshSuggestedButtons();
+    }
+
+    function copyAllCart() {
+        if (rxCart.length === 0) return;
+        const w = getWeight();
+        if (!w) {
+            showToast("Enter patient weight first");
+            return;
+        }
+        const lines = rxCart.map(item => {
+            const med = getMed(item.catId, item.medIdx);
+            const dose = med && med.refOnly ? null : calculateMedDose(med, w);
+            const mixLine = buildIvMixOrderLine(med, dose, item.ivMix);
+            if (mixLine) return mixLine;
+            return buildPlainRx(med, dose);
+        });
+        const text = lines.join("\n");
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("Copied " + lines.length + " orders");
+        }).catch(() => alert("Copy failed. Select and copy manually:\n\n" + text));
+    }
+
+    function onWeightChange() {
+        renderCart();
+        refreshSuggestedList();
+    }
+
+    function buildSuggestedRow(med, key) {
+        const w = getWeight();
+        const dose = med.refOnly ? null : (w ? calculateMedDose(med, w) : "____");
+        const preview = buildPlainRx(med, dose);
+        const inCart = isInCart(key);
+        const allergyWarnings = checkMedAllergy(med);
+
+        const row = document.createElement("div");
+        row.className = "suggested-item" + (med.refOnly ? " ref-only" : "") + (allergyWarnings.length ? " has-allergy" : "");
+
+        const textSpan = document.createElement("span");
+        let inner = `<strong>${med.name}</strong><br><small>${preview}</small>`;
+        if (med.refOnly && med.role) {
+            inner += `<span class="ref-badge">${med.role} · Thai formulary (verify weight/dose)</span>`;
+        }
+        if (allergyWarnings.length) {
+            inner += allergyWarnings.map(w =>
+                `<span class="allergy-warn-inline">⚠ ${w.text}</span>`
+            ).join("");
+        }
+        textSpan.innerHTML = inner;
+
+        const btn = document.createElement("button");
+        btn.className = "btn-add";
+        btn.dataset.key = key;
+        btn.disabled = inCart || rxCart.length >= MAX_CART;
+        btn.textContent = inCart ? "Added" : "+ Add";
+        btn.onclick = () => {
+            const p = key.split("|");
+            addToCart(p[0], parseInt(p[1], 10));
+        };
+
+        row.appendChild(textSpan);
+        row.appendChild(btn);
+        return row;
+    }
+
+    function selectDiagnosis(diag) {
+        activeDiagnosis = diag;
+        document.getElementById("diag-badge-wrap").innerHTML =
+            `<span class="diag-badge">${diag.name}</span>`;
+
+        renderDiagResults();
+        renderDiagQuickPicks();
+
+        const box = document.getElementById("suggested-box");
+        const title = document.getElementById("suggested-title");
+        const list = document.getElementById("suggested-list");
+        const hint = document.getElementById("suggested-hint");
+        title.textContent = diag.name + " — add to list:";
+        hint.style.display = "none";
+        list.innerHTML = "";
+        box.classList.add("visible");
+
+        diag.medKeys.forEach(key => {
+            const resolved = resolveMedKey(key);
+            const parts = resolved.split("|");
+            const catId = parts[0];
+            const medIdx = parseInt(parts[1], 10);
+            const med = getMed(catId, medIdx);
+            if (!med) return;
+            list.appendChild(buildSuggestedRow(med, resolved));
+        });
+    }
+
+    function refreshSuggestedButtons() {
+        if (!activeDiagnosis) return;
+        document.querySelectorAll("#suggested-list .btn-add").forEach(btn => {
+            const key = btn.dataset.key;
+            const inCart = isInCart(key);
+            btn.disabled = inCart || rxCart.length >= MAX_CART;
+            btn.textContent = inCart ? "Added" : "+ Add";
+        });
+    }
+
+    function handleMedSearch() {
+        const q = document.getElementById("med-search").value.toLowerCase().trim();
+        const container = document.getElementById("med-autocomplete");
+        container.innerHTML = "";
+        if (q.length < 1) return;
+        const terms = q.split(/\s+/);
+        allMedsList.filter(m => {
+            const hay = (m.name + " " + (m.preparation || "") + " " + (m.dosePed || "")).toLowerCase();
+            return terms.every(t => hay.includes(t));
+        })
+            .slice(0, 25)
+            .forEach(m => {
+                const div = document.createElement("div");
+                div.textContent = m.name;
+                div.onclick = () => {
+                    document.getElementById("med-search").value = m.name;
+                    container.innerHTML = "";
+                    addToCart(m.catId, m.medIdx);
+                };
+                container.appendChild(div);
+            });
+    }
+
+    function updateMedList() {
+        const cat = document.getElementById("category").value;
+        const sel = document.getElementById("medication");
+        const btn = document.getElementById("browseAddBtn");
+        sel.innerHTML = '<option value="">-- Medication --</option>';
+        btn.disabled = true;
+        if (!cat) { sel.disabled = true; return; }
+        sel.disabled = false;
+        medData[cat].forEach((item, index) => {
+            const opt = document.createElement("option");
+            opt.value = `${cat}|${index}`;
+            opt.textContent = item.name;
+            sel.appendChild(opt);
+        });
+    }
+
+    function onBrowseMedSelect() {
+        document.getElementById("browseAddBtn").disabled = !document.getElementById("medication").value;
+    }
+
+    function addBrowseSelection() {
+        const val = document.getElementById("medication").value;
+        if (!val) return;
+        const pipe = val.indexOf("|");
+        if (pipe < 0) return;
+        const catId = val.slice(0, pipe);
+        const medIdx = val.slice(pipe + 1);
+        addToCart(catId, medIdx);
+    }
+
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest("#med-search") && !e.target.closest("#med-autocomplete")) {
+            document.getElementById("med-autocomplete").innerHTML = "";
+        }
+        if (!e.target.closest("#allergy-search") && !e.target.closest("#allergy-autocomplete")) {
+            document.getElementById("allergy-autocomplete").innerHTML = "";
         }
     });
 
-    // The Classic Dropdown Logic
-    function updateMedList(clearSearch = true) {
-        if(clearSearch) document.getElementById("search").value = "";
-        
-        const catSelect = document.getElementById("category");
-        const medSelect = document.getElementById("medication");
-        const resultBox = document.getElementById("result-box");
-        
-        medSelect.innerHTML = '<option value="">-- Select Medication & Concentration --</option>';
-        if(clearSearch) {
-            resultBox.style.display = "none";
-            document.getElementById("advanced-panel").classList.remove("visible");
-            document.getElementById("dose-adjust-panel").classList.remove("visible");
-        }
-
-        if (catSelect.value) {
-            medSelect.disabled = false;
-            medData[catSelect.value].forEach((item, index) => {
-                let opt = document.createElement("option");
-                opt.value = `${catSelect.value}|${index}`;
-                opt.textContent = item.name;
-                medSelect.appendChild(opt);
-            });
-        } else {
-            medSelect.disabled = true;
-        }
-    }
-
-    // Calculation Logic
-    function showPrescription(selectedValue) {
-        const prevSelection = currentSelectedValue;
-        if (selectedValue && typeof selectedValue === "string") {
-            currentSelectedValue = selectedValue;
-        }
-        
-        const wtInput = parseFloat(document.getElementById("weight").value);
-        const resultBox = document.getElementById("result-box");
-        const rxText = document.getElementById("prescription-text");
-        const rxNote = document.getElementById("prescription-note");
-        const copyBtn = document.getElementById("copyBtn");
-        const advancedPanel = document.getElementById("advanced-panel");
-        const orderLabel = document.getElementById("order-mode-label");
-
-        copyBtn.innerText = "Copy Text";
-        copyBtn.style.background = "#27ae60";
-
-        if (currentSelectedValue) {
-            const [catId, medIdx] = currentSelectedValue.split("|");
-            const med = medData[catId][medIdx];
-
-            if (selectedValue && selectedValue !== prevSelection) {
-                resetDoseAdjustForMed(med);
-                document.getElementById("totalVolume").value = med.defaultVolume || "";
-                if (!isIvMed(med)) resetAdvancedPanel();
-            }
-
-            updateDoseAdjustUI(med);
-
-            let calculatedDose = null;
-            if (!isNaN(wtInput) && wtInput > 0) {
-                calculatedDose = calculateMedDose(med, wtInput);
-            }
-
-            const dosingNote = buildDosingNote(med);
-            const isIv = isIvMed(med);
-            const advancedOn = isIv && document.getElementById("advancedEnabled").checked;
-            if (isIv) {
-                advancedPanel.classList.add("visible");
-            } else {
-                advancedPanel.classList.remove("visible");
-            }
-
-            if (advancedOn) {
-                const advanced = buildAdvancedRx(med, calculatedDose);
-                rxText.innerHTML = advanced.html;
-                rxNote.innerHTML = advanced.noteHtml;
-                orderLabel.textContent = "IV dilution & drip (advanced) — copy text below";
-                rxText.dataset.plainOrder = advanced.plain;
-            } else {
-                const basic = buildBasicRx(med, calculatedDose);
-                rxText.innerHTML = basic.html;
-                rxNote.innerText = dosingNote;
-                orderLabel.textContent = "";
-                rxText.dataset.plainOrder = basic.plain;
-            }
-
-            resultBox.style.display = "block";
-        } else {
-            resultBox.style.display = "none";
-            advancedPanel.classList.remove("visible");
-            document.getElementById("dose-adjust-panel").classList.remove("visible");
-            orderLabel.textContent = "";
-        }
-    }
-    
-    function checkWeightRange(val) {
-        const w = parseFloat(val);
-        const warn = document.getElementById("weight-warn");
-        warn.style.display = (!isNaN(w) && w > 0 && (w < 3 || w > 100)) ? "block" : "none";
-    }
-
-    // Updates live if weight is changed while a med is selected
-    function recalculateCurrent() {
-        if (currentSelectedValue) {
-            showPrescription(currentSelectedValue);
-        }
-    }
-
-    function copyToClipboard() {
-        const rxEl = document.getElementById("prescription-text");
-        const textToCopy = rxEl.dataset.plainOrder || rxEl.innerText;
-        const copyBtn = document.getElementById("copyBtn");
-        
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            copyBtn.innerText = "Copied!";
-            copyBtn.style.background = "#2c3e50";
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-            alert("Clipboard access denied. You can manually highlight and copy the text.");
-        });
-    }
+    initDiagnosisUI();
+    document.getElementById("suggested-box").classList.add("visible");
+    document.getElementById("suggested-hint").style.display = "block";
 </script>
-
 </body>
 </html>
