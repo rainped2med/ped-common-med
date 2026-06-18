@@ -1108,7 +1108,7 @@
        Setup:
        1) Create a Google Sheet with a tab (default name "Drugs") with header row:
           key | category | name | standardMgKg | doseUnit | doseRangeLo | doseRangeHi | maxMg | maxMgPerDay
-          | dosesPerDay | concMgMl | mlPerBottle | note | rx | special
+          | dosesPerDay | concMgMl | strengthMg | perMl | mlPerBottle | note | rx | special
           Share the sheet as "Anyone with the link can view".
 
           To OVERRIDE an existing drug: set "key" to its "catId|medIdx" (e.g. "antimicrobial|8") — only the
@@ -1125,6 +1125,12 @@
           "mlPerBottle" sets the default bottle size used by the quantity-to-dispense calculator, so the
           doctor doesn't have to type it in each time. Applies to ANY existing drug by "key" — it doesn't
           require the drug to be doseAdjustable, since it's just packaging info, not dosing logic.
+
+          "strengthMg" + "perMl" let you enter a drug's label concentration directly (e.g. 120 and 5 for
+          "120mg/5ml") instead of pre-computing the ratio — concMgMl is derived automatically (24, here)
+          whenever both are filled in and "concMgMl" itself is left blank. For brand-new drugs, if the
+          "name" doesn't already contain a "(...mg...)" label, the "(Xmg/Yml)" suffix is appended to it
+          automatically too, so the label and the actual dosing math can never drift apart.
        2) For usage logging, create an Apps Script (Extensions > Apps Script) bound to the same Sheet with:
 
           function doPost(e) {
@@ -1222,6 +1228,16 @@
         return norm;
     }
 
+    /* strengthMg + perMl let you fill in a drug's label concentration (e.g. 120 mg / 5 ml) instead of
+       pre-computing the mg/ml ratio yourself — concMgMl is derived automatically when both are present
+       and concMgMl itself isn't already filled in directly. */
+    function deriveConcMgMl(row) {
+        if (row.strengthmg === undefined || row.strengthmg === "" || row.perml === undefined || row.perml === "") return null;
+        const s = parseFloat(row.strengthmg), p = parseFloat(row.perml);
+        if (isNaN(s) || isNaN(p) || p <= 0) return null;
+        return s / p;
+    }
+
     function rowsToOverrides(rows) {
         const overrides = {};
         rows.forEach(rawRow => {
@@ -1241,6 +1257,10 @@
                 if (f === "maxMgPerDay") entry.maxCap = value;
                 else entry[f] = value;
             });
+            if (entry.concMgMl === undefined) {
+                const derived = deriveConcMgMl(row);
+                if (derived != null) entry.concMgMl = derived;
+            }
             if (Object.keys(entry).length) overrides[key] = entry;
         });
         return overrides;
@@ -1299,7 +1319,7 @@
        fill "dosesPerDay"). Re-running sync updates the same drug in place rather than duplicating it. */
     const customDrugRegistry = {}; // sheetKey -> { catId, idx }, in-memory for this session
 
-    function buildNewDrugFields(row) {
+    function buildNewDrugFields(row, baseName) {
         const fields = { doseAdjustable: true, note: row.note || "" };
         const lo = row.doserangelo !== undefined && row.doserangelo !== "" ? parseFloat(row.doserangelo) : null;
         const hi = row.doserangehi !== undefined && row.doserangehi !== "" ? parseFloat(row.doserangehi) : null;
@@ -1309,9 +1329,20 @@
         if (row.maxmg !== undefined && row.maxmg !== "") fields.maxMg = parseFloat(row.maxmg);
         if (row.maxmgperday !== undefined && row.maxmgperday !== "") fields.maxMgPerDay = parseFloat(row.maxmgperday);
         if (row.dosesperday !== undefined && row.dosesperday !== "") fields.dosesPerDay = parseFloat(row.dosesperday);
-        if (row.concmgml !== undefined && row.concmgml !== "") fields.concMgMl = parseFloat(row.concmgml);
         if (row.mlperbottle !== undefined && row.mlperbottle !== "") fields.mlPerBottle = parseFloat(row.mlperbottle);
         if ((row.rx || "").includes("{dose} ml")) fields.roundHalfMl = true;
+
+        if (row.concmgml !== undefined && row.concmgml !== "") {
+            fields.concMgMl = parseFloat(row.concmgml);
+        } else {
+            const derived = deriveConcMgMl(row);
+            if (derived != null) {
+                fields.concMgMl = derived;
+                if (baseName && !/\(.*mg.*\)/i.test(baseName)) {
+                    fields.name = `${baseName} (${row.strengthmg}mg/${row.perml}ml)`;
+                }
+            }
+        }
         return fields;
     }
 
@@ -1329,12 +1360,12 @@
             if (customDrugRegistry[sheetKey]) {
                 const ref = customDrugRegistry[sheetKey];
                 const med = getMed(ref.catId, ref.idx);
-                if (med) { Object.assign(med, { name, rx }, buildNewDrugFields(row)); updated++; }
+                if (med) { Object.assign(med, { name, rx }, buildNewDrugFields(row, name)); updated++; }
                 return;
             }
 
             if (!medData[category]) medData[category] = [];
-            const newMed = Object.assign({ name, rx }, buildNewDrugFields(row));
+            const newMed = Object.assign({ name, rx }, buildNewDrugFields(row, name));
             const idx = medData[category].push(newMed) - 1;
             customDrugRegistry[sheetKey] = { catId: category, idx };
             created++;
