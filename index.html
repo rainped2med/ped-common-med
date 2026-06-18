@@ -1107,10 +1107,20 @@
     /*
        Setup:
        1) Create a Google Sheet with a tab (default name "Drugs") with header row:
-          key | standardMgKg | doseRangeLo | doseRangeHi | maxMg | maxMgPerDay | dosesPerDay | concMgMl | note | rx
-          "key" must match an existing declarative (doseAdjustable) med's "catId|medIdx", e.g. "antimicrobial|8".
-          Only fill in the columns you want to override — leave others blank to keep the bundled value.
+          key | category | name | standardMgKg | doseUnit | doseRangeLo | doseRangeHi | maxMg | maxMgPerDay
+          | dosesPerDay | concMgMl | note | rx | special
           Share the sheet as "Anyone with the link can view".
+
+          To OVERRIDE an existing drug: set "key" to its "catId|medIdx" (e.g. "antimicrobial|8") — only the
+          drugs already declared doseAdjustable in the code can be overridden this way. Fill in only the
+          columns you want to change; leave the rest blank to keep the bundled value.
+
+          To ADD a brand-new drug: give "key" any unique string of your own (e.g. "new_cefixime_po"),
+          fill in "category" (an existing category id like "antimicrobial", or a new one — it's created
+          automatically), "name", "rx" (must contain the literal "{dose}" placeholder plus its unit, e.g.
+          "Cefixime Susp (100 mg/5 ml) {dose} ml PO OD"), and "standardMgKg" — the drug is created on next
+          sync and is immediately editable from the Sheet from then on, no code changes needed. "doseUnit"
+          defaults to "mg/kg/dose" — set it to "mg/kg/day" plus "dosesPerDay" for divided dosing.
        2) For usage logging, create an Apps Script (Extensions > Apps Script) bound to the same Sheet with:
 
           function doPost(e) {
@@ -1255,6 +1265,58 @@
         return applied;
     }
 
+    /* ───────── New-drug creation from the Sheet ─────────
+       A row creates a brand-new drug (instead of overriding an existing one) when its "key" doesn't
+       match any existing catId|index AND it has "category", "name", "rx", and "standardMgKg" filled in.
+       "category" must be one of: neuro_pain, respiratory, gi, antimicrobial, cardio, emergency,
+       fluids, infant_supp, pals, ncpr (or any new category name — it will be created automatically).
+       "rx" must include the literal "{dose}" placeholder plus its unit, e.g. "{dose} ml" or "{dose} mg".
+       "doseUnit" is optional, defaults to "mg/kg/dose" (use "mg/kg/day" for divided dosing — then also
+       fill "dosesPerDay"). Re-running sync updates the same drug in place rather than duplicating it. */
+    const customDrugRegistry = {}; // sheetKey -> { catId, idx }, in-memory for this session
+
+    function buildNewDrugFields(row) {
+        const fields = { doseAdjustable: true, note: row.note || "" };
+        const lo = row.doserangelo !== undefined && row.doserangelo !== "" ? parseFloat(row.doserangelo) : null;
+        const hi = row.doserangehi !== undefined && row.doserangehi !== "" ? parseFloat(row.doserangehi) : null;
+        if (lo != null && hi != null && !isNaN(lo) && !isNaN(hi)) fields.doseRange = [lo, hi];
+        fields.standardMgKg = parseFloat(row.standardmgkg);
+        fields.doseUnit = row.doseunit || "mg/kg/dose";
+        if (row.maxmg !== undefined && row.maxmg !== "") fields.maxMg = parseFloat(row.maxmg);
+        if (row.maxmgperday !== undefined && row.maxmgperday !== "") fields.maxMgPerDay = parseFloat(row.maxmgperday);
+        if (row.dosesperday !== undefined && row.dosesperday !== "") fields.dosesPerDay = parseFloat(row.dosesperday);
+        if (row.concmgml !== undefined && row.concmgml !== "") fields.concMgMl = parseFloat(row.concmgml);
+        if ((row.rx || "").includes("{dose} ml")) fields.roundHalfMl = true;
+        return fields;
+    }
+
+    function applyNewDrugs(rows) {
+        let created = 0, updated = 0;
+        rows.forEach(rawRow => {
+            const row = normalizeRow(rawRow);
+            const sheetKey = row.key, category = row.category, name = row.name, rx = row.rx;
+            if (!sheetKey || !category || !name || !rx) return;
+            if (row.standardmgkg === undefined || row.standardmgkg === "" || isNaN(parseFloat(row.standardmgkg))) return;
+
+            const pipe = sheetKey.indexOf("|");
+            if (pipe >= 0 && getMed(sheetKey.slice(0, pipe), sheetKey.slice(pipe + 1))) return; // existing med, handled by overrides
+
+            if (customDrugRegistry[sheetKey]) {
+                const ref = customDrugRegistry[sheetKey];
+                const med = getMed(ref.catId, ref.idx);
+                if (med) { Object.assign(med, { name, rx }, buildNewDrugFields(row)); updated++; }
+                return;
+            }
+
+            if (!medData[category]) medData[category] = [];
+            const newMed = Object.assign({ name, rx }, buildNewDrugFields(row));
+            const idx = medData[category].push(newMed) - 1;
+            customDrugRegistry[sheetKey] = { catId: category, idx };
+            created++;
+        });
+        return { created, updated };
+    }
+
     function setSyncStatus(text, cls) {
         const el = document.getElementById("sync-status-bar");
         if (!el) return;
@@ -1272,15 +1334,31 @@
         return `${Math.round(hrs / 24)} day(s) ago`;
     }
 
+    function applyRows(rows) {
+        const overrides = rowsToOverrides(rows);
+        const applied = applyCatalogOverrides(overrides);
+        const { created, updated } = applyNewDrugs(rows);
+        if (created > 0) initSearchList();
+        return { applied, created, updated };
+    }
+
+    function describeSync(r) {
+        const parts = [`${r.applied} override${r.applied === 1 ? "" : "s"} applied`];
+        if (r.created) parts.push(`${r.created} new drug${r.created === 1 ? "" : "s"} added`);
+        if (r.updated) parts.push(`${r.updated} new drug${r.updated === 1 ? "" : "s"} updated`);
+        return parts.join(", ");
+    }
+
     async function syncCatalogFromSheet() {
-        const cachedOverrides = await syncDbGet("catalogOverrides");
+        const cachedRows = await syncDbGet("sheetRows");
         const lastSynced = await syncDbGet("lastSynced");
-        if (cachedOverrides) applyCatalogOverrides(cachedOverrides);
+        let cachedResult = null;
+        if (cachedRows) cachedResult = applyRows(cachedRows);
 
         if (!SHEET_CONFIG.enabled || !SHEET_CONFIG.sheetId) {
-            setSyncStatus(cachedOverrides
-                ? `Catalog: offline — using cached sync from ${formatAgo(lastSynced)}`
-                : "Catalog: using bundled defaults (offline)", cachedOverrides ? "stale" : "");
+            setSyncStatus(cachedResult
+                ? `Catalog: offline — using cached sync from ${formatAgo(lastSynced)} (${describeSync(cachedResult)})`
+                : "Catalog: using bundled defaults (offline)", cachedResult ? "stale" : "");
             return;
         }
 
@@ -1289,15 +1367,15 @@
             const res = await fetch(url, { cache: "no-store" });
             if (!res.ok) throw new Error("fetch failed: " + res.status);
             const csvText = await res.text();
-            const overrides = rowsToOverrides(parseSheetCsv(csvText));
-            const applied = applyCatalogOverrides(overrides);
-            await syncDbSet("catalogOverrides", overrides);
+            const rows = parseSheetCsv(csvText);
+            const result = applyRows(rows);
+            await syncDbSet("sheetRows", rows);
             await syncDbSet("lastSynced", Date.now());
             renderCart();
-            setSyncStatus(`Catalog: synced just now (${applied} override${applied === 1 ? "" : "s"} applied)`, "ok");
+            setSyncStatus(`Catalog: synced just now (${describeSync(result)})`, "ok");
         } catch (e) {
-            setSyncStatus(cachedOverrides
-                ? `Catalog: sync failed — using cached sync from ${formatAgo(lastSynced)}`
+            setSyncStatus(cachedResult
+                ? `Catalog: sync failed — using cached sync from ${formatAgo(lastSynced)} (${describeSync(cachedResult)})`
                 : "Catalog: sync failed — using bundled defaults", "error");
         }
     }
