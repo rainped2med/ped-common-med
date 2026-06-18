@@ -716,7 +716,7 @@
         return {
             days: 5,
             freqPerDay: parseFrequencyPerDay(med.rx) || 1,
-            packageSize: getDoseUnitKind(med) === "ml" ? 60 : null,
+            packageSize: getDoseUnitKind(med) === "ml" ? (med.mlPerBottle || 60) : null,
             mgPerTab: null
         };
     }
@@ -1108,7 +1108,7 @@
        Setup:
        1) Create a Google Sheet with a tab (default name "Drugs") with header row:
           key | category | name | standardMgKg | doseUnit | doseRangeLo | doseRangeHi | maxMg | maxMgPerDay
-          | dosesPerDay | concMgMl | note | rx | special
+          | dosesPerDay | concMgMl | mlPerBottle | note | rx | special
           Share the sheet as "Anyone with the link can view".
 
           To OVERRIDE an existing drug: set "key" to its "catId|medIdx" (e.g. "antimicrobial|8") — only the
@@ -1121,6 +1121,10 @@
           "Cefixime Susp (100 mg/5 ml) {dose} ml PO OD"), and "standardMgKg" — the drug is created on next
           sync and is immediately editable from the Sheet from then on, no code changes needed. "doseUnit"
           defaults to "mg/kg/dose" — set it to "mg/kg/day" plus "dosesPerDay" for divided dosing.
+
+          "mlPerBottle" sets the default bottle size used by the quantity-to-dispense calculator, so the
+          doctor doesn't have to type it in each time. Applies to ANY existing drug by "key" — it doesn't
+          require the drug to be doseAdjustable, since it's just packaging info, not dosing logic.
        2) For usage logging, create an Apps Script (Extensions > Apps Script) bound to the same Sheet with:
 
           function doPost(e) {
@@ -1265,6 +1269,26 @@
         return applied;
     }
 
+    /* Bottle size (mlPerBottle) applies to ANY existing med with a matching key — not gated by
+       doseAdjustable, since it only affects the quantity-to-dispense calculator, not dosing math. */
+    function applyBottleSizeOverrides(rows) {
+        let applied = 0;
+        rows.forEach(rawRow => {
+            const row = normalizeRow(rawRow);
+            const key = row.key;
+            if (!key || row.mlperbottle === undefined || row.mlperbottle === "") return;
+            const n = parseFloat(row.mlperbottle);
+            if (isNaN(n) || n <= 0) return;
+            const pipe = key.indexOf("|");
+            if (pipe < 0) return;
+            const med = getMed(key.slice(0, pipe), key.slice(pipe + 1));
+            if (!med) return;
+            med.mlPerBottle = n;
+            applied++;
+        });
+        return applied;
+    }
+
     /* ───────── New-drug creation from the Sheet ─────────
        A row creates a brand-new drug (instead of overriding an existing one) when its "key" doesn't
        match any existing catId|index AND it has "category", "name", "rx", and "standardMgKg" filled in.
@@ -1286,6 +1310,7 @@
         if (row.maxmgperday !== undefined && row.maxmgperday !== "") fields.maxMgPerDay = parseFloat(row.maxmgperday);
         if (row.dosesperday !== undefined && row.dosesperday !== "") fields.dosesPerDay = parseFloat(row.dosesperday);
         if (row.concmgml !== undefined && row.concmgml !== "") fields.concMgMl = parseFloat(row.concmgml);
+        if (row.mlperbottle !== undefined && row.mlperbottle !== "") fields.mlPerBottle = parseFloat(row.mlperbottle);
         if ((row.rx || "").includes("{dose} ml")) fields.roundHalfMl = true;
         return fields;
     }
@@ -1337,13 +1362,15 @@
     function applyRows(rows) {
         const overrides = rowsToOverrides(rows);
         const applied = applyCatalogOverrides(overrides);
+        const bottleSizes = applyBottleSizeOverrides(rows);
         const { created, updated } = applyNewDrugs(rows);
         if (created > 0) initSearchList();
-        return { applied, created, updated };
+        return { applied, bottleSizes, created, updated };
     }
 
     function describeSync(r) {
         const parts = [`${r.applied} override${r.applied === 1 ? "" : "s"} applied`];
+        if (r.bottleSizes) parts.push(`${r.bottleSizes} bottle size${r.bottleSizes === 1 ? "" : "s"} set`);
         if (r.created) parts.push(`${r.created} new drug${r.created === 1 ? "" : "s"} added`);
         if (r.updated) parts.push(`${r.updated} new drug${r.updated === 1 ? "" : "s"} updated`);
         return parts.join(", ");
