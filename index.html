@@ -14,6 +14,14 @@
         input[type="number"], input[type="text"], select { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid #bdc3c7; font-size: 15px; background-color: #fff; }
         input:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 6px rgba(52, 152, 219, 0.35); }
         .weight-bar { background: #f8f9fa; padding: 14px; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 12px; }
+        .age-input-row { display: flex; gap: 8px; }
+        .age-input-row input { flex: 1; }
+        .age-input-row select { width: auto; min-width: 90px; }
+        .kids-warn-box { margin-top: 10px; padding: 10px; border-radius: 6px; font-size: 0.82em; line-height: 1.4; }
+        .kids-warn-box.avoid { background: #fdedec; border: 1px solid #f1948a; color: #78281f; }
+        .kids-warn-box.caution { background: #fef9e7; border: 1px solid #f7dc6f; color: #7d6608; }
+        .kids-warn-box.unknown-age { background: #f4f6f7; border: 1px dashed #bdc3c7; color: #5d6d7e; }
+        .kids-warn-title { font-weight: bold; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.3px; margin-bottom: 4px; }
         .allergy-compact { margin-bottom: 16px; font-size: 0.9em; }
         .allergy-yesno { display: flex; gap: 20px; margin-top: 6px; }
         .allergy-yesno label { font-weight: normal; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; }
@@ -173,6 +181,19 @@
         <input type="number" id="weight" placeholder="e.g. 14.5" step="0.1" min="0" oninput="onWeightChange()">
     </div>
 
+    <div class="weight-bar age-bar">
+        <label for="age-value">Patient age (optional — enables KIDs List age-based safety warnings)</label>
+        <div class="age-input-row">
+            <input type="number" id="age-value" placeholder="e.g. 2" step="1" min="0" oninput="onAgeChange()">
+            <select id="age-unit" onchange="onAgeChange()">
+                <option value="days">days</option>
+                <option value="weeks">weeks</option>
+                <option value="months" selected>months</option>
+                <option value="years">years</option>
+            </select>
+        </div>
+    </div>
+
     <div class="allergy-compact" id="allergy-compact">
         <span style="font-weight:bold;color:#34495e;">Known drug allergy?</span>
         <div class="allergy-yesno">
@@ -307,6 +328,99 @@
     ];
 
     const CEPHALOSPORIN_TAGS = ["cephalosporin", "ceftriaxone", "cefdinir", "cefotaxime", "cephalexin"];
+
+    /* ───────── KIDs List (Pediatric Pharmacy Association, 2nd Edition, 2025) age-based warnings ─────────
+       Source: McPherson C et al. J Pediatr Pharmacol Ther 2025;30(4):422-439. DOI: 10.5863/JPPT-25-00061.
+       Only entries that match a drug + route actually present in this catalog are included here — this is
+       NOT a drug-drug interaction checker, it flags age-specific contraindications/cautions for individual
+       drugs. ageThresholdDays === null means the caution applies to all pediatric patients regardless of
+       age (shown whenever the drug is in the cart, with or without an age entered). */
+    const KIDS_LIST_RULES = [
+        {
+            match: med => /ceftriaxone/i.test(med.name),
+            recommendation: "caution",
+            ageThresholdDays: 21,
+            ageLabel: "younger than 3 weeks",
+            risk: "Kernicterus (displaces bilirubin from albumin)",
+            note: "Caution in younger than 3 weeks, except for one-time doses for gonococcal treatment.",
+            strength: "Weak", quality: "Very low"
+        },
+        {
+            match: med => /azithromycin/i.test(med.name),
+            recommendation: "avoid",
+            ageThresholdDays: 30,
+            ageLabel: "younger than 1 month",
+            risk: "Hypertrophic pyloric stenosis",
+            note: "Avoid in younger than 1 month except for Bordetella pertussis or Chlamydia trachomatis pneumonia; caution for Ureaplasma.",
+            strength: "Strong", quality: "High"
+        },
+        {
+            match: med => /naloxone/i.test(med.name) && /ncpr|neonat|postpartum/i.test(med.name + " " + med.rx),
+            recommendation: "avoid",
+            ageThresholdDays: null,
+            ageLabel: "neonates (postpartum resuscitation)",
+            risk: "Seizures",
+            note: "Avoid in neonates for postpartum resuscitation specifically — not a general neonatal contraindication for other indications.",
+            strength: "Strong", quality: "High"
+        },
+        {
+            match: med => /nitrofurantoin/i.test(med.name),
+            recommendation: "avoid",
+            ageThresholdDays: 30,
+            ageLabel: "younger than 1 month",
+            risk: "Hemolytic anemia",
+            note: "Avoid in younger than 1 month.",
+            strength: "Weak", quality: "Very low"
+        },
+        {
+            match: med => /cotrimoxazole|bactrim|sulfamethoxazole/i.test(med.name),
+            recommendation: "caution",
+            ageThresholdDays: 30,
+            ageLabel: "younger than 1 month",
+            risk: "Kernicterus",
+            note: "Caution (sulfonamide class) in younger than 1 month.",
+            strength: "Weak", quality: "Very low"
+        },
+        {
+            match: med => /montelukast/i.test(med.name),
+            recommendation: "caution",
+            ageThresholdDays: null,
+            ageLabel: "18 years and younger (all pediatric patients)",
+            risk: "Neuropsychiatric effects (sleep disturbances, irritability, aggression — FDA boxed warning)",
+            note: "Use with caution in all pediatric patients; limit to patients who will benefit and can be closely monitored for neuropsychiatric effects.",
+            strength: "Weak", quality: "Very low"
+        },
+        {
+            match: med => /midazolam infusion/i.test(med.name),
+            recommendation: "caution",
+            weightThresholdKg: 1.5,
+            ageLabel: "weighing less than 1500 g",
+            risk: "Severe intraventricular hemorrhage, periventricular leukomalacia, or death",
+            note: "Caution in patients weighing less than 1500 g.",
+            strength: "Weak", quality: "Low"
+        },
+        {
+            match: med => /propofol/i.test(med.name),
+            recommendation: "avoid",
+            ageThresholdDays: null,
+            ageLabel: "18 years and younger (all pediatric patients)",
+            risk: "Propofol-related infusion syndrome",
+            note: "Avoid doses >4 mg/kg/hr for longer than 48 hours in 18 years of age and younger.",
+            strength: "Strong", quality: "Moderate"
+        }
+    ];
+
+    function checkKidsListWarning(med, ageDays, weightKg) {
+        const rule = KIDS_LIST_RULES.find(r => r.match(med));
+        if (!rule) return null;
+        if (rule.weightThresholdKg != null) {
+            if (weightKg == null) return { rule, status: "unknown" };
+            return { rule, status: weightKg < rule.weightThresholdKg ? "applies" : "clear" };
+        }
+        if (rule.ageThresholdDays === null) return { rule, status: "applies" };
+        if (ageDays == null) return { rule, status: "unknown" };
+        return { rule, status: ageDays < rule.ageThresholdDays ? "applies" : "clear" };
+    }
 
     const clinicalSystems = [
         { id: "respiratory", short: "Respiratory & Allergy" },
@@ -1721,6 +1835,20 @@
         return (!isNaN(w) && w > 0) ? w : null;
     }
 
+    function getAgeDays() {
+        const valEl = document.getElementById("age-value");
+        const unitEl = document.getElementById("age-unit");
+        if (!valEl || !unitEl) return null;
+        const v = parseFloat(valEl.value);
+        if (isNaN(v) || v < 0) return null;
+        const mult = { days: 1, weeks: 7, months: 30.4375, years: 365.25 };
+        return v * (mult[unitEl.value] || 1);
+    }
+
+    function onAgeChange() {
+        renderCart();
+    }
+
     function hasAllergyMode() {
         const sel = document.querySelector('input[name="hasAllergy"]:checked');
         return sel && sel.value === "yes";
@@ -2399,6 +2527,20 @@
                     rbox.innerHTML = `<div class="range-title">Pharmacist check</div><div class="range-line">Enter patient weight to calculate dose range.</div>`;
                 }
                 div.appendChild(rbox);
+            }
+
+            const kidsCheck = checkKidsListWarning(med, getAgeDays(), w);
+            if (kidsCheck && kidsCheck.status !== "clear") {
+                const r = kidsCheck.rule;
+                const kbox = document.createElement("div");
+                if (kidsCheck.status === "unknown") {
+                    kbox.className = "kids-warn-box unknown-age";
+                    kbox.innerHTML = `<div class="kids-warn-title">KIDs List — verify age</div>This drug has a KIDs List ${r.recommendation} recommendation for ${r.ageLabel} (risk: ${r.risk}). Enter patient ${r.weightThresholdKg != null ? "weight" : "age"} to check applicability. ${r.note}`;
+                } else {
+                    kbox.className = "kids-warn-box " + r.recommendation;
+                    kbox.innerHTML = `<div class="kids-warn-title">KIDs List — ${r.recommendation === "avoid" ? "AVOID" : "Caution"} (${r.ageLabel})</div>Risk: ${r.risk}. ${r.note} <em>(${r.strength} recommendation, ${r.quality} quality evidence — PPA KIDs List 2025)</em>`;
+                }
+                div.appendChild(kbox);
             }
 
             if (allergyWarnings.length) {
