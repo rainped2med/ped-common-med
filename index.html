@@ -951,6 +951,8 @@
             /* Sedation/Induction */
             { name: "Propofol IV (induction)", rx: "Propofol (10 mg/ml) {dose} ml IV induction", note: "1–2 mg/kg (0.1–0.2 ml/kg). Reduce dose in shock. Apnea/hypotension risk. >3 yr only. Max 200 mg.", decimals: 1, calc: w => formatDoseValue(Math.min((w * 1.5) / 10, 20), { decimals: 1 }) },
             { name: "Dexmedetomidine Infusion", rx: "Dexmedetomidine infusion {dose} mcg/kg/h IV (loading 0.5–1 mcg/kg over 10 min optional)", note: "0.2–1 mcg/kg/h. Minimal respiratory depression. Watch bradycardia/hypotension. ICU/procedural sedation.", decimals: 1, calc: w => "0.5", isInfusion: true, infusionUnit: "mcg/kg/h", infusionRange: [0.2, 1], stockConcMcgMl: 100, standardConcMcgMl: 4 },
+            { name: "Midazolam Infusion (ICU sedation)", rx: "Midazolam infusion {dose} mcg/kg/min IV (start 1 mcg/kg/min; titrate)", note: "1–4 mcg/kg/min. Start low, titrate to sedation target (e.g. SBS/COMFORT score). Watch hypotension/respiratory depression, accumulation with prolonged use. Higher doses (up to ~10 mcg/kg/min) used for refractory status epilepticus under specialist guidance only.", decimals: 1, calc: w => "1", isInfusion: true, infusionUnit: "mcg/kg/min", infusionRange: [1, 4], stockConcMcgMl: 5000, standardConcMcgMl: 1000 },
+            { name: "Fentanyl Infusion (ICU analgesia)", rx: "Fentanyl infusion {dose} mcg/kg/h IV (start 1 mcg/kg/h; titrate)", note: "1–5 mcg/kg/h. Continuous analgosedation; opioid tolerance/withdrawal risk with prolonged use — wean gradually. Watch respiratory depression, chest wall rigidity at high doses.", decimals: 1, calc: w => "1", isInfusion: true, infusionUnit: "mcg/kg/h", infusionRange: [1, 5], stockConcMcgMl: 50, standardConcMcgMl: 10 },
             /* Antidotes */
             { name: "Mannitol 20% (ICP)", rx: "Mannitol 20% {dose} ml IV over 20–30 mins", note: "0.5–1 g/kg (2.5–5 ml/kg of 20%). Monitor serum osm <320 mOsm/kg. Foley required. Max 250 ml.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 3.75, 250)) },
             { name: "Flumazenil IV (benzo reversal)", rx: "Flumazenil (0.1 mg/ml) {dose} ml IV over 30 sec — titrate; repeat Q1 min PRN", note: "0.01 mg/kg (0.1 ml/kg) per dose. Max 0.2 mg/dose; total max 1 mg. CONTRAINDICATED: benzo-dependent, co-TCA, seizure risk.", decimals: 1, calc: w => formatDoseValue(Math.min(w * 0.1, 0.2) / 0.1, { decimals: 1 }) },
@@ -1062,6 +1064,36 @@
                 decimals: 0,
                 calc: w => "400"   /* fixed 400 IU — not weight-based */
             }
+        ],
+        infectious: [
+            { name: "Clindamycin PO (75mg/5ml)", rx: "Clindamycin Susp (75 mg/5 ml) {dose} ml PO TID", note: "10 mg/kg/dose TID (skin/soft tissue, anaerobic coverage). Max 450 mg/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 10) / 15, 30)), doseAdjustable: true, standardMgKg: 10, doseUnit: "mg/kg/dose", maxMg: 450, concMgMl: 15 },
+            { name: "Clindamycin IV", rx: "Clindamycin {dose} mg IV q 8 hr", note: "10 mg/kg/dose q8h (severe infections). Max 900 mg/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 900), { decimals: 0 }), doseAdjustable: true, standardMgKg: 10, doseUnit: "mg/kg/dose", maxMg: 900 },
+            { name: "Metronidazole PO/IV", rx: "Metronidazole {dose} mg PO/IV q 8 hr", note: "7.5 mg/kg/dose q8h (anaerobic, C. diff, giardiasis). Max 500 mg/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 7.5, 500), { decimals: 0 }), doseAdjustable: true, standardMgKg: 7.5, doseUnit: "mg/kg/dose", maxMg: 500 },
+            { name: "Doxycycline PO", rx: "Doxycycline {dose} mg PO BID (day 1), then OD", note: "2.2 mg/kg/dose BID. Max 100 mg/dose. Short courses (<21 days) now considered low risk for dental staining at any age per updated AAP guidance — verify local protocol.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 2.2, 100), { decimals: 0 }), doseAdjustable: true, standardMgKg: 2.2, doseUnit: "mg/kg/dose", maxMg: 100 }
+        ],
+        allergy: [
+            { name: "Diphenhydramine PO/IV", rx: "Diphenhydramine {dose} mg PO/IV q 6 hr PRN", note: "1 mg/kg/dose. Max 50 mg/dose. Sedating antihistamine.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1, 50), { decimals: 0 }), doseAdjustable: true, standardMgKg: 1, doseUnit: "mg/kg/dose", maxMg: 50 },
+            { name: "Hydroxyzine PO", rx: "Hydroxyzine {dose} mg PO q 6-8 hr PRN", note: "0.5–1 mg/kg/dose. Max 50 mg/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 0.5, 50), { decimals: 0 }), doseAdjustable: true, standardMgKg: 0.5, doseRange: [0.5, 1], doseUnit: "mg/kg/dose", maxMg: 50 },
+            { name: "Loratadine PO (non-sedating)", rx: "Loratadine {dose} mg PO OD", note: "Weight-band dosing (non-linear): <30 kg = 5 mg/day; ≥30 kg = 10 mg/day.", decimals: 0, calc: w => (w < 30 ? "5" : "10") },
+            { name: "Montelukast PO", rx: "Montelukast {dose} mg PO OD (evening)", note: "Age/weight-band dosing (approximate by weight — verify against actual age): <15 kg ≈ 4 mg; 15–30 kg ≈ 5 mg; >30 kg ≈ 10 mg.", decimals: 0, calc: w => (w < 15 ? "4" : (w <= 30 ? "5" : "10")) }
+        ],
+        renal: [
+            { name: "Nitrofurantoin PO (25mg/5ml)", rx: "Nitrofurantoin Susp (25 mg/5 ml) {dose} ml PO QID", note: "1.5–2 mg/kg/dose QID (UTI treatment). Max 100 mg/dose. Avoid if CrCl <60 or G6PD deficiency.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 1.5) / 5, 20)), doseAdjustable: true, standardMgKg: 1.5, doseRange: [1.5, 2], doseUnit: "mg/kg/dose", maxMg: 100, concMgMl: 5 },
+            { name: "Trimethoprim PO (UTI prophylaxis)", rx: "Trimethoprim {dose} mg PO OD (HS)", note: "2 mg/kg/day OD, given at night. Max 100 mg/day. Prophylactic dose — lower than treatment dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 2, 100), { decimals: 0 }), doseAdjustable: true, standardMgKg: 2, doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 100 },
+            { name: "Cefixime PO (100mg/5ml)", rx: "Cefixime Susp (100 mg/5 ml) {dose} ml PO OD", note: "8 mg/kg/day OD (UTI treatment, oral 3rd-gen cephalosporin). Max 400 mg/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 8) / 20, 20)), doseAdjustable: true, standardMgKg: 8, doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 400, concMgMl: 20 }
+        ],
+        hematology: [
+            { name: "Tranexamic Acid IV/PO", rx: "Tranexamic Acid {dose} mg IV/PO q 8 hr", note: "10–15 mg/kg/dose (bleeding/trauma). Max 1000 mg/dose. IV: give slow push/infusion over 10 min. Avoid in active thromboembolic disease.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 1000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 10, doseRange: [10, 15], doseUnit: "mg/kg/dose", maxMg: 1000 },
+            { name: "Folic Acid PO", rx: "Folic Acid {dose} mg PO OD", note: "Weight-band dosing: <10 kg = 0.1 mg/day; ≥10 kg = 1 mg/day. Hemolytic anemia/chronic hemolysis supplementation.", decimals: 1, calc: w => (w < 10 ? "0.1" : "1") }
+        ],
+        dermatology: [
+            { name: "Hydrocortisone 1% Cream (topical)", rx: "Hydrocortisone 1% Cream — apply thin layer to affected area BID-TID PRN", note: "Low-potency topical steroid for eczema/dermatitis. Not weight-based. Avoid prolonged use on face/skin folds — risk of atrophy.", calc: w => null },
+            { name: "Mupirocin 2% Ointment (topical)", rx: "Mupirocin 2% Ointment — apply to affected area TID x 5-10 days", note: "Impetigo/localized skin infection, or MRSA nasal decolonization (apply to nares BID x 5 days). Not weight-based.", calc: w => null },
+            { name: "Permethrin 5% Cream (scabies)", rx: "Permethrin 5% Cream — apply head-to-toe (avoid eyes/mouth), leave 8-14 hr, then wash off; repeat in 7 days", note: "Standard scabies treatment, all ages ≥2 months. Not weight-based — full-body application regardless of size. Treat household contacts simultaneously.", calc: w => null }
+        ],
+        endocrine: [
+            { name: "Levothyroxine PO (congenital hypothyroidism)", rx: "Levothyroxine {dose} mcg PO OD", note: "Age-banded mcg/kg/day (approximated here by weight as a rough proxy — dose by actual age and confirm with endocrinology, NOT pure weight): 0–3 mo ≈12 mcg/kg/day; 3–12 mo ≈8 mcg/kg/day; 1–5 yr ≈6 mcg/kg/day; 6–12 yr ≈4 mcg/kg/day; >12 yr ≈2.5 mcg/kg/day.", decimals: 0, calc: w => { let mcgKg; if (w <= 5) mcgKg = 12; else if (w <= 10) mcgKg = 8; else if (w <= 20) mcgKg = 6; else if (w <= 40) mcgKg = 4; else mcgKg = 2.5; return formatDoseValue(w * mcgKg, { decimals: 0 }); } },
+            { name: "Dextrose Gel 40% (oral/buccal, neonatal hypoglycemia)", rx: "Dextrose Gel 40% {dose} ml PO/buccal massaged into cheek mucosa", note: "0.5 g/kg/dose (200 mg/kg as 40% gel = 0.4 g/ml). Max 10 ml/dose. First-line for asymptomatic/mild neonatal hypoglycemia before considering IV.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 0.5) / 0.4, 10)) }
         ]
     };
 
@@ -2522,7 +2554,7 @@
         btn.disabled = true;
         if (!cat) { sel.disabled = true; return; }
         sel.disabled = false;
-        medData[cat].forEach((item, index) => {
+        (medData[cat] || []).forEach((item, index) => {
             const opt = document.createElement("option");
             opt.value = `${cat}|${index}`;
             opt.textContent = item.name;
