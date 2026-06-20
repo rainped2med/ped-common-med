@@ -98,6 +98,12 @@
         .sync-status-bar.error { color: #922b21; }
         .cart-item-remove { position: absolute; top: 8px; right: 8px; background: #fadbd8; color: #c0392b; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; font-size: 14px; line-height: 1; }
         .cart-item-remove:hover { background: #e74c3c; color: white; }
+        .stat-toggle-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+        .stat-toggle-btn { padding: 4px 10px; border-radius: 12px; border: 1px solid #e67e22; background: #fff; color: #e67e22; font-size: 0.75em; font-weight: bold; cursor: pointer; letter-spacing: 0.3px; }
+        .stat-toggle-btn:hover { background: #fdf2e9; }
+        .stat-toggle-btn.active { background: #e67e22; color: #fff; }
+        .stat-badge { display: inline-block; background: #e67e22; color: #fff; font-size: 0.72em; font-weight: bold; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .stat-note { font-size: 0.78em; color: #935116; margin-top: 4px; font-style: italic; }
         .cart-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
         .btn { padding: 10px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
         .btn-primary { background: #27ae60; color: white; flex: 1; min-width: 120px; }
@@ -2071,7 +2077,8 @@
             allergyWarnings,
             ivMix: isIvAntibiotic(med) ? buildDefaultIvMix(med, dose) : null,
             qty: qtySupported(med) ? defaultQtyState(med) : null,
-            ivInfusion: med.isInfusion ? defaultInfusionState(med) : null
+            ivInfusion: med.isInfusion ? defaultInfusionState(med) : null,
+            statDose: false
         });
         renderCart();
         showToast(allergyWarnings.length ? "Added with allergy warning" : "Added to list");
@@ -2080,6 +2087,13 @@
 
     function removeFromCart(id) {
         rxCart = rxCart.filter(item => item.id !== id);
+        renderCart();
+    }
+
+    function toggleStatDose(id) {
+        const item = rxCart.find(x => x.id === id);
+        if (!item) return;
+        item.statDose = !item.statDose;
         renderCart();
     }
 
@@ -2312,8 +2326,30 @@
             noteLine.textContent = `${item.name} — ${item.note}`;
 
             div.appendChild(removeBtn);
+            if (item.statDose) {
+                const statBadge = document.createElement("div");
+                statBadge.className = "stat-badge";
+                statBadge.textContent = "STAT — ONE-TIME DOSE NOW";
+                div.appendChild(statBadge);
+            }
             div.appendChild(rxLine);
             div.appendChild(noteLine);
+            if (item.statDose) {
+                const statNote = document.createElement("div");
+                statNote.className = "stat-note";
+                statNote.textContent = "Give as a single STAT dose now — not a recurring/scheduled order.";
+                div.appendChild(statNote);
+            }
+
+            const statRow = document.createElement("div");
+            statRow.className = "stat-toggle-row";
+            const statBtn = document.createElement("button");
+            statBtn.type = "button";
+            statBtn.className = "stat-toggle-btn" + (item.statDose ? " active" : "");
+            statBtn.textContent = item.statDose ? "✓ STAT (one-time dose)" : "Mark as STAT (one-time dose)";
+            statBtn.onclick = () => toggleStatDose(item.id);
+            statRow.appendChild(statBtn);
+            div.appendChild(statRow);
 
             if (isIvAntibiotic(med)) {
                 if (!item.ivMix) item.ivMix = buildDefaultIvMix(med, dose);
@@ -2391,7 +2427,7 @@
                 div.appendChild(box);
             }
 
-            if (qtySupported(med)) {
+            if (qtySupported(med) && !item.statDose) {
                 if (!item.qty) item.qty = defaultQtyState(med);
                 const qbox = document.createElement("div");
                 qbox.className = "qty-box";
@@ -2567,14 +2603,15 @@
         const lines = rxCart.map(item => {
             const med = getMed(item.catId, item.medIdx);
             const dose = med && med.refOnly ? null : calculateMedDose(med, w);
+            const statPrefix = item.statDose ? "STAT — " : "";
             const mixLine = buildIvMixOrderLine(med, dose, item.ivMix);
-            if (mixLine) return mixLine;
+            if (mixLine) return statPrefix + mixLine;
             if (med && med.isInfusion && item.ivInfusion) {
                 const infLine = buildInfusionOrderLine(med, w, item.ivInfusion);
-                if (infLine) return infLine;
+                if (infLine) return statPrefix + infLine;
             }
-            const base = buildPlainRx(med, dose);
-            if (med && item.qty && dose != null) {
+            const base = statPrefix + buildPlainRx(med, dose);
+            if (med && item.qty && dose != null && !item.statDose) {
                 const qtyLine = buildQtyOrderLine(med, dose, item.qty);
                 if (qtyLine) return base + "\n   " + qtyLine;
             }
