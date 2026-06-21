@@ -80,6 +80,10 @@
         .infusion-order { margin-top: 8px; font-size: 0.78em; color: #1e8449; background: #eafaf1; border: 1px dashed #a9dfbf; border-radius: 4px; padding: 6px 8px; line-height: 1.35; }
         .infusion-warn { margin-top: 6px; font-size: 0.78em; color: #c0392b; font-weight: bold; }
 
+        .lang-toggle-bar { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 10px; }
+        .lang-btn { padding: 5px 14px; border-radius: 14px; border: 1px solid #bdc3c7; background: #fff; color: #566573; font-size: 0.8em; font-weight: bold; cursor: pointer; }
+        .lang-btn:hover { background: #f4f6f6; }
+        .lang-btn.active { background: #2c3e50; color: #fff; border-color: #2c3e50; }
         .pharmacist-toggle-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 10px 12px; background: #f4ecf7; border: 1px solid #d7bde2; border-radius: 8px; }
         .pharmacist-toggle-bar label { font-weight: bold; color: #6c3483; font-size: 0.88em; display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; }
         .pharmacist-toggle-bar input[type="checkbox"] { width: 16px; height: 16px; }
@@ -178,37 +182,42 @@
 <body>
 
 <div class="container">
-    <h2>CRA Pediatric Rx & PALS Calculator</h2>
+    <div class="lang-toggle-bar">
+        <button type="button" class="lang-btn active" id="lang-btn-en" onclick="setLanguage('en')">EN</button>
+        <button type="button" class="lang-btn" id="lang-btn-th" onclick="setLanguage('th')">ไทย</button>
+    </div>
+
+    <h2 data-i18n="appTitle">CRA Pediatric Rx & PALS Calculator</h2>
     <div class="warning">
-        <strong>Disclaimer:</strong> Educational tool only. Hard max-caps are implemented, but always independently verify limits, contraindications, and dilutions before prescribing.
+        <strong data-i18n="disclaimerLabel">Disclaimer:</strong> <span data-i18n="disclaimerText">Educational tool only. Hard max-caps are implemented, but always independently verify limits, contraindications, and dilutions before prescribing.</span>
     </div>
 
     <div class="weight-bar">
-        <label for="weight">Patient weight (kg)</label>
+        <label for="weight" data-i18n="weightLabel">Patient weight (kg)</label>
         <input type="number" id="weight" placeholder="e.g. 14.5" step="0.1" min="0" oninput="onWeightChange()">
     </div>
 
     <div class="weight-bar age-bar">
-        <label for="age-value">Patient age (optional — enables KIDs List age-based safety warnings)</label>
+        <label for="age-value" data-i18n="ageLabel">Patient age (optional — enables KIDs List age-based safety warnings)</label>
         <div class="age-input-row">
             <input type="number" id="age-value" placeholder="e.g. 2" step="1" min="0" oninput="onAgeChange()">
             <select id="age-unit" onchange="onAgeChange()">
-                <option value="days">days</option>
-                <option value="weeks">weeks</option>
-                <option value="months" selected>months</option>
-                <option value="years">years</option>
+                <option value="days" data-i18n="ageUnitDays">days</option>
+                <option value="weeks" data-i18n="ageUnitWeeks">weeks</option>
+                <option value="months" selected data-i18n="ageUnitMonths">months</option>
+                <option value="years" data-i18n="ageUnitYears">years</option>
             </select>
         </div>
     </div>
 
     <div class="allergy-compact" id="allergy-compact">
-        <span style="font-weight:bold;color:#34495e;">Known drug allergy?</span>
+        <span style="font-weight:bold;color:#34495e;" data-i18n="allergyQuestion">Known drug allergy?</span>
         <div class="allergy-yesno">
-            <label><input type="radio" name="hasAllergy" value="no" checked onchange="onHasAllergyChange()"> No</label>
-            <label><input type="radio" name="hasAllergy" value="yes" onchange="onHasAllergyChange()"> Yes</label>
+            <label><input type="radio" name="hasAllergy" value="no" checked onchange="onHasAllergyChange()"> <span data-i18n="allergyNo">No</span></label>
+            <label><input type="radio" name="hasAllergy" value="yes" onchange="onHasAllergyChange()"> <span data-i18n="allergyYes">Yes</span></label>
         </div>
         <div id="allergy-detail" class="allergy-detail hidden">
-            <label for="allergy-search">Search and add allergy</label>
+            <label for="allergy-search" data-i18n="allergySearchLabel">Search and add allergy</label>
             <input type="text" id="allergy-search" placeholder="e.g. Ceftriaxone, Cefdinir, Penicillin..." oninput="handleAllergySearch()" autocomplete="off">
             <div id="allergy-autocomplete" class="autocomplete-items"></div>
             <div id="allergy-chips" class="allergy-chips"></div>
@@ -216,41 +225,41 @@
     </div>
 
     <div class="pharmacist-toggle-bar">
-        <label><input type="checkbox" id="pharmacist-toggle" onchange="onPharmacistToggle()"> Pharmacist check mode</label>
-        <span class="ph-hint">Shows the standard mg/kg dose range and flags if the order falls outside it</span>
+        <label><input type="checkbox" id="pharmacist-toggle" onchange="onPharmacistToggle()"> <span data-i18n="pharmacistToggle">Pharmacist check mode</span></label>
+        <span class="ph-hint" data-i18n="pharmacistHint">Shows the standard mg/kg dose range and flags if the order falls outside it</span>
     </div>
     <div class="sync-status-bar" id="sync-status-bar">Catalog: using bundled defaults (offline)</div>
 
     <div class="main-grid">
         <!-- LEFT: Search -->
         <div class="col-panel col-search">
-            <div class="col-header">Diagnosis &amp; medications</div>
+            <div class="col-header" data-i18n="diagMedHeader">Diagnosis &amp; medications</div>
             <div class="col-body">
                 <div class="diagnosis-panel">
                     <div class="diag-head">
-                        <span class="step-label">Diagnosis</span>
-                        <span class="diag-head-hint">Search · filter · or tap common</span>
+                        <span class="step-label" data-i18n="diagnosisStepLabel">Diagnosis</span>
+                        <span class="diag-head-hint" data-i18n="diagHeadHint">Search · filter · or tap common</span>
                     </div>
                     <div class="diag-filters">
                         <select id="system-filter" onchange="onSystemFilterChange()" aria-label="Filter by body system">
-                            <option value="">All systems</option>
+                            <option value="" data-i18n="allSystems">All systems</option>
                         </select>
                         <input type="text" id="diag-search" placeholder="e.g. fever, asthma, UTI, croup…" oninput="renderDiagResults()" autocomplete="off" aria-label="Search diagnosis">
                     </div>
-                    <p id="diag-results-hint" class="diag-results-hint">Pick a common diagnosis below, filter by system, or type to search.</p>
+                    <p id="diag-results-hint" class="diag-results-hint" data-i18n="diagResultsHint">Pick a common diagnosis below, filter by system, or type to search.</p>
                     <div id="diag-results" class="diag-results" role="listbox"></div>
                     <div id="diag-quick" class="diag-quick"></div>
                 </div>
 
                 <div id="suggested-box" class="suggested-box">
-                    <div class="suggested-title" id="suggested-title">Medications for this diagnosis</div>
+                    <div class="suggested-title" id="suggested-title" data-i18n="suggestedTitle">Medications for this diagnosis</div>
                     <div id="suggested-list"></div>
-                    <p id="suggested-hint" style="margin:8px 0 0 0;font-size:0.82em;color:#95a5a6;display:none;">Choose a diagnosis above to see suggested meds.</p>
+                    <p id="suggested-hint" style="margin:8px 0 0 0;font-size:0.82em;color:#95a5a6;display:none;" data-i18n="suggestedHint">Choose a diagnosis above to see suggested meds.</p>
                 </div>
 
                 <div class="section-divider"></div>
                 <div class="search-section">
-                    <h3>Or search medication directly</h3>
+                    <h3 data-i18n="searchDirectly">Or search medication directly</h3>
                     <input type="text" id="med-search" placeholder="e.g. Amox, Ceftriaxone, Paracetamol..." oninput="handleMedSearch()" autocomplete="off">
                     <div id="med-autocomplete" class="autocomplete-items"></div>
                 </div>
@@ -259,44 +268,44 @@
 
         <!-- RIGHT: Browse + prescription list -->
         <div class="col-panel col-rx">
-            <div class="col-header">Prescription list (max 10)</div>
+            <div class="col-header" data-i18n="prescriptionHeader">Prescription list (max 10)</div>
             <div class="col-body">
                 <div class="browse-block">
-                    <h3 style="margin:0 0 8px 0;font-size:0.85em;color:#566573;text-transform:uppercase;">Browse by category</h3>
+                    <h3 style="margin:0 0 8px 0;font-size:0.85em;color:#566573;text-transform:uppercase;" data-i18n="browseByCategory">Browse by category</h3>
                     <select id="category" onchange="updateMedList()">
-                        <option value="">-- Category --</option>
-                        <option value="neuro_pain">Analgesia, Sedation & Neurology</option>
-                        <option value="respiratory">Respiratory, Asthma & Allergy</option>
-                        <option value="gi">Gastrointestinal</option>
-                        <option value="antimicrobial">Antimicrobials (PO & IV)</option>
-                        <option value="cardio">Cardiovascular & Diuretics</option>
-                        <option value="emergency">Emergency, Resuscitation & PALS</option>
-                        <option value="fluids">IV Fluids, Electrolytes & Blood</option>
-                        <option value="infectious">Infectious disease</option>
-                        <option value="allergy">Allergy &amp; immunology</option>
-                        <option value="renal">Renal &amp; urology</option>
-                        <option value="hematology">Hematology &amp; oncology</option>
-                        <option value="dermatology">Dermatology</option>
-                        <option value="endocrine">Endocrine &amp; metabolic</option>
-                        <option value="infant_supp">Infant supplementation</option>
-                        <option value="pals">PALS — Pediatric Advanced Life Support</option>
-                        <option value="ncpr">NCPR / NRP — Neonatal Resuscitation</option>
+                        <option value="" data-i18n="categoryPlaceholder">-- Category --</option>
+                        <option value="neuro_pain" data-i18n="cat_neuro_pain">Analgesia, Sedation & Neurology</option>
+                        <option value="respiratory" data-i18n="cat_respiratory">Respiratory, Asthma & Allergy</option>
+                        <option value="gi" data-i18n="cat_gi">Gastrointestinal</option>
+                        <option value="antimicrobial" data-i18n="cat_antimicrobial">Antimicrobials (PO & IV)</option>
+                        <option value="cardio" data-i18n="cat_cardio">Cardiovascular & Diuretics</option>
+                        <option value="emergency" data-i18n="cat_emergency">Emergency, Resuscitation & PALS</option>
+                        <option value="fluids" data-i18n="cat_fluids">IV Fluids, Electrolytes & Blood</option>
+                        <option value="infectious" data-i18n="cat_infectious">Infectious disease</option>
+                        <option value="allergy" data-i18n="cat_allergy">Allergy &amp; immunology</option>
+                        <option value="renal" data-i18n="cat_renal">Renal &amp; urology</option>
+                        <option value="hematology" data-i18n="cat_hematology">Hematology &amp; oncology</option>
+                        <option value="dermatology" data-i18n="cat_dermatology">Dermatology</option>
+                        <option value="endocrine" data-i18n="cat_endocrine">Endocrine &amp; metabolic</option>
+                        <option value="infant_supp" data-i18n="cat_infant_supp">Infant supplementation</option>
+                        <option value="pals" data-i18n="cat_pals">PALS — Pediatric Advanced Life Support</option>
+                        <option value="ncpr" data-i18n="cat_ncpr">NCPR / NRP — Neonatal Resuscitation</option>
                     </select>
                     <select id="medication" onchange="onBrowseMedSelect()" disabled>
-                        <option value="">-- Medication --</option>
+                        <option value="" data-i18n="medicationPlaceholder">-- Medication --</option>
                     </select>
-                    <button type="button" class="btn-browse-add" id="browseAddBtn" onclick="addBrowseSelection()" disabled>+ Add selected to list</button>
+                    <button type="button" class="btn-browse-add" id="browseAddBtn" onclick="addBrowseSelection()" disabled data-i18n="addSelectedBtn">+ Add selected to list</button>
                 </div>
 
                 <div class="rx-section-divider"></div>
-                <div class="rx-section-label">Your orders</div>
+                <div class="rx-section-label" data-i18n="yourOrders">Your orders</div>
                 <div id="diag-badge-wrap"></div>
-                <div class="cart-count" id="cart-count">0 / 5 medications</div>
-                <div id="cart-empty" class="cart-empty">Search a diagnosis or drug on the left, then add up to 5 orders.</div>
+                <div class="cart-count" id="cart-count">0 / 10 medications</div>
+                <div id="cart-empty" class="cart-empty" data-i18n="cartEmpty">Search a diagnosis or drug on the left, then add up to 10 orders.</div>
                 <div id="cart-list"></div>
                 <div class="cart-actions">
-                    <button class="btn btn-primary" id="copyAllBtn" onclick="copyAllCart()" disabled>Copy all orders</button>
-                    <button class="btn btn-secondary" onclick="clearCart()">Clear</button>
+                    <button class="btn btn-primary" id="copyAllBtn" onclick="copyAllCart()" disabled data-i18n="copyAllBtn">Copy all orders</button>
+                    <button class="btn btn-secondary" onclick="clearCart()" data-i18n="clearBtn">Clear</button>
                 </div>
             </div>
         </div>
@@ -312,6 +321,133 @@
     let cartIdCounter = 0;
     let activeDiagnosis = null;
     let pharmacistMode = false;
+
+    /* ───────── UI language toggle (menu/labels only — drug names, rx text, and notes always stay
+       in their original language; this never touches the medication data pipeline). ───────── */
+    const TRANSLATIONS = {
+        en: {
+            appTitle: "CRA Pediatric Rx & PALS Calculator",
+            disclaimerLabel: "Disclaimer:",
+            disclaimerText: "Educational tool only. Hard max-caps are implemented, but always independently verify limits, contraindications, and dilutions before prescribing.",
+            weightLabel: "Patient weight (kg)",
+            ageLabel: "Patient age (optional — enables KIDs List age-based safety warnings)",
+            ageUnitDays: "days", ageUnitWeeks: "weeks", ageUnitMonths: "months", ageUnitYears: "years",
+            allergyQuestion: "Known drug allergy?",
+            allergyNo: "No", allergyYes: "Yes",
+            allergySearchLabel: "Search and add allergy",
+            pharmacistToggle: "Pharmacist check mode",
+            pharmacistHint: "Shows the standard mg/kg dose range and flags if the order falls outside it",
+            diagMedHeader: "Diagnosis & medications",
+            diagnosisStepLabel: "Diagnosis",
+            diagHeadHint: "Search · filter · or tap common",
+            allSystems: "All systems",
+            diagResultsHint: "Pick a common diagnosis below, filter by system, or type to search.",
+            diagNoMatch: "No match — try another word",
+            suggestedTitle: "Medications for this diagnosis",
+            suggestedHint: "Choose a diagnosis above to see suggested meds.",
+            searchDirectly: "Or search medication directly",
+            prescriptionHeader: "Prescription list (max 10)",
+            browseByCategory: "Browse by category",
+            categoryPlaceholder: "-- Category --",
+            medicationPlaceholder: "-- Medication --",
+            addSelectedBtn: "+ Add selected to list",
+            yourOrders: "Your orders",
+            cartEmpty: "Search a diagnosis or drug on the left, then add up to 10 orders.",
+            cartCountWord: "medications",
+            copyAllBtn: "Copy all orders",
+            clearBtn: "Clear",
+            cat_neuro_pain: "Analgesia, Sedation & Neurology",
+            cat_respiratory: "Respiratory, Asthma & Allergy",
+            cat_gi: "Gastrointestinal",
+            cat_antimicrobial: "Antimicrobials (PO & IV)",
+            cat_cardio: "Cardiovascular & Diuretics",
+            cat_emergency: "Emergency, Resuscitation & PALS",
+            cat_fluids: "IV Fluids, Electrolytes & Blood",
+            cat_infectious: "Infectious disease",
+            cat_allergy: "Allergy & immunology",
+            cat_renal: "Renal & urology",
+            cat_hematology: "Hematology & oncology",
+            cat_dermatology: "Dermatology",
+            cat_endocrine: "Endocrine & metabolic",
+            cat_infant_supp: "Infant supplementation",
+            cat_pals: "PALS — Pediatric Advanced Life Support",
+            cat_ncpr: "NCPR / NRP — Neonatal Resuscitation"
+        },
+        th: {
+            appTitle: "เครื่องคำนวณยาเด็กและ PALS (CRA)",
+            disclaimerLabel: "คำเตือน:",
+            disclaimerText: "เครื่องมือนี้ใช้เพื่อการศึกษาเท่านั้น มีการกำหนดขนาดยาสูงสุดไว้ แต่แพทย์ต้องตรวจสอบขนาดยา ข้อห้ามใช้ และการเจือจางด้วยตนเองทุกครั้งก่อนสั่งยา",
+            weightLabel: "น้ำหนักผู้ป่วย (กก.)",
+            ageLabel: "อายุผู้ป่วย (ไม่บังคับ — เปิดใช้คำเตือนความปลอดภัยตามอายุจาก KIDs List)",
+            ageUnitDays: "วัน", ageUnitWeeks: "สัปดาห์", ageUnitMonths: "เดือน", ageUnitYears: "ปี",
+            allergyQuestion: "มีประวัติแพ้ยาหรือไม่?",
+            allergyNo: "ไม่มี", allergyYes: "มี",
+            allergySearchLabel: "ค้นหาและเพิ่มรายการแพ้ยา",
+            pharmacistToggle: "โหมดตรวจสอบโดยเภสัชกร",
+            pharmacistHint: "แสดงช่วงขนาดยามาตรฐาน (มก./กก.) และแจ้งเตือนหากคำสั่งยาอยู่นอกช่วงดังกล่าว",
+            diagMedHeader: "การวินิจฉัยและยา",
+            diagnosisStepLabel: "การวินิจฉัย",
+            diagHeadHint: "ค้นหา · กรอง · หรือแตะรายการที่พบบ่อย",
+            allSystems: "ทุกระบบ",
+            diagResultsHint: "เลือกการวินิจฉัยที่พบบ่อยด้านล่าง กรองตามระบบ หรือพิมพ์เพื่อค้นหา",
+            diagNoMatch: "ไม่พบรายการที่ตรงกัน — ลองคำอื่น",
+            suggestedTitle: "ยาที่แนะนำสำหรับการวินิจฉัยนี้",
+            suggestedHint: "เลือกการวินิจฉัยด้านบนเพื่อดูยาที่แนะนำ",
+            searchDirectly: "หรือค้นหายาโดยตรง",
+            prescriptionHeader: "รายการสั่งยา (สูงสุด 10 รายการ)",
+            browseByCategory: "เรียกดูตามหมวดหมู่",
+            categoryPlaceholder: "-- หมวดหมู่ --",
+            medicationPlaceholder: "-- ยา --",
+            addSelectedBtn: "+ เพิ่มรายการที่เลือก",
+            yourOrders: "คำสั่งยาของคุณ",
+            cartEmpty: "ค้นหาการวินิจฉัยหรือยาทางด้านซ้าย แล้วเพิ่มได้สูงสุด 10 รายการ",
+            cartCountWord: "รายการยา",
+            copyAllBtn: "คัดลอกคำสั่งยาทั้งหมด",
+            clearBtn: "ล้างรายการ",
+            cat_neuro_pain: "ยาแก้ปวด ยาระงับประสาท & ระบบประสาท",
+            cat_respiratory: "ระบบหายใจ หอบหืด & ภูมิแพ้",
+            cat_gi: "ระบบทางเดินอาหาร",
+            cat_antimicrobial: "ยาต้านจุลชีพ (กิน & ฉีด)",
+            cat_cardio: "หัวใจและหลอดเลือด & ยาขับปัสสาวะ",
+            cat_emergency: "ฉุกเฉิน การกู้ชีพ & PALS",
+            cat_fluids: "สารน้ำทางหลอดเลือด เกลือแร่ & เลือด",
+            cat_infectious: "โรคติดเชื้อ",
+            cat_allergy: "ภูมิแพ้ & ภูมิคุ้มกัน",
+            cat_renal: "ไตและทางเดินปัสสาวะ",
+            cat_hematology: "โลหิตวิทยา & มะเร็งวิทยา",
+            cat_dermatology: "ผิวหนัง",
+            cat_endocrine: "ต่อมไร้ท่อ & เมแทบอลิซึม",
+            cat_infant_supp: "อาหารเสริมสำหรับทารก",
+            cat_pals: "PALS — การช่วยชีวิตขั้นสูงในเด็ก",
+            cat_ncpr: "NCPR / NRP — การกู้ชีพทารกแรกเกิด"
+        }
+    };
+
+    let currentLang = (function () {
+        try { return localStorage.getItem("pedRxLang") || "en"; } catch { return "en"; }
+    })();
+
+    function t(key) {
+        return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || TRANSLATIONS.en[key] || key;
+    }
+
+    function applyTranslations() {
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            el.textContent = t(el.dataset.i18n);
+        });
+        document.getElementById("lang-btn-en").classList.toggle("active", currentLang === "en");
+        document.getElementById("lang-btn-th").classList.toggle("active", currentLang === "th");
+    }
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        try { localStorage.setItem("pedRxLang", lang); } catch {}
+        applyTranslations();
+        initDiagnosisUI();
+        renderCart();
+        const suggestedHintEl = document.getElementById("suggested-hint");
+        if (suggestedHintEl && suggestedHintEl.style.display !== "none") suggestedHintEl.textContent = t("suggestedHint");
+    }
 
     function onPharmacistToggle() {
         pharmacistMode = document.getElementById("pharmacist-toggle").checked;
@@ -2103,7 +2239,7 @@
         renderCart();
         document.getElementById("suggested-list").innerHTML = "";
         document.getElementById("suggested-hint").style.display = "block";
-        document.getElementById("suggested-hint").textContent = "Choose a diagnosis above to see suggested meds.";
+        document.getElementById("suggested-hint").textContent = t("suggestedHint");
         document.getElementById("diag-badge-wrap").innerHTML = "";
         const df = document.getElementById("system-filter");
         const ds = document.getElementById("diag-search");
@@ -2117,7 +2253,7 @@
     function resetSuggestedHint() {
         document.getElementById("suggested-list").innerHTML = "";
         document.getElementById("suggested-hint").style.display = "block";
-        document.getElementById("suggested-hint").textContent = "Choose a diagnosis above to see suggested meds.";
+        document.getElementById("suggested-hint").textContent = t("suggestedHint");
         document.getElementById("suggested-box").classList.add("visible");
     }
 
@@ -2149,13 +2285,13 @@
     function initDiagnosisUI() {
         const sel = document.getElementById("system-filter");
         if (!sel) return;
-        sel.innerHTML = '<option value="">All systems</option>';
+        sel.innerHTML = `<option value="">${t("allSystems")}</option>`;
         clinicalSystems.forEach(sys => {
             const count = diagnosisData.filter(d => d.system === sys.id).length;
             if (!count) return;
             const opt = document.createElement("option");
             opt.value = sys.id;
-            opt.textContent = sys.short;
+            opt.textContent = TRANSLATIONS[currentLang]["cat_" + sys.id] || sys.short;
             sel.appendChild(opt);
         });
         renderDiagQuickPicks();
@@ -2238,7 +2374,7 @@
 
         if (!q && !systemId) {
             hint.style.display = "block";
-            hint.textContent = "Pick a common diagnosis below, filter by system, or type to search.";
+            hint.textContent = t("diagResultsHint");
             return;
         }
 
@@ -2255,7 +2391,7 @@
 
         list = list.slice(0, q ? 18 : 10);
         if (!list.length) {
-            container.innerHTML = '<p class="diag-empty">No match — try another word</p>';
+            container.innerHTML = `<p class="diag-empty">${t("diagNoMatch")}</p>`;
             return;
         }
 
@@ -2282,7 +2418,7 @@
         const countEl = document.getElementById("cart-count");
         const copyBtn = document.getElementById("copyAllBtn");
 
-        countEl.textContent = `${rxCart.length} / ${MAX_CART} medications`;
+        countEl.textContent = `${rxCart.length} / ${MAX_CART} ${t("cartCountWord")}`;
         copyBtn.disabled = rxCart.length === 0;
 
         list.replaceChildren();
@@ -2765,9 +2901,11 @@
         }
     });
 
+    applyTranslations();
     initDiagnosisUI();
     document.getElementById("suggested-box").classList.add("visible");
     document.getElementById("suggested-hint").style.display = "block";
+    document.getElementById("suggested-hint").textContent = t("suggestedHint");
 
     syncCatalogFromSheet();
     flushPendingUsageLogs();
