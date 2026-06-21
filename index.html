@@ -5,15 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRA Pediatric Rx & PALS Calculator</title>
     <style>
+        :root {
+            --brand-blue: #2563eb;
+            --brand-blue-dark: #1d4ed8;
+            --brand-teal: #0d9488;
+            --brand-teal-dark: #0f766e;
+            --ink: #1f2937;
+            --ink-soft: #4b5563;
+            --paper: #ffffff;
+            --bg-1: #eef3fb;
+            --bg-2: #f3fbf8;
+            --border-soft: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.05);
+            --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.06);
+            --radius: 14px;
+        }
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 16px; background-color: #f4f7f6; color: #333; margin: 0; }
-        .container { max-width: 1180px; margin: 0 auto; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: #2c3e50; text-align: center; border-bottom: 2px solid #ecf0f1; padding-bottom: 12px; margin-top: 0; }
-        .warning { background-color: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; font-size: 0.85em; text-align: center; margin-bottom: 20px; border: 1px solid #ffeeba; line-height: 1.4; }
-        label { font-weight: bold; display: block; margin-bottom: 6px; color: #34495e; font-size: 0.9em; }
-        input[type="number"], input[type="text"], select { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid #bdc3c7; font-size: 15px; background-color: #fff; }
-        input:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 6px rgba(52, 152, 219, 0.35); }
-        .weight-bar { background: #f8f9fa; padding: 14px; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 12px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 28px 16px;
+            background: linear-gradient(160deg, var(--bg-1) 0%, #f7f9fc 45%, var(--bg-2) 100%);
+            background-attachment: fixed;
+            color: var(--ink); margin: 0; line-height: 1.45;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::selection { background: #bfdbfe; color: var(--ink); }
+        .container {
+            max-width: 1180px; margin: 0 auto; background: var(--paper);
+            padding: 32px 30px; border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            animation: containerIn 0.35s ease-out;
+        }
+        @keyframes containerIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .app-header { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px; }
+        .app-header svg { flex-shrink: 0; }
+        h2 {
+            color: var(--ink); text-align: center; margin: 0 0 4px 0; font-size: 1.55em; font-weight: 800;
+            letter-spacing: -0.01em;
+            background: linear-gradient(90deg, var(--brand-blue) 0%, var(--brand-teal) 100%);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .app-subtitle { text-align: center; color: #94a3b8; font-size: 0.78em; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 18px; }
+        .title-divider { height: 3px; width: 64px; margin: 0 auto 22px; border-radius: 3px; background: linear-gradient(90deg, var(--brand-blue), var(--brand-teal)); }
+        .warning {
+            background: linear-gradient(135deg, #fff8e6, #fef3cd); color: #8a6d1f; padding: 14px 16px;
+            border-radius: 10px; font-size: 0.85em; text-align: center; margin-bottom: 22px;
+            border: 1px solid #fbe3a1; line-height: 1.5; box-shadow: var(--shadow-sm);
+        }
+        label { font-weight: 700; display: block; margin-bottom: 6px; color: var(--ink-soft); font-size: 0.9em; }
+        input[type="number"], input[type="text"], select {
+            width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #d8dee8;
+            font-size: 15px; background-color: #fff; color: var(--ink);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        input:hover, select:hover { border-color: #b6c2d4; }
+        input:focus, select:focus { outline: none; border-color: var(--brand-blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14); }
+        .weight-bar { background: linear-gradient(135deg, #f8fafc, #f1f5f9); padding: 14px; border-radius: 10px; border: 1px solid var(--border-soft); margin-bottom: 12px; transition: box-shadow 0.15s ease; }
+        .weight-bar:focus-within { box-shadow: var(--shadow-sm); border-color: #c7d2e3; }
         .age-input-row { display: flex; gap: 8px; }
         .age-input-row input { flex: 1; }
         .age-input-row select { width: auto; min-width: 90px; }
@@ -40,15 +90,18 @@
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
-        .col-panel { border-radius: 10px; border: 1px solid #dde4ea; overflow: visible; }
-        .col-header { padding: 12px 16px; font-weight: bold; font-size: 0.95em; }
-        .col-search .col-header { background: #ebf5fb; color: #1a5276; border-bottom: 2px solid #3498db; }
-        .col-rx .col-header { background: #eafaf1; color: #1e8449; border-bottom: 2px solid #27ae60; }
-        .col-body { padding: 16px; background: #fafbfc; min-height: 320px; }
+        .col-panel { border-radius: var(--radius); border: 1px solid var(--border-soft); overflow: visible; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s ease; }
+        .col-panel:hover { box-shadow: var(--shadow-md); }
+        .col-header { padding: 14px 18px; font-weight: 800; font-size: 0.95em; letter-spacing: 0.01em; border-radius: var(--radius) var(--radius) 0 0; }
+        .col-search .col-header { background: linear-gradient(120deg, #dbeafe, #eaf3fd); color: #1d4ed8; border-bottom: 2px solid #93c5fd; }
+        .col-rx .col-header { background: linear-gradient(120deg, #d1fae5, #e8faf0); color: #0f766e; border-bottom: 2px solid #6ee7b7; }
+        .col-body { padding: 18px; background: #fbfcfe; min-height: 320px; border-radius: 0 0 var(--radius) var(--radius); }
 
-        .cart-empty { color: #95a5a6; font-size: 0.9em; text-align: center; padding: 24px 12px; }
-        .cart-item { background: #fff; border: 1px solid #d5e8d4; border-left: 4px solid #27ae60; border-radius: 6px; padding: 12px; margin-bottom: 10px; position: relative; }
-        .cart-item-rx { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 0.95em; color: #2c3e50; line-height: 1.5; }
+        .cart-empty { color: #94a3b8; font-size: 0.9em; text-align: center; padding: 28px 12px; }
+        .cart-item { background: #fff; border: 1px solid #dcf0e3; border-left: 4px solid #10b981; border-radius: 10px; padding: 14px; margin-bottom: 10px; position: relative; box-shadow: var(--shadow-sm); transition: box-shadow 0.18s ease, transform 0.18s ease; animation: itemIn 0.25s ease-out; }
+        .cart-item:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+        @keyframes itemIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .cart-item-rx { font-family: 'SF Mono', 'Cascadia Code', 'Courier New', Courier, monospace; font-weight: bold; font-size: 0.95em; color: var(--ink); line-height: 1.5; }
         .cart-item-note { font-size: 0.78em; color: #7f8c8d; margin-top: 6px; }
         .ivmix-box { margin-top: 10px; background: #f8fbff; border: 1px solid #d6eaf8; border-radius: 6px; padding: 10px; }
         .ivmix-title { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.4px; color: #2980b9; font-weight: bold; margin-bottom: 8px; }
@@ -81,10 +134,10 @@
         .infusion-warn { margin-top: 6px; font-size: 0.78em; color: #c0392b; font-weight: bold; }
 
         .lang-toggle-bar { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 10px; }
-        .lang-btn { padding: 5px 14px; border-radius: 14px; border: 1px solid #bdc3c7; background: #fff; color: #566573; font-size: 0.8em; font-weight: bold; cursor: pointer; }
-        .lang-btn:hover { background: #f4f6f6; }
-        .lang-btn.active { background: #2c3e50; color: #fff; border-color: #2c3e50; }
-        .pharmacist-toggle-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 10px 12px; background: #f4ecf7; border: 1px solid #d7bde2; border-radius: 8px; }
+        .lang-btn { padding: 5px 14px; border-radius: 14px; border: 1px solid #cbd5e1; background: #fff; color: var(--ink-soft); font-size: 0.8em; font-weight: bold; cursor: pointer; transition: all 0.12s ease; }
+        .lang-btn:hover { background: #f1f5f9; }
+        .lang-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+        .pharmacist-toggle-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 11px 14px; background: linear-gradient(135deg, #f3e8fb, #f8f1fc); border: 1px solid #e3cdf2; border-radius: 10px; box-shadow: var(--shadow-sm); }
         .pharmacist-toggle-bar label { font-weight: bold; color: #6c3483; font-size: 0.88em; display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; }
         .pharmacist-toggle-bar input[type="checkbox"] { width: 16px; height: 16px; }
         .pharmacist-toggle-bar .ph-hint { font-size: 0.78em; color: #8e44ad; font-weight: normal; }
@@ -109,12 +162,13 @@
         .stat-badge { display: inline-block; background: #e67e22; color: #fff; font-size: 0.72em; font-weight: bold; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.5px; margin-bottom: 6px; }
         .stat-note { font-size: 0.78em; color: #935116; margin-top: 4px; font-style: italic; }
         .cart-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-        .btn { padding: 10px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
-        .btn-primary { background: #27ae60; color: white; flex: 1; min-width: 120px; }
-        .btn-primary:hover { background: #219150; }
-        .btn-primary:disabled { background: #95a5a6; cursor: not-allowed; }
-        .btn-secondary { background: #ecf0f1; color: #2c3e50; }
-        .btn-secondary:hover { background: #bdc3c7; }
+        .btn { padding: 11px 18px; border: none; border-radius: 9px; font-weight: 700; cursor: pointer; font-size: 0.9em; transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease; }
+        .btn:active:not(:disabled) { transform: translateY(1px) scale(0.99); }
+        .btn-primary { background: linear-gradient(135deg, #10b981, #0d9488); color: white; flex: 1; min-width: 120px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.28); }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(13, 148, 136, 0.38); transform: translateY(-1px); }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+        .btn-secondary { background: #eef2f6; color: var(--ink); }
+        .btn-secondary:hover { background: #dde5ee; }
         .cart-count { font-size: 0.8em; color: #7f8c8d; margin-bottom: 10px; }
         .diag-badge { display: inline-block; background: #d5f5e3; color: #186a3b; padding: 4px 10px; border-radius: 20px; font-size: 0.8em; margin-bottom: 10px; }
 
@@ -125,7 +179,7 @@
         .autocomplete-items div:hover { background: #3498db; color: white; }
         .autocomplete-items div small { display: block; font-size: 0.8em; opacity: 0.85; margin-top: 2px; }
 
-        .suggested-box { background: #fff; border: 1px solid #d6eaf8; border-radius: 8px; padding: 12px; margin-top: 12px; display: none; }
+        .suggested-box { background: #fff; border: 1px solid #d6eaf8; border-radius: 10px; padding: 14px; margin-top: 12px; display: none; box-shadow: var(--shadow-sm); }
         .suggested-box.visible { display: block; }
         .suggested-title { font-weight: bold; color: #2980b9; margin-bottom: 10px; font-size: 0.9em; }
         .suggested-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid #ecf0f1; font-size: 0.85em; }
@@ -134,14 +188,15 @@
         .suggested-item.ref-only { opacity: 0.88; }
         .suggested-item.ref-only .ref-badge { font-size: 0.72em; color: #7f8c8d; font-weight: normal; display: block; margin-top: 4px; }
         .cart-item.ref-only .cart-item-rx { font-family: inherit; font-size: 0.88em; font-weight: 600; }
-        .btn-add { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; white-space: nowrap; }
-        .btn-add:hover { background: #2980b9; }
+        .btn-add { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 7px 13px; border-radius: 7px; cursor: pointer; font-size: 0.8em; white-space: nowrap; transition: transform 0.12s ease, box-shadow 0.12s ease; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25); }
+        .btn-add:hover:not(:disabled) { box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35); transform: translateY(-1px); }
         .btn-add:disabled { background: #bdc3c7; cursor: not-allowed; }
 
-        .browse-block { background: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+        .browse-block { background: #fbfdff; border: 1px solid var(--border-soft); border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
         .browse-block select { margin-bottom: 10px; }
-        .browse-block .btn-browse-add { width: 100%; margin-top: 4px; padding: 10px; background: #3498db; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
-        .browse-block .btn-browse-add:hover:not(:disabled) { background: #2980b9; }
+        .browse-block .btn-browse-add { width: 100%; margin-top: 4px; padding: 11px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9em; transition: transform 0.12s ease, box-shadow 0.12s ease; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25); }
+        .browse-block .btn-browse-add:hover:not(:disabled) { box-shadow: 0 5px 14px rgba(37, 99, 235, 0.35); transform: translateY(-1px); }
+        .browse-block .btn-browse-add:disabled { background: #cbd5e1; box-shadow: none; }
         .browse-block .btn-browse-add:disabled { background: #bdc3c7; cursor: not-allowed; }
         .rx-section-divider { border-top: 1px dashed #d5dbdb; margin: 4px 0 14px 0; padding-top: 4px; }
         .rx-section-label { font-size: 0.85em; color: #566573; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; margin-bottom: 10px; }
@@ -150,7 +205,7 @@
         .toast { position: fixed; bottom: 20px; right: 20px; background: #2c3e50; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9em; opacity: 0; transition: opacity 0.3s; z-index: 999; }
         .toast.show { opacity: 1; }
 
-        .diagnosis-panel { background: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+        .diagnosis-panel { background: #fbfdff; border: 1px solid var(--border-soft); border-radius: 10px; padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
         .diag-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
         .diag-head .step-label { margin: 0; font-size: 0.8em; }
         .diag-head-hint { font-size: 0.78em; color: #95a5a6; font-weight: normal; }
@@ -161,22 +216,32 @@
         .diag-results-hint { font-size: 0.8em; color: #95a5a6; margin: 8px 0 0; line-height: 1.35; }
         .diag-results { max-height: 168px; overflow-y: auto; margin-top: 6px; border: 1px solid #ecf0f1; border-radius: 6px; background: #fafbfc; }
         .diag-results:empty { display: none; }
-        .diag-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 8px 10px; border: none; border-bottom: 1px solid #ecf0f1; background: transparent; cursor: pointer; text-align: left; font-size: 0.88em; color: #2c3e50; }
+        .diag-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 9px 10px; border: none; border-bottom: 1px solid #ecf0f1; background: transparent; cursor: pointer; text-align: left; font-size: 0.88em; color: var(--ink); transition: background 0.12s ease, padding-left 0.12s ease; }
         .diag-row:last-child { border-bottom: none; }
-        .diag-row:hover { background: #ebf5fb; }
-        .diag-row.active { background: #d6eaf8; font-weight: 600; }
+        .diag-row:hover { background: #eff6ff; padding-left: 14px; }
+        .diag-row.active { background: #dbeafe; font-weight: 600; }
         .diag-row-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .diag-row-sys { font-size: 0.72em; color: #7f8c8d; font-weight: normal; flex-shrink: 0; max-width: 42%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .diag-empty { font-size: 0.82em; color: #95a5a6; padding: 10px; margin: 0; text-align: center; }
         .diag-quick { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
         .diag-quick-label { font-size: 0.75em; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.3px; }
-        .diag-pill { padding: 4px 10px; border-radius: 14px; border: 1px solid #d6eaf8; background: #f4f9fd; color: #1a5276; font-size: 0.78em; cursor: pointer; white-space: nowrap; }
-        .diag-pill:hover { background: #3498db; color: white; border-color: #3498db; }
-        .diag-pill.active { background: #3498db; color: white; border-color: #2980b9; }
+        .diag-pill { padding: 5px 11px; border-radius: 14px; border: 1px solid #d6eaf8; background: #f4f9fd; color: #1d4ed8; font-size: 0.78em; cursor: pointer; white-space: nowrap; transition: all 0.12s ease; }
+        .diag-pill:hover { background: var(--brand-blue); color: white; border-color: var(--brand-blue); transform: translateY(-1px); }
+        .diag-pill.active { background: var(--brand-blue); color: white; border-color: var(--brand-blue-dark); }
         .diag-pill.emerg { border-color: #fadbd8; background: #fff5f5; color: #922b21; }
         .diag-pill.emerg:hover { background: #e74c3c; border-color: #e74c3c; color: white; }
         .diag-pill.emerg.active { background: #e74c3c; border-color: #c0392b; color: white; }
         .section-divider { border-top: 1px dashed #d5dbdb; margin: 18px 0 14px 0; }
+
+        /* polish: scrollbars, toasts, autocomplete */
+        .diag-results::-webkit-scrollbar, .autocomplete-items::-webkit-scrollbar { width: 8px; }
+        .diag-results::-webkit-scrollbar-thumb, .autocomplete-items::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        .diag-results::-webkit-scrollbar-thumb:hover, .autocomplete-items::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .toast { box-shadow: var(--shadow-lg); border-radius: 10px; transform: translateY(6px); transition: opacity 0.25s ease, transform 0.25s ease; }
+        .toast.show { transform: translateY(0); }
+        .autocomplete-items { border-radius: 10px; border-color: var(--border-soft); box-shadow: var(--shadow-md); }
+        .autocomplete-items div:hover { background: var(--brand-blue); }
+        button { font-family: inherit; }
     </style>
 </head>
 <body>
@@ -187,7 +252,17 @@
         <button type="button" class="lang-btn" id="lang-btn-th" onclick="setLanguage('th')">ไทย</button>
     </div>
 
-    <h2 data-i18n="appTitle">CRA Pediatric Rx & PALS Calculator</h2>
+    <div class="app-header">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 3v6a5 5 0 0 0 10 0V3" stroke="#2563eb" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M9 3h6" stroke="#2563eb" stroke-width="1.7" stroke-linecap="round"/>
+            <circle cx="19" cy="14.5" r="2.7" stroke="#0d9488" stroke-width="1.7"/>
+            <path d="M12 9v3a5 5 0 0 0 2.2 4.15" stroke="#0d9488" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <h2 data-i18n="appTitle">CRA Pediatric Rx & PALS Calculator</h2>
+    </div>
+    <div class="app-subtitle">Weight-based dosing &middot; PALS &amp; NCPR &middot; offline-first</div>
+    <div class="title-divider"></div>
     <div class="warning">
         <strong data-i18n="disclaimerLabel">Disclaimer:</strong> <span data-i18n="disclaimerText">Educational tool only. Hard max-caps are implemented, but always independently verify limits, contraindications, and dilutions before prescribing.</span>
     </div>
