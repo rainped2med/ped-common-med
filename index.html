@@ -716,6 +716,18 @@
         return med.rx.replace("{dose}", doseStr);
     }
 
+    /* Strips recurring-frequency wording (q X hr, PRN, BID/TID/QID/OD/HS) from an order line for
+       STAT (one-time) doses, since "q 8 hr PRN" contradicts a single immediate administration. */
+    function stripFrequencyForStat(text) {
+        return text
+            .replace(/\bPRN\b/gi, "")
+            .replace(/\bq\s*\d+(?:-\d+)?\s*hr\b/gi, "")
+            .replace(/\b(BID|TID|QID|OD|HS)\b/gi, "")
+            .replace(/\s{2,}/g, " ")
+            .replace(/\s+([.,])/g, "$1")
+            .trim();
+    }
+
     function isIvAntibiotic(med) {
         if (!med) return false;
         const text = (med.name + " " + med.rx).toLowerCase();
@@ -2439,6 +2451,7 @@
 
             const dose = w ? calculateMedDose(med, w) : null;
             item.plain = buildPlainRx(med, dose);
+            if (item.statDose) item.plain = stripFrequencyForStat(item.plain);
 
             const allergyWarnings = item.allergyWarnings || checkMedAllergy(med);
 
@@ -2746,7 +2759,8 @@
                 const infLine = buildInfusionOrderLine(med, w, item.ivInfusion);
                 if (infLine) return statPrefix + infLine;
             }
-            const base = statPrefix + buildPlainRx(med, dose);
+            const plainRx = item.statDose ? stripFrequencyForStat(buildPlainRx(med, dose)) : buildPlainRx(med, dose);
+            const base = statPrefix + plainRx;
             if (med && item.qty && dose != null && !item.statDose) {
                 const qtyLine = buildQtyOrderLine(med, dose, item.qty);
                 if (qtyLine) return base + "\n   " + qtyLine;
