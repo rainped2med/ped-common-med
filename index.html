@@ -879,7 +879,7 @@
         const days = qty.days, freq = qty.freqPerDay;
         if (r.kind === "ml") {
             if (r.bottles == null) return `${label}: ${r.totalMl.toFixed(1)} ml needed for ${days} day(s) (${freq}x/day) — enter bottle size to compute bottle count.`;
-            return `${label}: Dispense ${r.bottles} bottle(s) of ${r.pkg} ml (≈${r.exactBottles} bottles exactly) for ${days} day(s), ${freq}x/day — uses ${r.totalMl.toFixed(1)} ml of ${r.totalDispensedMl} ml dispensed.`;
+            return `${label}: Dispense ${r.bottles} bottle(s) of ${r.pkg} ml for ${days} day(s), ${freq}x/day.`;
         }
         if (r.kind === "tab") {
             return `${label}: dispense ${r.tabletsToDispense} tablet(s) for ${days} day(s), ${freq}x/day (${r.totalTab.toFixed(2)} tab needed).`;
