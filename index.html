@@ -425,13 +425,6 @@
                     <div id="suggested-list"></div>
                     <p id="suggested-hint" style="margin:8px 0 0 0;font-size:0.82em;color:#95a5a6;display:none;" data-i18n="suggestedHint">Choose a diagnosis above to see suggested meds.</p>
                 </div>
-
-                <div class="section-divider"></div>
-                <div class="search-section">
-                    <h3 data-i18n="searchDirectly">Or search medication directly</h3>
-                    <input type="text" id="med-search" placeholder="e.g. Amox, Ceftriaxone, Paracetamol..." oninput="handleMedSearch()" autocomplete="off">
-                    <div id="med-autocomplete" class="autocomplete-items"></div>
-                </div>
             </div>
         </div>
 
@@ -464,6 +457,12 @@
                         <option value="" data-i18n="medicationPlaceholder">-- Medication --</option>
                     </select>
                     <button type="button" class="btn-browse-add" id="browseAddBtn" onclick="addBrowseSelection()" disabled data-i18n="addSelectedBtn">+ Add selected to list</button>
+                </div>
+
+                <div class="search-section browse-block">
+                    <h3 style="margin:0 0 8px 0;font-size:0.85em;color:#566573;text-transform:uppercase;" data-i18n="searchDirectly">Or search medication directly</h3>
+                    <input type="text" id="med-search" placeholder="e.g. Amox, Ceftriaxone, Paracetamol..." oninput="handleMedSearch()" autocomplete="off">
+                    <div id="med-autocomplete" class="autocomplete-items"></div>
                 </div>
 
                 <div class="rx-section-divider"></div>
