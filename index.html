@@ -1365,7 +1365,10 @@
             { name: "Gentamicin IV", rx: "Gentamicin {dose} mg IV OD", note: "7.5 mg/kg/day. Max 500 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 7.5, doseRange: [5, 7.5], maxMg: 500, decimals: 0, defaultVolume: 50, calc: w => formatDoseValue(Math.min(w * 7.5, 500), { decimals: 0 }) },
             { name: "Acyclovir IV", rx: "Acyclovir {dose} mg IV q 8 hr", note: "10 mg/kg/dose q8 hr. Max 800 mg/dose.", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 10, doseRange: [10, 20], maxMg: 800, decimals: 0, defaultVolume: 100, calc: w => formatDoseValue(Math.min(w * 10, 800), { decimals: 0 }) },
             { name: "Fluconazole IV/PO", rx: "Fluconazole {dose} mg IV/PO OD", note: "6 mg/kg/day. Max 800 mg/day.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 6, doseRange: [6, 12], maxMg: 800, decimals: 0, defaultVolume: 100, calc: w => formatDoseValue(Math.min(w * 6, 800), { decimals: 0 }) },
-            { name: "Oseltamivir PO (Tamiflu)", rx: "Oseltamivir {dose} mg PO BID x 5 days", note: "Weight-based bands. Max 75 mg/dose.", decimals: 0, calc: w => { if (w < 15) return "30"; if (w <= 23) return "45"; if (w <= 40) return "60"; return "75"; } }
+            { name: "Oseltamivir PO (Tamiflu)", rx: "Oseltamivir {dose} mg PO BID x 5 days", note: "Weight-based bands. Max 75 mg/dose.", decimals: 0, calc: w => { if (w < 15) return "30"; if (w <= 23) return "45"; if (w <= 40) return "60"; return "75"; } },
+            { name: "Amikacin IV", rx: "Amikacin {dose} mg IV OD", note: "15 mg/kg/day OD (UTI / Gram-neg). Max 1500 mg/day. Monitor levels & renal function.", doseAdjustable: true, doseUnit: "mg/kg/day", standardMgKg: 15, doseRange: [15, 20], dosesPerDay: 1, maxMg: 1500, decimals: 0, defaultVolume: 100, calc: w => formatDoseValue(Math.min(w * 15, 1500), { decimals: 0 }) },
+            { name: "Ciprofloxacin PO (250mg/5ml)", rx: "Ciprofloxacin Susp (250 mg/5 ml) {dose} ml PO BID", note: "20-40 mg/kg/day div BID (UTI). Max 750 mg (15 ml)/dose. Fluoroquinolone — reserve in children, use when indicated.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 15) / 50, 15)), doseAdjustable: true, standardMgKg: 30, doseUnit: "mg/kg/day", dosesPerDay: 2, maxMg: 750, concMgMl: 50, doseRange: [20, 40] },
+            { name: "Augmentin PO (457mg/5ml) - Standard 45 mg/kg/day (UTI)", rx: "Amoxicillin/Clavulanate (457 mg/5 ml) {dose} ml PO BID", note: "40-50 mg/kg/day of amoxicillin div BID (UTI / standard dose). Max 875 mg Amox (11 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 22.5) / 80, 11)), doseAdjustable: true, standardMgKg: 45, doseUnit: "mg/kg/day", dosesPerDay: 2, maxMg: 875, concMgMl: 80, doseRange: [40, 50] }
         ],
         cardio: [
             { name: "Furosemide PO (10 mg/ml)", rx: "Furosemide (10 mg/ml) {dose} ml PO BID", note: "1 mg/kg. Max 40 mg (4 ml)/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w / 10, 4)), doseAdjustable: true, standardMgKg: 1, doseUnit: "mg/kg/dose", maxMg: 40, concMgMl: 10 },
@@ -2061,6 +2064,28 @@
                 "antimicrobial|13", /* Gentamicin — synergy / Gram-neg */
                 "neuro_pain|0", "neuro_pain|1", "neuro_pain|3", /* paracetamol */
                 "respiratory|3"  /* Salbutamol neb — wheeze/secretions */
+            ]
+        },
+        {
+            name: "Urinary tract infection (UTI)",
+            system: "renal",
+            keywords: ["uti", "urinary tract infection", "pyelonephritis", "cystitis", "urine infection", "vesicoureteral"],
+            medKeys: [
+                /* Oral (Table 3) */
+                "antimicrobial|19", /* Augmentin standard 40-50 mg/kg/day */
+                "antimicrobial|5",  /* Cephalexin */
+                "renal|2",          /* Cefixime */
+                "antimicrobial|18", /* Ciprofloxacin */
+                "antimicrobial|7",  /* Cotrimoxazole / Bactrim */
+                "renal|0",          /* Nitrofurantoin (treatment) */
+                /* IV / injectable (Table 2) */
+                "antimicrobial|8",  /* Ceftriaxone IV */
+                "antimicrobial|10", /* Cefotaxime IV */
+                "antimicrobial|17", /* Amikacin IV */
+                "antimicrobial|13", /* Gentamicin IV */
+                /* Prophylaxis + symptomatic */
+                "renal|1",          /* Trimethoprim (prophylaxis) */
+                "neuro_pain|0", "neuro_pain|1" /* paracetamol — fever */
             ]
         },
         {
