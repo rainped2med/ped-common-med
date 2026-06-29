@@ -1545,7 +1545,17 @@
             { name: "Zidovudine (AZT) - neonatal HIV prophylaxis", rx: "Zidovudine {dose} mg PO q12h (term neonate) x 4 weeks", note: "PMTCT (term): 4 mg/kg/dose q12h from birth x 4 weeks. Syrup 10 mg/ml. Preterm 30-35 wk: 2 mg/kg q12h (q8h after 2 wks); <30 wk: 2 mg/kg q12h (q8h after 4 wks).", decimals: 1, calc: w => formatDoseValue(w * 4, { decimals: 1 }), doseAdjustable: true, standardMgKg: 4, doseUnit: "mg/kg/dose", dosesPerDay: 2 },
             { name: "Lamivudine (3TC) - neonatal HIV prophylaxis", rx: "Lamivudine {dose} mg PO q12h", note: "High-risk PMTCT (part of AZT+3TC+NVP): 2 mg/kg/dose q12h. Syrup 10 mg/ml.", decimals: 1, calc: w => formatDoseValue(w * 2, { decimals: 1 }), doseAdjustable: true, standardMgKg: 2, doseUnit: "mg/kg/dose", dosesPerDay: 2 },
             { name: "Nevirapine (NVP) - neonatal HIV prophylaxis", rx: "Nevirapine {dose} mg PO q24h", note: "High-risk PMTCT (part of AZT+3TC+NVP triple prophylaxis): 4 mg/kg/dose once daily. Syrup 10 mg/ml. Verify duration per current PMTCT protocol.", decimals: 1, calc: w => formatDoseValue(w * 4, { decimals: 1 }), doseAdjustable: true, standardMgKg: 4, doseUnit: "mg/kg/dose", dosesPerDay: 1 },
-            { name: "Prednisolone - TB meningitis adjunct", rx: "Prednisolone {dose} mg PO OD x ~3-4 weeks, then taper", note: "Adjunctive steroid for CNS/meningeal TB (and TB pericarditis): 1-2 mg/kg/day once daily for 3-4 weeks, then taper. Max 60 mg/day.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1, 60), { decimals: 0 }), doseAdjustable: true, standardMgKg: 1, doseRange: [1, 2], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 60 }
+            { name: "Prednisolone - TB meningitis adjunct", rx: "Prednisolone {dose} mg PO OD x ~3-4 weeks, then taper", note: "Adjunctive steroid for CNS/meningeal TB (and TB pericarditis): 1-2 mg/kg/day once daily for 3-4 weeks, then taper. Max 60 mg/day.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1, 60), { decimals: 0 }), doseAdjustable: true, standardMgKg: 1, doseRange: [1, 2], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 60 },
+            /* --- Second-line TB (MDR / XDR), Thai pediatric TB table 5.8 --- */
+            { name: "Levofloxacin (Lfx) - 2nd-line TB", rx: "Levofloxacin {dose} mg PO OD", note: "MDR-TB Group A fluoroquinolone: 15-20 mg/kg/day once daily. Max 1.5 g/day.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 15, 1500), { decimals: 0 }), doseAdjustable: true, standardMgKg: 15, doseRange: [15, 20], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 1500 },
+            { name: "Moxifloxacin (Mfx) - 2nd-line TB", rx: "Moxifloxacin {dose} mg PO OD", note: "MDR-TB Group A fluoroquinolone: 10-15 mg/kg/day once daily. Max 400 mg/day.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 400), { decimals: 0 }), doseAdjustable: true, standardMgKg: 10, doseRange: [10, 15], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 400 },
+            { name: "Bedaquiline (Bdq) - 2nd-line TB", rx: "Bedaquiline {dose} mg PO OD (loading x2 wks; see note)", note: "MDR-TB Group A. 15-29 kg: 200 mg OD x2 wks, then 100 mg 3x/week x22 wks. >=30 kg: 400 mg OD x2 wks, then 200 mg 3x/week x22 wks. Limited data <15 kg. Monitor QTc/ECG.", decimals: 0, calc: w => (w < 15 ? null : (w < 30 ? "200" : "400")) },
+            { name: "Linezolid (Lzd) - 2nd-line TB", rx: "Linezolid {dose} mg PO OD", note: "MDR-TB Group A: <=15 kg 15 mg/kg/day; >15 kg 10-12 mg/kg/day, once daily. Max 600 mg/day. Monitor CBC (myelosuppression) + peripheral/optic neuropathy.", decimals: 0, calc: w => formatDoseValue(Math.min(w <= 15 ? w * 15 : w * 10, 600), { decimals: 0 }) },
+            { name: "Clofazimine (Cfz) - 2nd-line TB", rx: "Clofazimine {dose} mg PO OD", note: "MDR-TB Group B: 2-5 mg/kg/day once daily. Max 100 mg/day. Causes reddish-brown skin discolouration.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 3, 100), { decimals: 0 }), doseAdjustable: true, standardMgKg: 3, doseRange: [2, 5], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 100 },
+            { name: "Cycloserine (Cs) - 2nd-line TB", rx: "Cycloserine {dose} mg PO div BID", note: "MDR-TB Group B: 7-<30 kg 15-20 mg/kg/day; >=30 kg 10-15 mg/kg/day, divided BID. Max 1 g/day. Monitor CNS/psychiatric effects; give with pyridoxine.", decimals: 0, calc: w => formatDoseValue(Math.min(w < 30 ? w * 15 : w * 12, 1000), { decimals: 0 }) },
+            { name: "Delamanid (Dlm) - 2nd-line TB", rx: "Delamanid {dose} mg PO BID", note: "MDR-TB. AGE-based dosing: 3-5 y 25 mg BID; 6-11 y 50 mg BID; 12-17 y 100 mg BID. Weight bands shown are an approximation - verify by age. Monitor QTc.", decimals: 0, calc: w => (w < 20 ? "25" : (w < 35 ? "50" : "100")) },
+            { name: "Ethionamide (Eto) - 2nd-line TB", rx: "Ethionamide {dose} mg PO div 2-3 doses", note: "MDR-TB Group C: 15-20 mg/kg/day divided 2-3 times daily (WHO allows once daily). Max 1 g/day. GI upset, hypothyroidism.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 15, 1000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 15, doseRange: [15, 20], doseUnit: "mg/kg/day", maxMg: 1000 },
+            { name: "Para-aminosalicylic acid (PAS) - 2nd-line TB", rx: "PAS {dose} mg PO div 2-4 doses", note: "MDR/XDR-TB Group C: 200-300 mg/kg/day divided 2-4 times daily. Max 10 g/day. GI intolerance common.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 200, 10000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 200, doseRange: [200, 300], doseUnit: "mg/kg/day", maxMg: 10000 }
         ],
         allergy: [
             { name: "Diphenhydramine PO/IV", rx: "Diphenhydramine {dose} mg PO/IV q 6 hr PRN", note: "1 mg/kg/dose. Max 50 mg/dose. Sedating antihistamine.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1, 50), { decimals: 0 }), doseAdjustable: true, standardMgKg: 1, doseUnit: "mg/kg/dose", maxMg: 50 },
@@ -2160,6 +2170,40 @@
                 "infectious|7",  /* Ethambutol */
                 "infectious|8",  /* Pyridoxine */
                 "infectious|10"  /* Co-trimoxazole PCP prophylaxis */
+            ]
+        },
+        {
+            name: "MDR-TB (multidrug-resistant)",
+            system: "tb_hiv",
+            keywords: ["mdr", "mdr-tb", "multidrug resistant", "drug resistant tb", "rifampicin resistant", "rr-tb", "วัณโรคดื้อยา", "bdq", "bedaquiline regimen", "shorter oral regimen"],
+            medKeys: [
+                "infectious|18", /* Bedaquiline (Group A) */
+                "infectious|16", /* Levofloxacin (Group A FQ) */
+                "infectious|19", /* Linezolid (Group A) */
+                "infectious|20", /* Clofazimine (Group B) */
+                "infectious|21", /* Cycloserine (Group B) */
+                "infectious|6",  /* Pyrazinamide (companion) */
+                "infectious|7",  /* Ethambutol (companion) */
+                "infectious|23", /* Ethionamide (Group C, shorter regimen) */
+                "infectious|22", /* Delamanid (alternative) */
+                "infectious|8"   /* Pyridoxine (with Cs/Lzd) */
+            ]
+        },
+        {
+            name: "XDR-TB / pre-XDR (extensively drug-resistant)",
+            system: "tb_hiv",
+            keywords: ["xdr", "xdr-tb", "pre-xdr", "extensively drug resistant", "fluoroquinolone resistant", "salvage tb", "วัณโรคดื้อยารุนแรง"],
+            medKeys: [
+                "infectious|18", /* Bedaquiline (Group A) */
+                "infectious|19", /* Linezolid (Group A) */
+                "infectious|22", /* Delamanid */
+                "infectious|17", /* Moxifloxacin (if FQ still active) */
+                "infectious|20", /* Clofazimine (Group B) */
+                "infectious|21", /* Cycloserine (Group B) */
+                "infectious|24", /* PAS (Group C) */
+                "infectious|23", /* Ethionamide (Group C) */
+                "antimicrobial|17", /* Amikacin (injectable, if susceptible) */
+                "infectious|8"   /* Pyridoxine */
             ]
         },
         {

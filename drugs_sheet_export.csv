@@ -143,6 +143,15 @@ infectious|12,infectious,Zidovudine (AZT) - neonatal HIV prophylaxis,4,,,,,2,,,,
 infectious|13,infectious,Lamivudine (3TC) - neonatal HIV prophylaxis,2,,,,,2,,,,,,,
 infectious|14,infectious,Nevirapine (NVP) - neonatal HIV prophylaxis,4,,,,,1,,,,,,,
 infectious|15,infectious,Prednisolone - TB meningitis adjunct,1,1,2,60,,1,,,,,,,
+infectious|16,infectious,Levofloxacin (Lfx) - 2nd-line TB,15,15,20,1500,,1,,,,,,,
+infectious|17,infectious,Moxifloxacin (Mfx) - 2nd-line TB,10,10,15,400,,1,,,,,,,
+infectious|18,infectious,Bedaquiline (Bdq) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band fixed dosing with loading + 3x/week maintenance
+infectious|19,infectious,Linezolid (Lzd) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band: <=15kg 15 mg/kg/day; >15kg 10-12 mg/kg/day (max 600)
+infectious|20,infectious,Clofazimine (Cfz) - 2nd-line TB,3,2,5,100,,1,,,,,,,
+infectious|21,infectious,Cycloserine (Cs) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band: 7-<30kg 15-20; >=30kg 10-15 mg/kg/day div BID (max 1g)
+infectious|22,infectious,Delamanid (Dlm) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-band: 3-5y 25mg BID; 6-11y 50mg BID; 12-17y 100mg BID
+infectious|23,infectious,Ethionamide (Eto) - 2nd-line TB,15,15,20,1000,,,,,,,,,
+infectious|24,infectious,Para-aminosalicylic acid (PAS) - 2nd-line TB,200,200,300,10000,,,,,,,,,
 allergy|0,allergy,Diphenhydramine PO/IV,1,,,50,,,,,,,,,
 allergy|1,allergy,Hydroxyzine PO,0.5,0.5,1,50,,,,,,,,,
 allergy|2,allergy,Loratadine PO (non-sedating),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Weight-band dosing (non-linear): <30 kg = 5 mg/day; >=30 kg = 10 mg/day.
