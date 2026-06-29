@@ -1528,7 +1528,20 @@
             { name: "Clindamycin PO (75mg/5ml)", rx: "Clindamycin Susp (75 mg/5 ml) {dose} ml PO TID", note: "10 mg/kg/dose TID (skin/soft tissue, anaerobic coverage). Max 450 mg/dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 10) / 15, 30)), doseAdjustable: true, standardMgKg: 10, doseUnit: "mg/kg/dose", maxMg: 450, concMgMl: 15 },
             { name: "Clindamycin IV", rx: "Clindamycin {dose} mg IV q 8 hr", note: "10 mg/kg/dose q8h (severe infections). Max 900 mg/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 900), { decimals: 0 }), doseAdjustable: true, standardMgKg: 10, doseUnit: "mg/kg/dose", maxMg: 900 },
             { name: "Metronidazole PO/IV", rx: "Metronidazole {dose} mg PO/IV q 8 hr", note: "7.5 mg/kg/dose q8h (anaerobic, C. diff, giardiasis). Max 500 mg/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 7.5, 500), { decimals: 0 }), doseAdjustable: true, standardMgKg: 7.5, doseUnit: "mg/kg/dose", maxMg: 500 },
-            { name: "Doxycycline PO", rx: "Doxycycline {dose} mg PO BID (day 1), then OD", note: "2.2 mg/kg/dose BID. Max 100 mg/dose. Short courses (<21 days) now considered low risk for dental staining at any age per updated AAP guidance — verify local protocol.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 2.2, 100), { decimals: 0 }), doseAdjustable: true, standardMgKg: 2.2, doseUnit: "mg/kg/dose", maxMg: 100 }
+            { name: "Doxycycline PO", rx: "Doxycycline {dose} mg PO BID (day 1), then OD", note: "2.2 mg/kg/dose BID. Max 100 mg/dose. Short courses (<21 days) now considered low risk for dental staining at any age per updated AAP guidance — verify local protocol.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 2.2, 100), { decimals: 0 }), doseAdjustable: true, standardMgKg: 2.2, doseUnit: "mg/kg/dose", maxMg: 100 },
+            /* --- Tuberculosis: first-line (Thai pediatric TB guideline / HRZE) --- */
+            { name: "Isoniazid (INH) PO - TB treatment", rx: "Isoniazid {dose} mg PO OD", note: "10 mg/kg/day (range 10-15). Max 300 mg/day, once daily. Part of HRZE regimen. Give pyridoxine (vit B6) with it.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 300), { decimals: 0 }), doseAdjustable: true, standardMgKg: 10, doseRange: [10, 15], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 300 },
+            { name: "Rifampicin (RIF) PO - TB treatment", rx: "Rifampicin {dose} mg PO OD (empty stomach)", note: "15 mg/kg/day (range 10-20). Max 600 mg/day, once daily on empty stomach. Part of HRZE. Strong CYP inducer - check interactions (e.g. antiretrovirals).", decimals: 0, calc: w => formatDoseValue(Math.min(w * 15, 600), { decimals: 0 }), doseAdjustable: true, standardMgKg: 15, doseRange: [10, 20], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 600 },
+            { name: "Pyrazinamide (PZA) PO - TB treatment", rx: "Pyrazinamide {dose} mg PO OD", note: "35 mg/kg/day (range 30-40). Max 2000 mg/day, once daily. Intensive phase only (first 2 months).", decimals: 0, calc: w => formatDoseValue(Math.min(w * 35, 2000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 35, doseRange: [30, 40], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 2000 },
+            { name: "Ethambutol (EMB) PO - TB treatment", rx: "Ethambutol {dose} mg PO OD", note: "20 mg/kg/day (range 15-25, do not exceed 25). Max 1200 mg/day, once daily. Intensive phase. Monitor visual acuity / colour vision.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 20, 1200), { decimals: 0 }), doseAdjustable: true, standardMgKg: 20, doseRange: [15, 25], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 1200 },
+            { name: "Pyridoxine (Vitamin B6) - give with INH", rx: "Pyridoxine {dose} mg PO OD", note: "Give alongside isoniazid to prevent peripheral neuropathy. ~1 mg/kg/day; usual 12.5-50 mg/day. Max 50 mg/day.", decimals: 0, calc: w => formatDoseValue(Math.min(Math.max(w * 1, 12.5), 50), { decimals: 0 }), doseAdjustable: true, standardMgKg: 1, doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 50 },
+            { name: "Isoniazid (INH) - TB preventive therapy (TPT/LTBI)", rx: "Isoniazid {dose} mg PO OD x 6-9 months", note: "Latent TB / TB preventive therapy: 10 mg/kg/day (max 300) once daily for 6-9 months (9-12 months if HIV+). Add pyridoxine. Alternative: rifampicin 15 mg/kg/day x 4 months.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 10, 300), { decimals: 0 }), doseAdjustable: true, standardMgKg: 10, doseRange: [10, 15], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 300 },
+            /* --- HIV: prophylaxis (PCP + neonatal PMTCT). Chronic ART is weight-band/FDC - use the guideline chart, not this calculator. --- */
+            { name: "Co-trimoxazole (TMP-SMX) - PCP prophylaxis", rx: "Cotrimoxazole Susp (40 mg TMP/5 ml) {dose} ml PO OD (3 days/week)", note: "PCP prophylaxis: 5 mg/kg/day of TMP (or 150 mg/m2/day) once daily, 3 days per week. Max 160 mg TMP/dose. NOTE: lower than treatment dose.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 5) / 8, 20)), doseAdjustable: true, standardMgKg: 5, doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 160, concMgMl: 8 },
+            { name: "Dapsone - PCP prophylaxis (alternative)", rx: "Dapsone {dose} mg PO OD", note: "PCP prophylaxis alternative (if cotrimoxazole not tolerated): 2 mg/kg/day once daily. Max 100 mg/day. Check G6PD before use.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 2, 100), { decimals: 0 }), doseAdjustable: true, standardMgKg: 2, doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 100 },
+            { name: "Zidovudine (AZT) - neonatal HIV prophylaxis", rx: "Zidovudine {dose} mg PO q12h (term neonate) x 4 weeks", note: "PMTCT (term): 4 mg/kg/dose q12h from birth x 4 weeks. Syrup 10 mg/ml. Preterm 30-35 wk: 2 mg/kg q12h (q8h after 2 wks); <30 wk: 2 mg/kg q12h (q8h after 4 wks).", decimals: 1, calc: w => formatDoseValue(w * 4, { decimals: 1 }), doseAdjustable: true, standardMgKg: 4, doseUnit: "mg/kg/dose", dosesPerDay: 2 },
+            { name: "Lamivudine (3TC) - neonatal HIV prophylaxis", rx: "Lamivudine {dose} mg PO q12h", note: "High-risk PMTCT (part of AZT+3TC+NVP): 2 mg/kg/dose q12h. Syrup 10 mg/ml.", decimals: 1, calc: w => formatDoseValue(w * 2, { decimals: 1 }), doseAdjustable: true, standardMgKg: 2, doseUnit: "mg/kg/dose", dosesPerDay: 2 },
+            { name: "Nevirapine (NVP) - neonatal HIV prophylaxis", rx: "Nevirapine {dose} mg PO q24h", note: "High-risk PMTCT (part of AZT+3TC+NVP triple prophylaxis): 4 mg/kg/dose once daily. Syrup 10 mg/ml. Verify duration per current PMTCT protocol.", decimals: 1, calc: w => formatDoseValue(w * 4, { decimals: 1 }), doseAdjustable: true, standardMgKg: 4, doseUnit: "mg/kg/dose", dosesPerDay: 1 }
         ],
         allergy: [
             { name: "Diphenhydramine PO/IV", rx: "Diphenhydramine {dose} mg PO/IV q 6 hr PRN", note: "1 mg/kg/dose. Max 50 mg/dose. Sedating antihistamine.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1, 50), { decimals: 0 }), doseAdjustable: true, standardMgKg: 1, doseUnit: "mg/kg/dose", maxMg: 50 },
@@ -2086,6 +2099,47 @@
                 /* Prophylaxis + symptomatic */
                 "renal|1",          /* Trimethoprim (prophylaxis) */
                 "neuro_pain|0", "neuro_pain|1" /* paracetamol — fever */
+            ]
+        },
+        {
+            name: "Tuberculosis (active) - first-line treatment",
+            system: "infectious",
+            keywords: ["tb", "tuberculosis", "วัณโรค", "hrze", "pulmonary tb", "tb meningitis", "miliary", "ptb"],
+            medKeys: [
+                "infectious|4",  /* Isoniazid */
+                "infectious|5",  /* Rifampicin */
+                "infectious|6",  /* Pyrazinamide */
+                "infectious|7",  /* Ethambutol */
+                "infectious|8"   /* Pyridoxine (with INH) */
+            ]
+        },
+        {
+            name: "Latent TB / TB preventive therapy (TPT)",
+            system: "infectious",
+            keywords: ["ltbi", "latent tb", "tpt", "ipt", "tb prophylaxis", "tb contact", "tb exposure", "isoniazid preventive"],
+            medKeys: [
+                "infectious|9",  /* Isoniazid - TPT */
+                "infectious|8"   /* Pyridoxine */
+            ]
+        },
+        {
+            name: "HIV - opportunistic infection prophylaxis",
+            system: "infectious",
+            keywords: ["hiv", "aids", "เอชไอวี", "pcp", "pneumocystis", "oi prophylaxis", "cotrimoxazole prophylaxis", "immunocompromised prophylaxis"],
+            medKeys: [
+                "infectious|10", /* Co-trimoxazole PCP prophylaxis */
+                "infectious|11"  /* Dapsone (alternative) */
+            ]
+        },
+        {
+            name: "Neonatal HIV exposure - ARV prophylaxis (PMTCT)",
+            system: "ncpr",
+            keywords: ["pmtct", "neonatal hiv", "hiv exposed infant", "mtct", "arv prophylaxis", "hiv newborn", "prevention mother to child"],
+            medKeys: [
+                "infectious|12", /* Zidovudine (AZT) */
+                "infectious|13", /* Lamivudine (3TC) */
+                "infectious|14", /* Nevirapine (NVP) */
+                "infectious|10"  /* Co-trimoxazole prophylaxis (from 4-6 wks) */
             ]
         },
         {
