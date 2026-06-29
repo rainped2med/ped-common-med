@@ -142,6 +142,7 @@ infectious|11,infectious,Dapsone - PCP prophylaxis (alternative),2,,,100,,1,,,,,
 infectious|12,infectious,Zidovudine (AZT) - neonatal HIV prophylaxis,4,,,,,2,,,,,,,
 infectious|13,infectious,Lamivudine (3TC) - neonatal HIV prophylaxis,2,,,,,2,,,,,,,
 infectious|14,infectious,Nevirapine (NVP) - neonatal HIV prophylaxis,4,,,,,1,,,,,,,
+infectious|15,infectious,Prednisolone - TB meningitis adjunct,1,1,2,60,,1,,,,,,,
 allergy|0,allergy,Diphenhydramine PO/IV,1,,,50,,,,,,,,,
 allergy|1,allergy,Hydroxyzine PO,0.5,0.5,1,50,,,,,,,,,
 allergy|2,allergy,Loratadine PO (non-sedating),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Weight-band dosing (non-linear): <30 kg = 5 mg/day; >=30 kg = 10 mg/day.

@@ -540,6 +540,7 @@
             cat_infant_supp: "Infant supplementation",
             cat_pals: "PALS — Pediatric Advanced Life Support",
             cat_ncpr: "NCPR / NRP — Neonatal Resuscitation",
+            cat_tb_hiv: "TB & HIV",
             themeDark: "Dark",
             themeLight: "Light"
         },
@@ -590,6 +591,7 @@
             cat_infant_supp: "อาหารเสริมสำหรับทารก",
             cat_pals: "PALS — การช่วยชีวิตขั้นสูงในเด็ก",
             cat_ncpr: "NCPR / NRP — การกู้ชีพทารกแรกเกิด",
+            cat_tb_hiv: "วัณโรค และ เอชไอวี",
             themeDark: "มืด",
             themeLight: "สว่าง"
         }
@@ -768,7 +770,8 @@
         { id: "infant_supp", short: "Infant supplementation" },
         { id: "pals", short: "PALS — Pediatric ALS" },
         { id: "ncpr", short: "NCPR / NRP — Neonatal" },
-        { id: "fluids", short: "IV Fluids & Electrolytes" }
+        { id: "fluids", short: "IV Fluids & Electrolytes" },
+        { id: "tb_hiv", short: "TB & HIV" }
     ];
 
     function calcMaintenance(wt) {
@@ -1541,7 +1544,8 @@
             { name: "Dapsone - PCP prophylaxis (alternative)", rx: "Dapsone {dose} mg PO OD", note: "PCP prophylaxis alternative (if cotrimoxazole not tolerated): 2 mg/kg/day once daily. Max 100 mg/day. Check G6PD before use.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 2, 100), { decimals: 0 }), doseAdjustable: true, standardMgKg: 2, doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 100 },
             { name: "Zidovudine (AZT) - neonatal HIV prophylaxis", rx: "Zidovudine {dose} mg PO q12h (term neonate) x 4 weeks", note: "PMTCT (term): 4 mg/kg/dose q12h from birth x 4 weeks. Syrup 10 mg/ml. Preterm 30-35 wk: 2 mg/kg q12h (q8h after 2 wks); <30 wk: 2 mg/kg q12h (q8h after 4 wks).", decimals: 1, calc: w => formatDoseValue(w * 4, { decimals: 1 }), doseAdjustable: true, standardMgKg: 4, doseUnit: "mg/kg/dose", dosesPerDay: 2 },
             { name: "Lamivudine (3TC) - neonatal HIV prophylaxis", rx: "Lamivudine {dose} mg PO q12h", note: "High-risk PMTCT (part of AZT+3TC+NVP): 2 mg/kg/dose q12h. Syrup 10 mg/ml.", decimals: 1, calc: w => formatDoseValue(w * 2, { decimals: 1 }), doseAdjustable: true, standardMgKg: 2, doseUnit: "mg/kg/dose", dosesPerDay: 2 },
-            { name: "Nevirapine (NVP) - neonatal HIV prophylaxis", rx: "Nevirapine {dose} mg PO q24h", note: "High-risk PMTCT (part of AZT+3TC+NVP triple prophylaxis): 4 mg/kg/dose once daily. Syrup 10 mg/ml. Verify duration per current PMTCT protocol.", decimals: 1, calc: w => formatDoseValue(w * 4, { decimals: 1 }), doseAdjustable: true, standardMgKg: 4, doseUnit: "mg/kg/dose", dosesPerDay: 1 }
+            { name: "Nevirapine (NVP) - neonatal HIV prophylaxis", rx: "Nevirapine {dose} mg PO q24h", note: "High-risk PMTCT (part of AZT+3TC+NVP triple prophylaxis): 4 mg/kg/dose once daily. Syrup 10 mg/ml. Verify duration per current PMTCT protocol.", decimals: 1, calc: w => formatDoseValue(w * 4, { decimals: 1 }), doseAdjustable: true, standardMgKg: 4, doseUnit: "mg/kg/dose", dosesPerDay: 1 },
+            { name: "Prednisolone - TB meningitis adjunct", rx: "Prednisolone {dose} mg PO OD x ~3-4 weeks, then taper", note: "Adjunctive steroid for CNS/meningeal TB (and TB pericarditis): 1-2 mg/kg/day once daily for 3-4 weeks, then taper. Max 60 mg/day.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1, 60), { decimals: 0 }), doseAdjustable: true, standardMgKg: 1, doseRange: [1, 2], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 60 }
         ],
         allergy: [
             { name: "Diphenhydramine PO/IV", rx: "Diphenhydramine {dose} mg PO/IV q 6 hr PRN", note: "1 mg/kg/dose. Max 50 mg/dose. Sedating antihistamine.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1, 50), { decimals: 0 }), doseAdjustable: true, standardMgKg: 1, doseUnit: "mg/kg/dose", maxMg: 50 },
@@ -2101,10 +2105,20 @@
                 "neuro_pain|0", "neuro_pain|1" /* paracetamol — fever */
             ]
         },
+        /* ===== TB & HIV group ===== */
         {
-            name: "Tuberculosis (active) - first-line treatment",
-            system: "infectious",
-            keywords: ["tb", "tuberculosis", "วัณโรค", "hrze", "pulmonary tb", "tb meningitis", "miliary", "ptb"],
+            name: "Latent TB (TB preventive therapy)",
+            system: "tb_hiv",
+            keywords: ["ltbi", "latent tb", "tpt", "ipt", "tb prophylaxis", "tb contact", "tb exposure", "isoniazid preventive", "วัณโรคระยะแฝง", "วัณโรค"],
+            medKeys: [
+                "infectious|9",  /* Isoniazid - TPT */
+                "infectious|8"   /* Pyridoxine */
+            ]
+        },
+        {
+            name: "Pulmonary TB",
+            system: "tb_hiv",
+            keywords: ["tb", "tuberculosis", "วัณโรค", "วัณโรคปอด", "hrze", "pulmonary tb", "ptb", "miliary", "active tb", "tb treatment"],
             medKeys: [
                 "infectious|4",  /* Isoniazid */
                 "infectious|5",  /* Rifampicin */
@@ -2114,26 +2128,43 @@
             ]
         },
         {
-            name: "Latent TB / TB preventive therapy (TPT)",
-            system: "infectious",
-            keywords: ["ltbi", "latent tb", "tpt", "ipt", "tb prophylaxis", "tb contact", "tb exposure", "isoniazid preventive"],
+            name: "TB meningitis",
+            system: "tb_hiv",
+            keywords: ["tb meningitis", "tbm", "cns tb", "meningeal tb", "วัณโรคเยื่อหุ้มสมอง", "tuberculous meningitis"],
             medKeys: [
-                "infectious|9",  /* Isoniazid - TPT */
-                "infectious|8"   /* Pyridoxine */
+                "infectious|4",  /* Isoniazid */
+                "infectious|5",  /* Rifampicin */
+                "infectious|6",  /* Pyrazinamide */
+                "infectious|7",  /* Ethambutol */
+                "infectious|8",  /* Pyridoxine */
+                "infectious|15"  /* Prednisolone - adjunctive steroid (longer continuation phase: HR x ~10 months) */
             ]
         },
         {
-            name: "HIV - opportunistic infection prophylaxis",
-            system: "infectious",
-            keywords: ["hiv", "aids", "เอชไอวี", "pcp", "pneumocystis", "oi prophylaxis", "cotrimoxazole prophylaxis", "immunocompromised prophylaxis"],
+            name: "HIV",
+            system: "tb_hiv",
+            keywords: ["hiv", "aids", "เอชไอวี", "pcp", "pneumocystis", "oi prophylaxis", "opportunistic infection", "cotrimoxazole prophylaxis", "immunocompromised"],
             medKeys: [
                 "infectious|10", /* Co-trimoxazole PCP prophylaxis */
                 "infectious|11"  /* Dapsone (alternative) */
             ]
         },
         {
+            name: "HIV with TB (co-infection)",
+            system: "tb_hiv",
+            keywords: ["hiv tb", "tb hiv", "co-infection", "coinfection", "hiv with tb", "tb in hiv", "เอชไอวี วัณโรค"],
+            medKeys: [
+                "infectious|4",  /* Isoniazid */
+                "infectious|5",  /* Rifampicin - NOTE: induces ART metabolism, see drug note */
+                "infectious|6",  /* Pyrazinamide */
+                "infectious|7",  /* Ethambutol */
+                "infectious|8",  /* Pyridoxine */
+                "infectious|10"  /* Co-trimoxazole PCP prophylaxis */
+            ]
+        },
+        {
             name: "Neonatal HIV exposure - ARV prophylaxis (PMTCT)",
-            system: "ncpr",
+            system: "tb_hiv",
             keywords: ["pmtct", "neonatal hiv", "hiv exposed infant", "mtct", "arv prophylaxis", "hiv newborn", "prevention mother to child"],
             medKeys: [
                 "infectious|12", /* Zidovudine (AZT) */
