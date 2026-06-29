@@ -1555,7 +1555,24 @@
             { name: "Cycloserine (Cs) - 2nd-line TB", rx: "Cycloserine {dose} mg PO div BID", note: "MDR-TB Group B: 7-<30 kg 15-20 mg/kg/day; >=30 kg 10-15 mg/kg/day, divided BID. Max 1 g/day. Monitor CNS/psychiatric effects; give with pyridoxine.", decimals: 0, calc: w => formatDoseValue(Math.min(w < 30 ? w * 15 : w * 12, 1000), { decimals: 0 }) },
             { name: "Delamanid (Dlm) - 2nd-line TB", rx: "Delamanid {dose} mg PO BID", note: "MDR-TB. AGE-based dosing: 3-5 y 25 mg BID; 6-11 y 50 mg BID; 12-17 y 100 mg BID. Weight bands shown are an approximation - verify by age. Monitor QTc.", decimals: 0, calc: w => (w < 20 ? "25" : (w < 35 ? "50" : "100")) },
             { name: "Ethionamide (Eto) - 2nd-line TB", rx: "Ethionamide {dose} mg PO div 2-3 doses", note: "MDR-TB Group C: 15-20 mg/kg/day divided 2-3 times daily (WHO allows once daily). Max 1 g/day. GI upset, hypothyroidism.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 15, 1000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 15, doseRange: [15, 20], doseUnit: "mg/kg/day", maxMg: 1000 },
-            { name: "Para-aminosalicylic acid (PAS) - 2nd-line TB", rx: "PAS {dose} mg PO div 2-4 doses", note: "MDR/XDR-TB Group C: 200-300 mg/kg/day divided 2-4 times daily. Max 10 g/day. GI intolerance common.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 200, 10000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 200, doseRange: [200, 300], doseUnit: "mg/kg/day", maxMg: 10000 }
+            { name: "Para-aminosalicylic acid (PAS) - 2nd-line TB", rx: "PAS {dose} mg PO div 2-4 doses", note: "MDR/XDR-TB Group C: 200-300 mg/kg/day divided 2-4 times daily. Max 10 g/day. GI intolerance common.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 200, 10000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 200, doseRange: [200, 300], doseUnit: "mg/kg/day", maxMg: 10000 },
+            /* --- HIV antiretrovirals (ART) - Thai pediatric guideline Appendix D, weight-band dosing --- */
+            { name: "Dolutegravir (DTG) - ART", rx: "Dolutegravir {dose} mg PO OD", note: "INSTI, first-line. Dispersible 5mg tab (>=4wk & >=3kg): 3-<6kg 5mg; 6-<10kg 15mg; 10-<14kg 20mg; 14-<20kg 25mg OD. Film tab 50mg: >=20kg 50mg OD. >=30kg can use TLD (TDF/3TC/DTG). With rifampicin: give twice daily. Dispersible & film NOT interchangeable mg-for-mg.", calc: w => { if (w < 3) return null; if (w < 6) return "5"; if (w < 10) return "15"; if (w < 14) return "20"; if (w < 20) return "25"; return "50"; } },
+            { name: "TLD (TDF/3TC/DTG 300/300/50) - ART FDC", rx: "TLD (TDF/3TC/DTG 300/300/50) {dose} PO OD", note: "Preferred first-line fixed-dose combination. >=30 kg and able to swallow tablets: 1 tablet once daily. With rifampicin: add a separate DTG 50 mg 12 h after the TLD dose. Not for <30 kg - use separate pediatric formulations.", calc: w => (w >= 30 ? "1 tablet" : null) },
+            { name: "Abacavir (ABC) - ART", rx: "Abacavir {dose} mg PO OD", note: "NRTI. >=3 months: 16 mg/kg OD (syrup 20 mg/ml). Tablet bands: 14-<20kg 300mg; 20-<25kg 450mg; >25kg 600mg OD. Counsel on hypersensitivity (HLA-B*5701). Avoid if VL>100,000 unless with DTG.", decimals: 0, calc: w => { if (w < 14) return formatDoseValue(w * 16, { decimals: 0 }); if (w < 20) return "300"; if (w < 25) return "450"; return "600"; } },
+            { name: "Lamivudine (3TC) - ART (treatment)", rx: "Lamivudine {dose} mg PO q12h", note: "NRTI. >=4 wk: 4 mg/kg/dose q12h (max 150 mg/dose). <4 wk: 2 mg/kg q12h. Alt >3y: 8-10 mg/kg OD. Tablet bands: 14-<20kg 75mg BID; >=25kg 150mg BID.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 4, 150), { decimals: 0 }) },
+            { name: "Zidovudine (AZT) - ART (treatment)", rx: "Zidovudine {dose} mg PO q12h", note: "NRTI. Treatment bands: 4-<9kg 12 mg/kg; 9-30kg 9 mg/kg; >=30kg 300 mg, every 12 hr. Syrup 10 mg/ml. Monitor for anaemia.", decimals: 0, calc: w => { if (w < 9) return formatDoseValue(w * 12, { decimals: 0 }); if (w < 30) return formatDoseValue(w * 9, { decimals: 0 }); return "300"; } },
+            { name: "Tenofovir DF (TDF) - ART", rx: "Tenofovir DF {dose} mg PO OD", note: "NRTI. Age >=2y. Weight bands: 17-<22kg 150mg; 22-<28kg 200mg; 28-<35kg 250mg; >=35kg 300mg OD (or 2-<12y 8 mg/kg OD). Monitor renal function & bone. Levels rise with LPV/ATV.", calc: w => { if (w < 17) return null; if (w < 22) return "150"; if (w < 28) return "200"; if (w < 35) return "250"; return "300"; } },
+            { name: "Emtricitabine (FTC) - ART", rx: "Emtricitabine {dose} mg PO OD", note: "NRTI. 3 mo-17y: 6 mg/kg OD (max 240 mg). Tablet >33kg: 200 mg OD.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 6, 240), { decimals: 0 }) },
+            { name: "Efavirenz (EFV) - ART", rx: "Efavirenz {dose} mg PO OD (bedtime)", note: "NNRTI. Weight bands: 10-<15kg 200mg; 15-<20kg 250mg; 20-<25kg 300mg; 25-<32.5kg 350mg; >=32.5kg 400mg OD at bedtime. Rifampicin-compatible. CNS/psychiatric side effects.", calc: w => { if (w < 10) return null; if (w < 15) return "200"; if (w < 20) return "250"; if (w < 25) return "300"; if (w < 32.5) return "350"; return "400"; } },
+            { name: "Rilpivirine (RPV) - ART", rx: "Rilpivirine {dose} mg PO OD (with food)", note: "NNRTI. >=12y & >=35kg: 25 mg OD with food. Only if pre-treatment VL <500,000 copies/ml and CD4 >350. Do NOT use with rifampicin (use rifabutin).", calc: w => (w >= 35 ? "25" : null) },
+            { name: "Etravirine (ETR) - ART", rx: "Etravirine {dose} mg PO q12h (with food)", note: "NNRTI (2nd-gen). >=2y. Bands: 10-<20kg 100mg; 20-<25kg 125mg; 25-<30kg 150mg; >=30kg 200mg q12h with food.", calc: w => { if (w < 10) return null; if (w < 20) return "100"; if (w < 25) return "125"; if (w < 30) return "150"; return "200"; } },
+            { name: "Lopinavir/ritonavir (LPV/r) - ART", rx: "Lopinavir/ritonavir {dose} mg PO q12h", note: "PI. Tablet (LPV/RTV) by weight: 15-25kg 200/50; >25-35kg 300/75; >35kg 400/100, every 12 hr. Syrup (80/20 per ml) needs refrigeration, give with food. Twice-daily preferred over once-daily.", calc: w => { if (w < 15) return null; if (w <= 25) return "200/50"; if (w <= 35) return "300/75"; return "400/100"; } },
+            { name: "Atazanavir/ritonavir (ATV/r) - ART", rx: "Atazanavir/ritonavir {dose} mg PO OD", note: "PI (boosted). >=6y, with food. 15-<35kg: ATV 200 / RTV 100 OD; >=35kg: ATV 300 / RTV 100 OD. Causes asymptomatic indirect hyperbilirubinaemia.", calc: w => { if (w < 15) return null; if (w < 35) return "200/100"; return "300/100"; } },
+            { name: "Darunavir/ritonavir (DRV/r) - ART", rx: "Darunavir/ritonavir {dose} mg PO OD", note: "PI (boosted). >=3y, no DRV resistance. 15-40kg: DRV 600 / RTV 100 OD; >40kg: DRV 900 / RTV 100 OD, with food. If prior boosted-PI resistance, use twice-daily dosing (see guideline).", calc: w => { if (w < 15) return null; if (w <= 40) return "600/100"; return "900/100"; } },
+            { name: "Ritonavir (RTV) - PI booster", rx: "Ritonavir {dose} mg PO q12h (booster)", note: "Pharmacokinetic booster for other PIs (not antiviral alone): <15kg 3 mg/kg; >=15kg 2.5 mg/kg every 12 hr. Give with food.", decimals: 0, calc: w => formatDoseValue(w < 15 ? w * 3 : w * 2.5, { decimals: 0 }) },
+            { name: "Raltegravir (RAL) - ART", rx: "Raltegravir {dose} mg PO q12h", note: "INSTI. >=12y & >=25kg: 400 mg (film-coated) twice daily. >=50kg: may use 600mg x2 once daily (adult HD form). With rifampicin: 400 mg twice daily. Film-coated and chewable forms NOT interchangeable.", calc: w => (w >= 25 ? "400" : null) },
+            { name: "TAF/FTC (25/200) - ART FDC", rx: "TAF/FTC (25/200) {dose} PO OD", note: "NRTI backbone FDC. >=6y & >=25kg: 1 tablet once daily. Combine with a third agent (e.g. DTG). Less renal/bone toxicity than TDF.", calc: w => (w >= 25 ? "1 tablet" : null) }
         ],
         allergy: [
             { name: "Diphenhydramine PO/IV", rx: "Diphenhydramine {dose} mg PO/IV q 6 hr PRN", note: "1 mg/kg/dose. Max 50 mg/dose. Sedating antihistamine.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 1, 50), { decimals: 0 }), doseAdjustable: true, standardMgKg: 1, doseUnit: "mg/kg/dose", maxMg: 50 },
@@ -2151,12 +2168,39 @@
             ]
         },
         {
-            name: "HIV",
+            name: "HIV - opportunistic infection prophylaxis",
             system: "tb_hiv",
             keywords: ["hiv", "aids", "เอชไอวี", "pcp", "pneumocystis", "oi prophylaxis", "opportunistic infection", "cotrimoxazole prophylaxis", "immunocompromised"],
             medKeys: [
                 "infectious|10", /* Co-trimoxazole PCP prophylaxis */
                 "infectious|11"  /* Dapsone (alternative) */
+            ]
+        },
+        {
+            name: "HIV - antiretroviral therapy (ART)",
+            system: "tb_hiv",
+            keywords: ["hiv", "aids", "เอชไอวี", "art", "arv", "antiretroviral", "tld", "dolutegravir", "first-line art", "haart", "tenofovir", "abacavir"],
+            medKeys: [
+                /* Preferred first-line */
+                "infectious|26", /* TLD (TDF/3TC/DTG) FDC */
+                "infectious|25", /* Dolutegravir (DTG) */
+                "infectious|30", /* Tenofovir DF (TDF) */
+                "infectious|28", /* Lamivudine (3TC) */
+                "infectious|27", /* Abacavir (ABC) */
+                "infectious|31", /* Emtricitabine (FTC) */
+                "infectious|29", /* Zidovudine (AZT) */
+                "infectious|40", /* TAF/FTC FDC */
+                /* NNRTIs */
+                "infectious|32", /* Efavirenz (EFV) */
+                "infectious|33", /* Rilpivirine (RPV) */
+                "infectious|34", /* Etravirine (ETR) */
+                /* PIs */
+                "infectious|35", /* Lopinavir/ritonavir (LPV/r) */
+                "infectious|36", /* Atazanavir/r (ATV/r) */
+                "infectious|37", /* Darunavir/r (DRV/r) */
+                "infectious|38", /* Ritonavir (booster) */
+                /* INSTI */
+                "infectious|39"  /* Raltegravir (RAL) */
             ]
         },
         {
@@ -2169,7 +2213,9 @@
                 "infectious|6",  /* Pyrazinamide */
                 "infectious|7",  /* Ethambutol */
                 "infectious|8",  /* Pyridoxine */
-                "infectious|10"  /* Co-trimoxazole PCP prophylaxis */
+                "infectious|10", /* Co-trimoxazole PCP prophylaxis */
+                "infectious|32", /* Efavirenz - rifampicin-compatible (no dose change) */
+                "infectious|25"  /* Dolutegravir - give twice daily with rifampicin */
             ]
         },
         {

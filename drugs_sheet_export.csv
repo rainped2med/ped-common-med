@@ -152,6 +152,22 @@ infectious|21,infectious,Cycloserine (Cs) - 2nd-line TB,,,,,,,,,,,,,Non-standard
 infectious|22,infectious,Delamanid (Dlm) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-band: 3-5y 25mg BID; 6-11y 50mg BID; 12-17y 100mg BID
 infectious|23,infectious,Ethionamide (Eto) - 2nd-line TB,15,15,20,1000,,,,,,,,,
 infectious|24,infectious,Para-aminosalicylic acid (PAS) - 2nd-line TB,200,200,300,10000,,,,,,,,,
+infectious|25,infectious,Dolutegravir (DTG) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band: 3-<6kg 5mg; 6-<10kg 15mg; 10-<14kg 20mg; 14-<20kg 25mg; >=20kg 50mg OD
+infectious|26,infectious,TLD (TDF/3TC/DTG 300/300/50) - ART FDC,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=30kg 1 tablet OD (first-line FDC)
+infectious|27,infectious,Abacavir (ABC) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 16 mg/kg OD; bands 14-<20kg 300; 20-<25kg 450; >25kg 600 OD
+infectious|28,infectious,Lamivudine (3TC) - ART (treatment),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 4 mg/kg q12h (max 150/dose)
+infectious|29,infectious,Zidovudine (AZT) - ART (treatment),,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 4-<9kg 12mg/kg; 9-30kg 9mg/kg; >=30kg 300mg q12h
+infectious|30,infectious,Tenofovir DF (TDF) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 17-<22kg 150; 22-<28kg 200; 28-<35kg 250; >=35kg 300 OD
+infectious|31,infectious,Emtricitabine (FTC) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 6 mg/kg OD (max 240); >33kg 200 OD
+infectious|32,infectious,Efavirenz (EFV) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 10-<15kg 200; 15-<20kg 250; 20-<25kg 300; 25-<32.5kg 350; >=32.5kg 400 OD
+infectious|33,infectious,Rilpivirine (RPV) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=12y & >=35kg 25mg OD with food
+infectious|34,infectious,Etravirine (ETR) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 10-<20kg 100; 20-<25kg 125; 25-<30kg 150; >=30kg 200 q12h
+infectious|35,infectious,Lopinavir/ritonavir (LPV/r) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 15-25kg 200/50; >25-35kg 300/75; >35kg 400/100 q12h
+infectious|36,infectious,Atazanavir/ritonavir (ATV/r) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 15-<35kg ATV200/r100; >=35kg ATV300/r100 OD
+infectious|37,infectious,Darunavir/ritonavir (DRV/r) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 15-40kg DRV600/r100; >40kg DRV900/r100 OD
+infectious|38,infectious,Ritonavir (RTV) - PI booster,,,,,,,,,,,,,Non-standard dosing (not live-editable) - booster: <15kg 3mg/kg; >=15kg 2.5mg/kg q12h
+infectious|39,infectious,Raltegravir (RAL) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=12y & >=25kg 400mg q12h (film-coated)
+infectious|40,infectious,TAF/FTC (25/200) - ART FDC,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=6y & >=25kg 1 tablet OD
 allergy|0,allergy,Diphenhydramine PO/IV,1,,,50,,,,,,,,,
 allergy|1,allergy,Hydroxyzine PO,0.5,0.5,1,50,,,,,,,,,
 allergy|2,allergy,Loratadine PO (non-sedating),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Weight-band dosing (non-linear): <30 kg = 5 mg/day; >=30 kg = 10 mg/day.
