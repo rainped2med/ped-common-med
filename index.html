@@ -184,6 +184,12 @@
         .ivmix-grid input, .ivmix-grid select { padding: 7px 9px; font-size: 0.82em; }
         .ivmix-readonly { padding: 7px 9px; font-size: 0.82em; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 7px; color: var(--ink); }
         .ivmix-warn { margin-top: 6px; font-size: 0.78em; color: var(--danger-tx); font-weight: 600; }
+        .ivmix-rec { color: var(--ink-muted); font-weight: 400; }
+        .ivmix-interval-cell { grid-column: 1 / -1; }
+        .ivmix-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .ivmix-chip { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--field-border); background: var(--field-bg); color: var(--ink-soft); font-size: 0.8em; font-weight: 700; cursor: pointer; transition: all 0.12s ease; font-family: inherit; }
+        .ivmix-chip:hover { border-color: var(--brand-blue); color: var(--brand-blue); }
+        .ivmix-chip.active { background: var(--brand-blue); border-color: var(--brand-blue); color: #fff; }
         .ivmix-order { margin-top: 8px; font-size: 0.78em; color: var(--info-tx); background: color-mix(in srgb, var(--info-bg) 70%, var(--paper)); border: 1px dashed var(--info-bd); border-radius: 7px; padding: 7px 9px; line-height: 1.4; }
         @media (max-width: 560px) { .ivmix-grid { grid-template-columns: 1fr; } }
 
@@ -958,11 +964,31 @@
         const totalVol = Math.max(Math.ceil(drugMl + 50), med.defaultVolume || 100);
         return {
             standardConcMgMl: standardConc,
-            diluent: "NSS",
+            diluent: recommendIvDiluent(med),
             totalVolumeMl: totalVol,
-            intervalHr: 24,
+            intervalHr: defaultIvInterval(med),
             dripMin: 30
         };
+    }
+
+    /* Recommend the diluent from the drug's Compatible_Diluent enrichment (falls back to NSS). */
+    function recommendIvDiluent(med) {
+        const d = (med.diluent || "").toUpperCase();
+        if (/\bNS\b|SALINE|NSS/.test(d)) return "NSS";
+        if (/D5W|DEXTROSE|D10/.test(d)) return "D5W";
+        return "NSS";
+    }
+
+    /* Default the dosing interval from the drug's frequency, snapped to a preset. */
+    const IV_INTERVAL_PRESETS = [1, 2, 3, 4, 6, 8, 12, 24];
+    function defaultIvInterval(med) {
+        let h = 24;
+        if (med.dosesPerDay && med.dosesPerDay > 0) h = 24 / med.dosesPerDay;
+        else if (med.rx) {
+            const m = /q\s*(\d+)\s*hr/i.exec(med.rx);
+            if (m) h = parseFloat(m[1]);
+        }
+        return IV_INTERVAL_PRESETS.reduce((best, p) => Math.abs(p - h) < Math.abs(best - h) ? p : best, 24);
     }
 
     function computeIvMix(med, dose, ivMix) {
@@ -2974,7 +3000,7 @@
                             <div class="ivmix-readonly" data-ivmix="finalBagConc">${mix && !isNaN(mix.finalBagConc) ? mix.finalBagConc : "—"}</div>
                         </div>
                         <div>
-                            <label>Diluent</label>
+                            <label>Diluent${med.diluent ? ` <span class="ivmix-rec">(rec: ${med.diluent})</span>` : ""}</label>
                             <select>
                                 <option value="NSS" ${item.ivMix.diluent === "NSS" ? "selected" : ""}>NSS</option>
                                 <option value="D5W" ${item.ivMix.diluent === "D5W" ? "selected" : ""}>D5W</option>
@@ -2982,17 +3008,19 @@
                             </select>
                         </div>
                         <div>
-                            <label>Interval (hr)</label>
-                            <input type="number" step="1" min="1" value="${mix ? mix.interval : 24}" />
-                        </div>
-                        <div>
                             <label>Drip over (min)</label>
                             <input type="number" step="1" min="1" value="${mix ? mix.dripMin : 30}" />
+                        </div>
+                        <div class="ivmix-interval-cell">
+                            <label>Interval</label>
+                            <div class="ivmix-chips" data-ivmix="intervalChips">
+                                ${IV_INTERVAL_PRESETS.map(h => `<button type="button" class="ivmix-chip${(mix ? mix.interval : item.ivMix.intervalHr) == h ? " active" : ""}" data-hr="${h}">${h} hr</button>`).join("")}
+                            </div>
                         </div>
                     </div>
                     ${mix && mix.volumeTooLow ? '<p class="ivmix-warn" data-ivmix="warn">Total volume is less than drug volume — increase total bag volume.</p>' : ""}
                 `;
-                const inputs = box.querySelectorAll("input");
+                const inputs = box.querySelectorAll(".ivmix-grid input");
                 const sel = box.querySelector("select");
                 inputs[0].addEventListener("input", (e) => updateIvMix(item.id, "totalVolumeMl", e.target.value));
                 inputs[0].addEventListener("blur", (e) => {
@@ -3004,8 +3032,14 @@
                     }
                 });
                 sel.onchange = (e) => updateIvMix(item.id, "diluent", e.target.value);
-                inputs[1].addEventListener("input", (e) => updateIvMix(item.id, "intervalHr", e.target.value));
-                inputs[2].addEventListener("input", (e) => updateIvMix(item.id, "dripMin", e.target.value));
+                inputs[1].addEventListener("input", (e) => updateIvMix(item.id, "dripMin", e.target.value));
+                box.querySelectorAll('[data-ivmix="intervalChips"] .ivmix-chip').forEach(btn => {
+                    btn.onclick = () => {
+                        box.querySelectorAll('[data-ivmix="intervalChips"] .ivmix-chip').forEach(b => b.classList.remove("active"));
+                        btn.classList.add("active");
+                        updateIvMix(item.id, "intervalHr", btn.dataset.hr);
+                    };
+                });
 
                 const order = document.createElement("div");
                 order.className = "ivmix-order";
