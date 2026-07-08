@@ -11,15 +11,15 @@ neuro_pain|8,neuro_pain,Diazepam Rectal Gel (5 mg/ml),0.5,,,20,,,,,5,,,,
 neuro_pain|9,neuro_pain,Diazepam IV (5 mg/ml),0.2,,,10,,,,,5,,,,
 neuro_pain|10,neuro_pain,Lorazepam IV (2 mg/ml),0.1,,,4,,,,,2,,,,
 neuro_pain|11,neuro_pain,Midazolam IN/Buccal (5 mg/ml),0.2,,,10,,,,,5,,,,
-respiratory|0,respiratory,Cetirizine Syrup (5mg/5ml),0.25,,,10,,,,,1,,,,
-respiratory|1,respiratory,Chlorpheniramine Syrup (2mg/5ml),0.08,,,4,,,,,0.4,,,,
+respiratory|0,respiratory,Cetirizine Syrup (5mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: <6mo 2.5mg; 6mo-<6yr 2.5-5mg; >=6yr 5-10mg OD
+respiratory|1,respiratory,Chlorpheniramine Syrup (2mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: 2-<6yr 1mg; 6-<12yr 2mg; >=12yr 4mg q4-6h
 respiratory|2,respiratory,Salbutamol Syrup (2mg/5ml),0.15,0.1,0.15,4,,,,,0.4,,,,
 respiratory|3,respiratory,Salbutamol Nebulizer (2.5 mg/nebule),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1 nebule (2.5 mg) per dose. Standard unit-dose nebule.
 respiratory|4,respiratory,Ipratropium Nebulizer (250 mcg/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - <20 kg: 1 ml (250 mcg). >=20 kg: 2 ml (500 mcg max).
 respiratory|5,respiratory,Budesonide Nebulizer (0.5 mg/2ml respule),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 respules by severity. Max 2 mg/day.
 respiratory|6,respiratory,Dexamethasone PO/IV (4 mg/ml),0.6,0.15,0.6,16,,,,,4,,,,
-respiratory|7,respiratory,Prednisolone PO (5mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Asthma: 1 mg/kg. Max 60 mg (12 ml)/day.
-respiratory|8,respiratory,Hydrocortisone IV,4,2,4,250,,,,,,,,,
+respiratory|7,respiratory,Prednisolone PO (5mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Asthma 1-2 mg/kg/day; max by age 20mg <2yr / 30mg 2-5yr / 40mg >5yr
+respiratory|8,respiratory,Hydrocortisone IV,5,2,5,250,,,,,,,,,
 respiratory|9,respiratory,"Adrenaline Nebulizer (Croup) (1:1,000)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5 ml/kg. Max 5 ml (5 mg)/dose.
 respiratory|10,respiratory,Magnesium Sulfate IV (Asthma),50,,,2000,,,,,500,,,,
 gi|0,gi,Ondansetron PO (4mg/5ml),0.15,0.1,0.15,8,,,,,0.8,,,,
@@ -27,23 +27,23 @@ gi|1,gi,Ondansetron IV (2 mg/ml),0.15,,,8,,,,,2,,,,
 gi|2,gi,Domperidone PO (1mg/ml),0.25,0.25,0.4,10,,,,,1,,,,
 gi|3,gi,Omeprazole PO/IV,1,,,40,,,,,,,,,
 gi|4,gi,Famotidine PO/IV (10 mg/ml),0.5,,,20,,,,,10,,,,
-gi|5,gi,Lactulose PO (3.3g/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1 ml/kg. Max 30 ml/dose.
+gi|5,gi,Lactulose PO (3.3g/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.667-2 g/kg/day (1-3 ml/kg/day). Max 40 g/day (~60 ml/day).
 gi|6,gi,Lidocaine Oral Gel 2% (topical - mouth ulcers),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Topical mucosal analgesia for HFMD/herpangina ulcers. Apply sparingly with cotton tip. Do not swallow large amounts. Not weight-based.
 gi|7,gi,Eurofer PO (10 mg iron/ml),6,3,6,100,,2,,,10,,,,
 antimicrobial|0,antimicrobial,Amoxicillin Drops (50mg/ml),45,25,50,1000,,2,,,50,,,,
-antimicrobial|1,antimicrobial,Amoxicillin PO (250mg/5ml) - HIGH DOSE,90,80,100,1000,,2,,,50,,,,
-antimicrobial|2,antimicrobial,Augmentin PO (457mg/5ml) - HIGH DOSE,90,80,100,880,,2,,,80,,,,
-antimicrobial|3,antimicrobial,Augmentin ES PO (600mg/5ml) - HIGH DOSE,90,80,100,1020,,2,,,120,,,,
+antimicrobial|1,antimicrobial,Amoxicillin PO (250mg/5ml) - HIGH DOSE,90,80,100,1000,4000,2,,,50,,,,
+antimicrobial|2,antimicrobial,Augmentin PO (457mg/5ml) - HIGH DOSE,90,80,100,1000,,2,,,80,,,,
+antimicrobial|3,antimicrobial,Augmentin ES PO (600mg/5ml) - HIGH DOSE,90,80,100,1000,,2,,,120,,,,
 antimicrobial|4,antimicrobial,Azithromycin PO (200mg/5ml),10,10,12,500,,,,,40,,,,
-antimicrobial|5,antimicrobial,Cephalexin PO (250mg/5ml),50,25,50,1000,,2,,,50,,,,
-antimicrobial|6,antimicrobial,Cefdinir PO (125mg/5ml),14,7,14,600,,,,,25,,,,
-antimicrobial|7,antimicrobial,Cotrimoxazole/Bactrim PO (200/40mg/5ml),8,6,12,160,,2,,,8,,,,
-antimicrobial|8,antimicrobial,Ceftriaxone IV (Standard),70,50,100,2000,,,,,,,,,
-antimicrobial|9,antimicrobial,Ceftriaxone IV (Meningitis),100,50,100,,4000,2,,,,,,,
-antimicrobial|10,antimicrobial,Cefotaxime IV,150,100,200,2000,,3,,,,,,,
+antimicrobial|5,antimicrobial,Cephalexin PO (250mg/5ml),50,25,50,1000,2000,2,,,50,,,,
+antimicrobial|6,antimicrobial,Cefdinir PO (125mg/5ml),14,7,14,600,600,1,,,25,,,,
+antimicrobial|7,antimicrobial,Cotrimoxazole/Bactrim PO (200/40mg/5ml),8,6,12,320,,2,,,8,,,,
+antimicrobial|8,antimicrobial,Ceftriaxone IV (Standard),70,50,75,2000,,,,,,,,,
+antimicrobial|9,antimicrobial,Ceftriaxone IV (Meningitis),100,80,100,,4000,2,,,,,,,
+antimicrobial|10,antimicrobial,Cefotaxime IV,150,100,200,2000,12000,3,,,,,,,
 antimicrobial|11,antimicrobial,Meropenem IV,20,20,40,2000,,,,,,,,,
-antimicrobial|12,antimicrobial,Vancomycin IV,15,10,15,1000,,,,,,,,,
-antimicrobial|13,antimicrobial,Gentamicin IV,7.5,5,7.5,500,,,,,,,,,
+antimicrobial|12,antimicrobial,Vancomycin IV,15,10,15,1000,2000,,,,,,,,
+antimicrobial|13,antimicrobial,Gentamicin IV,7.5,6,7.5,500,,,,,,,,,
 antimicrobial|14,antimicrobial,Acyclovir IV,10,10,20,800,,,,,,,,,
 antimicrobial|15,antimicrobial,Fluconazole IV/PO,6,6,12,800,,,,,,,,,
 antimicrobial|16,antimicrobial,Oseltamivir PO (Tamiflu),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Weight-based bands. Max 75 mg/dose.
@@ -170,8 +170,8 @@ infectious|39,infectious,Raltegravir (RAL) - ART,,,,,,,,,,,,,Non-standard dosing
 infectious|40,infectious,TAF/FTC (25/200) - ART FDC,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=6y & >=25kg 1 tablet OD
 allergy|0,allergy,Diphenhydramine PO/IV,1,,,50,,,,,,,,,
 allergy|1,allergy,Hydroxyzine PO,0.5,0.5,1,50,,,,,,,,,
-allergy|2,allergy,Loratadine PO (non-sedating),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Weight-band dosing (non-linear): <30 kg = 5 mg/day; >=30 kg = 10 mg/day.
-allergy|3,allergy,Montelukast PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - Age/weight-band dosing (approximate by weight - verify against actual age): <15 kg ~ 4 mg; 15-30 kg ~ 5 mg; >30 kg ~ 10 mg.
+allergy|2,allergy,Loratadine PO (non-sedating),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: 2-<6yr 5mg OD; >=6yr 5mg BID or 10mg OD
+allergy|3,allergy,Montelukast PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: <6yr 4mg; 6-<15yr 5mg; >=15yr 10mg OD evening
 renal|0,renal,Nitrofurantoin PO (25mg/5ml),1.5,1.5,2,100,,,,,5,,,,
 renal|1,renal,Trimethoprim PO (UTI prophylaxis),2,,,100,,1,,,,,,,
 renal|2,renal,Cefixime PO (100mg/5ml),8,,,400,,1,,,20,,,,
