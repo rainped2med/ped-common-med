@@ -22,6 +22,11 @@ respiratory|7,respiratory,Prednisolone PO (5mg/5ml),,,,,,,,,,,,,Non-standard dos
 respiratory|8,respiratory,Hydrocortisone IV,5,2,5,250,,,,,,,,,
 respiratory|9,respiratory,"Adrenaline Nebulizer (Croup) (1:1,000)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5 ml/kg. Max 5 ml (5 mg)/dose.
 respiratory|10,respiratory,Magnesium Sulfate IV (Asthma),50,,,2000,,,,,500,,,,
+respiratory|11,respiratory,Fluticasone propionate (Flixotide) MDI 125 mcg,,,,,,,,,,,,,Non-standard dosing (not live-editable) - ICS controller. GINA low-medium 1-2 puff/day. Use spacer.
+respiratory|12,respiratory,Salmeterol/Fluticasone (Seretide) MDI 25/125 mcg,,,,,,,,,,,,,Non-standard dosing (not live-editable) - ICS+LABA controller. GINA 1-2 puff/day.
+respiratory|13,respiratory,Budesonide/Formoterol (Symbicort) MDI 160/4.5 mcg,,,,,,,,,,,,,Non-standard dosing (not live-editable) - ICS+formoterol controller/MART. 1-2 puff/day.
+respiratory|14,respiratory,Carbocysteine (mucolytic),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 2-5yr 100mg BID; 6-11yr 100-250mg TID; >=12yr 750mg TID
+respiratory|15,respiratory,Ambroxol (mucolytic),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 2-<6yr 7.5-15mg TID; 6-12yr 15-30mg BID-TID; >12yr 60-120mg/day
 gi|0,gi,Ondansetron PO (4mg/5ml),0.15,0.1,0.15,8,,,,,0.8,,,,
 gi|1,gi,Ondansetron IV (2 mg/ml),0.15,,,8,,,,,2,,,,
 gi|2,gi,Domperidone PO (1mg/ml),0.25,0.25,0.4,10,,,,,1,,,,
@@ -30,6 +35,10 @@ gi|4,gi,Famotidine PO/IV (10 mg/ml),0.5,,,20,,,,,10,,,,
 gi|5,gi,Lactulose PO (3.3g/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.667-2 g/kg/day (1-3 ml/kg/day). Max 40 g/day (~60 ml/day).
 gi|6,gi,Lidocaine Oral Gel 2% (topical - mouth ulcers),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Topical mucosal analgesia for HFMD/herpangina ulcers. Apply sparingly with cotton tip. Do not swallow large amounts. Not weight-based.
 gi|7,gi,Eurofer PO (10 mg iron/ml),6,3,6,100,,2,,,10,,,,
+gi|8,gi,Lansoprazole PO,1,0.7,3,30,30,1,,,,,,,
+gi|9,gi,Aluminum/Magnesium Hydroxide (Alum milk),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 0.5-1 ml/kg/dose TID. Max 20 ml/dose, 80 ml/day."
+gi|10,gi,Simethicone Drops (20 mg/0.3 ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - <10.9kg 20mg QID; >=10.9kg/2-<12yr 40mg QID (max 480/day); >=12yr 40-125mg QID
+gi|11,gi,Dioctahedral Smectite (Smecta),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 18 g/day div 3 x3 days then 9 g/day div 3 (1 sachet=3g); <=7 days
 antimicrobial|0,antimicrobial,Amoxicillin Drops (50mg/ml),45,25,50,1000,,2,,,50,,,,
 antimicrobial|1,antimicrobial,Amoxicillin PO (250mg/5ml) - HIGH DOSE,90,80,100,1000,4000,2,,,50,,,,
 antimicrobial|2,antimicrobial,Augmentin PO (457mg/5ml) - HIGH DOSE,90,80,100,1000,,2,,,80,,,,
@@ -172,6 +181,9 @@ allergy|0,allergy,Diphenhydramine PO/IV,1,,,50,,,,,,,,,
 allergy|1,allergy,Hydroxyzine PO,0.5,0.5,1,50,,,,,,,,,
 allergy|2,allergy,Loratadine PO (non-sedating),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: 2-<6yr 5mg OD; >=6yr 5mg BID or 10mg OD
 allergy|3,allergy,Montelukast PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: <6yr 4mg; 6-<15yr 5mg; >=15yr 10mg OD evening
+allergy|4,allergy,Desloratadine PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 6-11mo 1mg; 1-5yr 1.25mg; 6-11yr 2.5mg; >=12yr 5mg OD
+allergy|5,allergy,Bilastine PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 2-11yr (>=16kg) 10mg OD; >=12yr 20mg OD
+allergy|6,allergy,Pseudoephedrine PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 4-<6yr 15mg; 6-<12yr 30mg; >=12yr 60mg q4-6h
 renal|0,renal,Nitrofurantoin PO (25mg/5ml),1.5,1.5,2,100,,,,,5,,,,
 renal|1,renal,Trimethoprim PO (UTI prophylaxis),2,,,100,,1,,,,,,,
 renal|2,renal,Cefixime PO (100mg/5ml),8,,,400,,1,,,20,,,,
