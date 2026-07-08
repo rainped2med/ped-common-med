@@ -1,196 +1,196 @@
-key,category,name,standardMgKg,doseRangeLo,doseRangeHi,maxMg,maxMgPerDay,dosesPerDay,strengthMg,perMl,concMgMl,mlPerBottle,note,rx,special
-neuro_pain|0,neuro_pain,Paracetamol PO (120mg/5ml),12,10,15,996,,,,,24,,,,
-neuro_pain|1,neuro_pain,Paracetamol PO (250mg/5ml),12,10,15,1000,,,,,50,,,,
-neuro_pain|2,neuro_pain,Paracetamol Drops PO (100mg/ml),12,10,15,1000,,,,,100,,,,
-neuro_pain|3,neuro_pain,Paracetamol IV (10 mg/ml),12,10,15,1000,,,,,10,,,,
-neuro_pain|4,neuro_pain,Ibuprofen PO (100mg/5ml),10,5,10,400,,,,,20,,,,
-neuro_pain|5,neuro_pain,Morphine IV (1 mg/ml),0.1,,,10,,,,,1,,,,
-neuro_pain|6,neuro_pain,Fentanyl IV (50 mcg/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1 mcg/kg. Max 100 mcg (2 ml)/dose.
-neuro_pain|7,neuro_pain,Ketorolac IV (30 mg/ml),0.5,,,30,,,,,30,,,,
-neuro_pain|8,neuro_pain,Diazepam Rectal Gel (5 mg/ml),0.5,,,20,,,,,5,,,,
-neuro_pain|9,neuro_pain,Diazepam IV (5 mg/ml),0.2,,,10,,,,,5,,,,
-neuro_pain|10,neuro_pain,Lorazepam IV (2 mg/ml),0.1,,,4,,,,,2,,,,
-neuro_pain|11,neuro_pain,Midazolam IN/Buccal (5 mg/ml),0.2,,,10,,,,,5,,,,
-respiratory|0,respiratory,Cetirizine Syrup (5mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: <6mo 2.5mg; 6mo-<6yr 2.5-5mg; >=6yr 5-10mg OD
-respiratory|1,respiratory,Chlorpheniramine Syrup (2mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: 2-<6yr 1mg; 6-<12yr 2mg; >=12yr 4mg q4-6h
-respiratory|2,respiratory,Salbutamol Syrup (2mg/5ml),0.15,0.1,0.15,4,,,,,0.4,,,,
-respiratory|3,respiratory,Salbutamol Nebulizer (2.5 mg/nebule),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1 nebule (2.5 mg) per dose. Standard unit-dose nebule.
-respiratory|4,respiratory,Ipratropium Nebulizer (250 mcg/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - <20 kg: 1 ml (250 mcg). >=20 kg: 2 ml (500 mcg max).
-respiratory|5,respiratory,Budesonide Nebulizer (0.5 mg/2ml respule),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 respules by severity. Max 2 mg/day.
-respiratory|6,respiratory,Dexamethasone PO/IV (4 mg/ml),0.6,0.15,0.6,16,,,,,4,,,,
-respiratory|7,respiratory,Prednisolone PO (5mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Asthma 1-2 mg/kg/day; max by age 20mg <2yr / 30mg 2-5yr / 40mg >5yr
-respiratory|8,respiratory,Hydrocortisone IV,5,2,5,250,,,,,,,,,
-respiratory|9,respiratory,"Adrenaline Nebulizer (Croup) (1:1,000)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5 ml/kg. Max 5 ml (5 mg)/dose.
-respiratory|10,respiratory,Magnesium Sulfate IV (Asthma),50,,,2000,,,,,500,,,,
-respiratory|11,respiratory,Fluticasone propionate (Flixotide) MDI 125 mcg,,,,,,,,,,,,,Non-standard dosing (not live-editable) - ICS controller. GINA low-medium 1-2 puff/day. Use spacer.
-respiratory|12,respiratory,Salmeterol/Fluticasone (Seretide) MDI 25/125 mcg,,,,,,,,,,,,,Non-standard dosing (not live-editable) - ICS+LABA controller. GINA 1-2 puff/day.
-respiratory|13,respiratory,Budesonide/Formoterol (Symbicort) MDI 160/4.5 mcg,,,,,,,,,,,,,Non-standard dosing (not live-editable) - ICS+formoterol controller/MART. 1-2 puff/day.
-respiratory|14,respiratory,Carbocysteine (mucolytic),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 2-5yr 100mg BID; 6-11yr 100-250mg TID; >=12yr 750mg TID
-respiratory|15,respiratory,Ambroxol (mucolytic),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 2-<6yr 7.5-15mg TID; 6-12yr 15-30mg BID-TID; >12yr 60-120mg/day
-gi|0,gi,Ondansetron PO (4mg/5ml),0.15,0.1,0.15,8,,,,,0.8,,,,
-gi|1,gi,Ondansetron IV (2 mg/ml),0.15,,,8,,,,,2,,,,
-gi|2,gi,Domperidone PO (1mg/ml),0.25,0.25,0.4,10,,,,,1,,,,
-gi|3,gi,Omeprazole PO/IV,1,,,40,,,,,,,,,
-gi|4,gi,Famotidine PO/IV (10 mg/ml),0.5,,,20,,,,,10,,,,
-gi|5,gi,Lactulose PO (3.3g/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.667-2 g/kg/day (1-3 ml/kg/day). Max 40 g/day (~60 ml/day).
-gi|6,gi,Lidocaine Oral Gel 2% (topical - mouth ulcers),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Topical mucosal analgesia for HFMD/herpangina ulcers. Apply sparingly with cotton tip. Do not swallow large amounts. Not weight-based.
-gi|7,gi,Eurofer PO (10 mg iron/ml),6,3,6,100,,2,,,10,,,,
-gi|8,gi,Lansoprazole PO,1,0.7,3,30,30,1,,,,,,,
-gi|9,gi,Aluminum/Magnesium Hydroxide (Alum milk),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 0.5-1 ml/kg/dose TID. Max 20 ml/dose, 80 ml/day."
-gi|10,gi,Simethicone Drops (20 mg/0.3 ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - <10.9kg 20mg QID; >=10.9kg/2-<12yr 40mg QID (max 480/day); >=12yr 40-125mg QID
-gi|11,gi,Dioctahedral Smectite (Smecta),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 18 g/day div 3 x3 days then 9 g/day div 3 (1 sachet=3g); <=7 days
-antimicrobial|0,antimicrobial,Amoxicillin Drops (50mg/ml),45,25,50,1000,,2,,,50,,,,
-antimicrobial|1,antimicrobial,Amoxicillin PO (250mg/5ml) - HIGH DOSE,90,80,100,1000,4000,2,,,50,,,,
-antimicrobial|2,antimicrobial,Augmentin PO (457mg/5ml) - HIGH DOSE,90,80,100,1000,,2,,,80,,,,
-antimicrobial|3,antimicrobial,Augmentin ES PO (600mg/5ml) - HIGH DOSE,90,80,100,1000,,2,,,120,,,,
-antimicrobial|4,antimicrobial,Azithromycin PO (200mg/5ml),10,10,12,500,,,,,40,,,,
-antimicrobial|5,antimicrobial,Cephalexin PO (250mg/5ml),50,25,50,1000,2000,2,,,50,,,,
-antimicrobial|6,antimicrobial,Cefdinir PO (125mg/5ml),14,7,14,600,600,1,,,25,,,,
-antimicrobial|7,antimicrobial,Cotrimoxazole/Bactrim PO (200/40mg/5ml),8,6,12,320,,2,,,8,,,,
-antimicrobial|8,antimicrobial,Ceftriaxone IV (Standard),70,50,75,2000,,,,,,,,,
-antimicrobial|9,antimicrobial,Ceftriaxone IV (Meningitis),100,80,100,,4000,2,,,,,,,
-antimicrobial|10,antimicrobial,Cefotaxime IV,150,100,200,2000,12000,3,,,,,,,
-antimicrobial|11,antimicrobial,Meropenem IV,20,20,40,2000,,,,,,,,,
-antimicrobial|12,antimicrobial,Vancomycin IV,15,10,15,1000,2000,,,,,,,,
-antimicrobial|13,antimicrobial,Gentamicin IV,7.5,6,7.5,500,,,,,,,,,
-antimicrobial|14,antimicrobial,Acyclovir IV,10,10,20,800,,,,,,,,,
-antimicrobial|15,antimicrobial,Fluconazole IV/PO,6,6,12,800,,,,,,,,,
-antimicrobial|16,antimicrobial,Oseltamivir PO (Tamiflu),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Weight-based bands. Max 75 mg/dose.
-antimicrobial|17,antimicrobial,Amikacin IV,15,15,20,1500,,1,,,,,,,
-antimicrobial|18,antimicrobial,Ciprofloxacin PO (250mg/5ml),30,20,40,750,,2,,,50,,,,
-antimicrobial|19,antimicrobial,Augmentin PO (457mg/5ml) - Standard 45 mg/kg/day (UTI),45,40,50,875,,2,,,80,,,,
-cardio|0,cardio,Furosemide PO (10 mg/ml),1,,,40,,,,,10,,,,
-cardio|1,cardio,Furosemide IV (10 mg/ml),1,,,40,,,,,10,,,,
-cardio|2,cardio,Spironolactone PO,1,,,100,,,,,,,,,
-cardio|3,cardio,Captopril PO,0.1,,,50,,,,,,,,,
-cardio|4,cardio,Milrinone IV Loading,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 50 mcg/kg load. Max 2500 mcg.
-emergency|0,emergency,"Epinephrine ARREST (1:10,000)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.1 ml/kg. Max 10 ml (1 mg)/dose.
-emergency|1,emergency,"Epinephrine ANAPHYLAXIS (1:1,000)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.01 ml/kg. Max 0.5 ml (0.5 mg)/dose.
-emergency|2,emergency,Amiodarone IV (50mg/ml),5,,,300,,,,,50,,,,
-emergency|3,emergency,Adenosine IV (3mg/ml) - 1st Dose,0.1,,,6,,,,,3,,,,
-emergency|4,emergency,Atropine IV (0.1 mg/ml),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 0.02 mg/kg. Min 1 ml, max 5 ml/dose."
-emergency|5,emergency,Calcium Gluconate (10%),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.6 ml/kg. Max 20 ml/dose.
-emergency|6,emergency,Calcium Chloride (10%),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.2 ml/kg. Max 20 ml/dose.
-emergency|7,emergency,Dextrose: D10W (Hypoglycemia),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 5 ml/kg. Max 250 ml/dose.
-emergency|8,emergency,Dextrose: D25W (Hypoglycemia),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 2 ml/kg. Max 100 ml/dose.
-emergency|9,emergency,Lidocaine 2% (20mg/ml),1,,,100,,,,,20,,,,
-emergency|10,emergency,Magnesium Sulfate 50% (500mg/ml),50,,,2000,,,,,500,,,,
-emergency|11,emergency,Naloxone IV/IM (0.4mg/ml),0.1,,,2,,,,,0.4,,,,
-emergency|12,emergency,Sodium Bicarbonate 8.4% (1mEq/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1 mEq/kg. Max 50 mEq (50 ml)/dose.
-emergency|13,emergency,Ketamine IV (RSI),1.5,,,100,,,,,10,,,,
-emergency|14,emergency,Rocuronium IV (RSI),1,,,100,,,,,10,,,,
-emergency|15,emergency,Defibrillation Shock,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 2 J/kg. Max 200 J.
-pals|0,pals,Dopamine Infusion,,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 5-20) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-pals|1,pals,Norepinephrine Infusion,,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 0.01-2) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-pals|2,pals,Dobutamine Infusion,,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 5-20) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-pals|3,pals,Milrinone Infusion (PALS),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 0.25-0.75) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-pals|4,pals,Vasopressin Infusion,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.3-2 milliunits/kg/min. Second vasopressor; do NOT titrate >0.04 units/min. Central line. Unit-based infusion - dilution calculator not yet supported for this drug; calculate manually.
-pals|5,pals,Epinephrine Infusion (shock),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 0.01-1) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-pals|6,pals,Succinylcholine IV (RSI),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 1-2 mg/kg. Infant: 2 mg/kg; child: 1.5 mg/kg; IM 4-5 mg/kg. Contraindicated: hyperkalemia, burns >24h, myopathy."
-pals|7,pals,Vecuronium IV (post-intubation paralysis),0.1,,,10,,,,,,,,,
-pals|8,pals,Sugammadex IV (rocuronium reversal),16,,,200,,,,,,,,,
-pals|9,pals,Propofol IV (induction),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 mg/kg (0.1-0.2 ml/kg). Reduce dose in shock. Apnea/hypotension risk. >3 yr only. Max 200 mg.
-pals|10,pals,Dexmedetomidine Infusion,,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/h, range 0.2-1) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-pals|11,pals,Midazolam Infusion (ICU sedation),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 1-4) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-pals|12,pals,Fentanyl Infusion (ICU analgesia),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/h, range 1-5) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-pals|13,pals,Mannitol 20% (ICP),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5-1 g/kg (2.5-5 ml/kg of 20%). Monitor serum osm <320 mOsm/kg. Foley required. Max 250 ml.
-pals|14,pals,Flumazenil IV (benzo reversal),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 0.01 mg/kg (0.1 ml/kg) per dose. Max 0.2 mg/dose; total max 1 mg. CONTRAINDICATED: benzo-dependent, co-TCA, seizure risk."
-pals|15,pals,Pralidoxime (2-PAM) IV (organophosphate),25,25,50,2000,,,,,,,,,
-pals|16,pals,Hydroxocobalamin IV (cyanide),70,,,5000,,,,,,,,,
-pals|17,pals,Glucagon IV (beta-blocker OD),0.05,0.05,0.15,5,,,,,,,,,
-pals|18,pals,Fosphenytoin IV (2nd line seizure),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 20 mg PE/kg (max 1500 mg PE). Monitor ECG. Do NOT exceed 3 mg PE/kg/min.
-pals|19,pals,Procainamide IV (SVT/VT),15,,,1000,,,,,,,,,
-pals|20,pals,Septic Shock Fluid Bolus (PALS),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 10-20 ml/kg/bolus. Reassess after each. Avoid >60 ml/kg unless ICU. Preferred: LR (less hyperchloremia).
-pals|21,pals,5% Albumin Bolus (fluid-refractory shock),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 10-20 ml/kg. Consider after 40-60 ml/kg crystalloid. Avoid in TBI.
-pals|22,pals,Piperacillin-Tazobactam IV (sepsis - HAI),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 300 mg pip/kg/day / Q6-8h (max 16 g pip/day). HAI/broad-spectrum coverage. First hour of sepsis recognition.
-pals|23,pals,Hydrocortisone IV (septic shock adjunct),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 mg/kg/day / Q6-8h (max 50 mg/m2/day). Only if fluid + vasopressor refractory. Do not routine-use.
-pals|24,pals,Sildenafil PO (pulmonary HTN),0.5,0.5,1,10,,,,,,,,,
-ncpr|0,ncpr,"Epinephrine IV/IO - NCPR (1:10,000)",,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 0.01-0.03 mg/kg (0.1-0.3 ml/kg of 1:10,000). NCPR 1st-line drug. HR <60 after adequate PPV + 30s compressions."
-ncpr|1,ncpr,Epinephrine ETT - NCPR (temporary only),0.05,0.05,0.1,1,,,,,0.1,,,,
-ncpr|2,ncpr,Normal Saline 10 ml/kg - NCPR volume,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 10 ml/kg over 5-10 min. Repeat x1-2 PRN. Use O-neg pRBCs if hemorrhagic shock (abruption/vasa previa).
-ncpr|3,ncpr,Sodium Bicarbonate 4.2% - NCPR (0.5 mEq/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 mEq/kg. ONLY after adequate ventilation established. CO2 must be clearing. Dilute to 0.5 mEq/ml (4.2%). Slow >=5 min.
-ncpr|4,ncpr,D10W Bolus - Neonate (Hypoglycemia),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 2 ml/kg D10W (200 mg/kg). AVOID D25W/D50W in neonates (hyperosmolar sclerosis). Follow with D10W infusion. Monitor BGL Q30-60 min.
-ncpr|5,ncpr,Naloxone - NCPR (opioid reversal),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.1 mg/kg. ONLY if known maternal opioid within 4h AND HR >100 after PPV. NOT for general resuscitation of birth depression.
-ncpr|6,ncpr,Calcium Gluconate 10% - Neonate (hypocalcemia),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 ml/kg/day as infusion. Monitor ECG. Do NOT bolus fast. Extravasation causes necrosis.
-ncpr|7,ncpr,Prostaglandin E1 / Alprostadil (duct-dependent CHD),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 0.01-0.1) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-ncpr|8,ncpr,Phenobarbital IV - Neonate (seizure / HIE),20,,,400,,,,,,,,,
-ncpr|9,ncpr,Levetiracetam IV - Neonate (seizure alternative),40,40,60,1500,,,,,,,,,
-ncpr|10,ncpr,Dopamine Infusion - Neonate (hypotension),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 5-20) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-ncpr|11,ncpr,Dobutamine Infusion - Neonate (low CO),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 5-20) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet"
-ncpr|12,ncpr,Hydrocortisone IV - Neonate (vasopressor-refractory),1,,,25,,,,,,,,,
-ncpr|13,ncpr,Caffeine Citrate IV/PO (apnea of prematurity),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Loading: 20 mg/kg IV over 30 min. Maintenance: 5-10 mg/kg/day. Start within 3 days in <32 wk. Reduces extubation failure. Monitor HR.
-ncpr|14,ncpr,Vitamin K1 (Phytonadione) IM - All Newborns,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5 mg IM for <1500 g; 1 mg IM for >=1500 g. Give at birth. Essential for all newborns (hemorrhagic disease prevention).
-ncpr|15,ncpr,Poractant Alfa (Curosurf) - Surfactant (RDS),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 100-200 mg/kg first dose (1.25-2.5 ml/kg). Repeat 100 mg/kg Q12h PRN. Give within 2h (rescue) or prophylactic <27 wk. Reduce FiO2 as tolerated.
-ncpr|16,ncpr,Ampicillin IV - Neonate (early-onset sepsis),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 100-200 mg/kg/day / Q8-12h (term); Q12h (preterm). Cover GBS + Listeria. Combine with gentamicin.
-fluids|0,fluids,0.9% Normal Saline (Fluid Bolus),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 20 ml/kg. Max 1000 ml/bolus.
-fluids|1,fluids,Ringer's Lactate (Fluid Bolus),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 20 ml/kg. Max 1000 ml/bolus.
-fluids|2,fluids,3% Hypertonic Saline,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 3 ml/kg. Max 250 ml.
-fluids|3,fluids,Packed Red Blood Cells (PRBCs),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 10 ml/kg. Max 350 ml/unit.
-fluids|4,fluids,Maintenance Fluid (D5 1/2 NS),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 4-2-1 Rule. Max 120 ml/hr.
-fluids|5,fluids,Maintenance Fluid (D5 NS),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 4-2-1 Rule. Max 120 ml/hr.
-fluids|6,fluids,Potassium Chloride (KCl),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 2 mEq/kg/day. Max 40 mEq/L peripherally.
-infant_supp|0,infant_supp,Vitamin E Drops - Preterm (Aqua-E 50 IU/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Preterm: 15-25 IU/day. Aqua-E ~50 IU/ml -> 0.3-0.5 ml/day. Give if unfortified human milk; HMF/preterm formula usually sufficient. Max 25 IU/day.
-infant_supp|1,infant_supp,Ferrous Sulfate Drops - Preterm (15 mg Fe/0.6 ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Preterm: 2-4 mg elemental iron/kg/day. Max 15 mg/day. Start at 2-4 wk of age (or at full enteral feeds ~100 ml/kg/day). Continue to 6-12 mo corrected age. Conc = 25 mg Fe/ml.
-infant_supp|2,infant_supp,Multivitamin (MTV) Drops - Preterm,,,,,,,,,,,,,"Non-standard dosing (not live-editable) - Preterm: 0.5-1 ml/day once tolerating full enteral feeds. Ensure formulation covers Vit A, C, D without exceeding upper limits with HMF."
-infant_supp|3,infant_supp,Iron Drops - Term Breastfed (15 mg Fe/0.6 ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Term exclusively/partially breastfed: 1 mg elemental iron/kg/day (start per guideline). Continue until adequate iron-rich complementary foods introduced. Conc = 25 mg Fe/ml. Max 15 mg/day.
-infant_supp|4,infant_supp,Ferrous Sulfate Tablet - Term Breastfed (65 mg elemental/tab),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Term exclusively/partially breastfed iron prophylaxis: 1 mg elemental iron/kg/day (start per guideline). Max 15 mg/day elemental Fe. Tab contains 65 mg elemental Fe. Dose calculated as elemental mg/day / 65.
-infant_supp|5,infant_supp,Ferrous Gluconate Tablet - Term Breastfed (35 mg elemental/tab),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Term exclusively/partially breastfed iron prophylaxis: 1 mg elemental iron/kg/day (start per guideline). Max 15 mg/day elemental Fe. Tab contains 35 mg elemental Fe. Dose calculated as elemental mg/day / 35.
-infant_supp|6,infant_supp,Vitamin D3 Drops - Infant (400 IU/drop or 400 IU/ml),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - All breastfed & partially breastfed infants from first days of life. Also formula-fed infants taking <1 L/day of fortified formula. Dose: 400 IU/day (1 drop if 400 IU/drop, or 1 ml if 400 IU/ml)."
-infectious|0,infectious,Clindamycin PO (75mg/5ml),10,,,450,,,,,15,,,,
-infectious|1,infectious,Clindamycin IV,10,,,900,,,,,,,,,
-infectious|2,infectious,Metronidazole PO/IV,7.5,,,500,,,,,,,,,
-infectious|3,infectious,Doxycycline PO,2.2,,,100,,,,,,,,,
-infectious|4,infectious,Isoniazid (INH) PO - TB treatment,10,10,15,300,,1,,,,,,,
-infectious|5,infectious,Rifampicin (RIF) PO - TB treatment,15,10,20,600,,1,,,,,,,
-infectious|6,infectious,Pyrazinamide (PZA) PO - TB treatment,35,30,40,2000,,1,,,,,,,
-infectious|7,infectious,Ethambutol (EMB) PO - TB treatment,20,15,25,1200,,1,,,,,,,
-infectious|8,infectious,Pyridoxine (Vitamin B6) - give with INH,1,,,50,,1,,,,,,,
-infectious|9,infectious,Isoniazid (INH) - TB preventive therapy (TPT/LTBI),10,10,15,300,,1,,,,,,,
-infectious|10,infectious,Co-trimoxazole (TMP-SMX) - PCP prophylaxis,5,,,160,,1,,,8,,,,
-infectious|11,infectious,Dapsone - PCP prophylaxis (alternative),2,,,100,,1,,,,,,,
-infectious|12,infectious,Zidovudine (AZT) - neonatal HIV prophylaxis,4,,,,,2,,,,,,,
-infectious|13,infectious,Lamivudine (3TC) - neonatal HIV prophylaxis,2,,,,,2,,,,,,,
-infectious|14,infectious,Nevirapine (NVP) - neonatal HIV prophylaxis,4,,,,,1,,,,,,,
-infectious|15,infectious,Prednisolone - TB meningitis adjunct,1,1,2,60,,1,,,,,,,
-infectious|16,infectious,Levofloxacin (Lfx) - 2nd-line TB,15,15,20,1500,,1,,,,,,,
-infectious|17,infectious,Moxifloxacin (Mfx) - 2nd-line TB,10,10,15,400,,1,,,,,,,
-infectious|18,infectious,Bedaquiline (Bdq) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band fixed dosing with loading + 3x/week maintenance
-infectious|19,infectious,Linezolid (Lzd) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band: <=15kg 15 mg/kg/day; >15kg 10-12 mg/kg/day (max 600)
-infectious|20,infectious,Clofazimine (Cfz) - 2nd-line TB,3,2,5,100,,1,,,,,,,
-infectious|21,infectious,Cycloserine (Cs) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band: 7-<30kg 15-20; >=30kg 10-15 mg/kg/day div BID (max 1g)
-infectious|22,infectious,Delamanid (Dlm) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-band: 3-5y 25mg BID; 6-11y 50mg BID; 12-17y 100mg BID
-infectious|23,infectious,Ethionamide (Eto) - 2nd-line TB,15,15,20,1000,,,,,,,,,
-infectious|24,infectious,Para-aminosalicylic acid (PAS) - 2nd-line TB,200,200,300,10000,,,,,,,,,
-infectious|25,infectious,Dolutegravir (DTG) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band: 3-<6kg 5mg; 6-<10kg 15mg; 10-<14kg 20mg; 14-<20kg 25mg; >=20kg 50mg OD
-infectious|26,infectious,TLD (TDF/3TC/DTG 300/300/50) - ART FDC,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=30kg 1 tablet OD (first-line FDC)
-infectious|27,infectious,Abacavir (ABC) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 16 mg/kg OD; bands 14-<20kg 300; 20-<25kg 450; >25kg 600 OD
-infectious|28,infectious,Lamivudine (3TC) - ART (treatment),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 4 mg/kg q12h (max 150/dose)
-infectious|29,infectious,Zidovudine (AZT) - ART (treatment),,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 4-<9kg 12mg/kg; 9-30kg 9mg/kg; >=30kg 300mg q12h
-infectious|30,infectious,Tenofovir DF (TDF) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 17-<22kg 150; 22-<28kg 200; 28-<35kg 250; >=35kg 300 OD
-infectious|31,infectious,Emtricitabine (FTC) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 6 mg/kg OD (max 240); >33kg 200 OD
-infectious|32,infectious,Efavirenz (EFV) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 10-<15kg 200; 15-<20kg 250; 20-<25kg 300; 25-<32.5kg 350; >=32.5kg 400 OD
-infectious|33,infectious,Rilpivirine (RPV) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=12y & >=35kg 25mg OD with food
-infectious|34,infectious,Etravirine (ETR) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 10-<20kg 100; 20-<25kg 125; 25-<30kg 150; >=30kg 200 q12h
-infectious|35,infectious,Lopinavir/ritonavir (LPV/r) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 15-25kg 200/50; >25-35kg 300/75; >35kg 400/100 q12h
-infectious|36,infectious,Atazanavir/ritonavir (ATV/r) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 15-<35kg ATV200/r100; >=35kg ATV300/r100 OD
-infectious|37,infectious,Darunavir/ritonavir (DRV/r) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 15-40kg DRV600/r100; >40kg DRV900/r100 OD
-infectious|38,infectious,Ritonavir (RTV) - PI booster,,,,,,,,,,,,,Non-standard dosing (not live-editable) - booster: <15kg 3mg/kg; >=15kg 2.5mg/kg q12h
-infectious|39,infectious,Raltegravir (RAL) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=12y & >=25kg 400mg q12h (film-coated)
-infectious|40,infectious,TAF/FTC (25/200) - ART FDC,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=6y & >=25kg 1 tablet OD
-allergy|0,allergy,Diphenhydramine PO/IV,1,,,50,,,,,,,,,
-allergy|1,allergy,Hydroxyzine PO,0.5,0.5,1,50,,,,,,,,,
-allergy|2,allergy,Loratadine PO (non-sedating),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: 2-<6yr 5mg OD; >=6yr 5mg BID or 10mg OD
-allergy|3,allergy,Montelukast PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: <6yr 4mg; 6-<15yr 5mg; >=15yr 10mg OD evening
-allergy|4,allergy,Desloratadine PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 6-11mo 1mg; 1-5yr 1.25mg; 6-11yr 2.5mg; >=12yr 5mg OD
-allergy|5,allergy,Bilastine PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 2-11yr (>=16kg) 10mg OD; >=12yr 20mg OD
-allergy|6,allergy,Pseudoephedrine PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 4-<6yr 15mg; 6-<12yr 30mg; >=12yr 60mg q4-6h
-renal|0,renal,Nitrofurantoin PO (25mg/5ml),1.5,1.5,2,100,,,,,5,,,,
-renal|1,renal,Trimethoprim PO (UTI prophylaxis),2,,,100,,1,,,,,,,
-renal|2,renal,Cefixime PO (100mg/5ml),8,,,400,,1,,,20,,,,
-hematology|0,hematology,Tranexamic Acid IV/PO,10,10,15,1000,,,,,,,,,
-hematology|1,hematology,Folic Acid PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - Weight-band dosing: <10 kg = 0.1 mg/day; >=10 kg = 1 mg/day. Hemolytic anemia/chronic hemolysis supplementation.
-dermatology|0,dermatology,Hydrocortisone 1% Cream (topical),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Low-potency topical steroid for eczema/dermatitis. Not weight-based. Avoid prolonged use on face/skin folds - risk of atrophy.
-dermatology|1,dermatology,Mupirocin 2% Ointment (topical),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - Impetigo/localized skin infection, or MRSA nasal decolonization (apply to nares BID x 5 days). Not weight-based."
-dermatology|2,dermatology,Permethrin 5% Cream (scabies),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - Standard scabies treatment, all ages >=2 months. Not weight-based - full-body application regardless of size. Treat household contacts simultaneously."
-endocrine|0,endocrine,Levothyroxine PO (congenital hypothyroidism),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - Age-banded mcg/kg/day (approximated here by weight as a rough proxy - dose by actual age and confirm with endocrinology, NOT pure weight): 0-3 mo ~12 mcg/kg/day; 3-12 mo ~8 mcg/kg/day; 1-5 yr ~6 mcg/kg/day; 6-12 yr ~4 mcg/kg/day; >12 yr ~2.5 mcg/kg/day."
-endocrine|1,endocrine,"Dextrose Gel 40% (oral/buccal, neonatal hypoglycemia)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5 g/kg/dose (200 mg/kg as 40% gel = 0.4 g/ml). Max 10 ml/dose. First-line for asymptomatic/mild neonatal hypoglycemia before considering IV.
+key,category,name,standardMgKg,doseRangeLo,doseRangeHi,maxMg,maxMgPerDay,dosesPerDay,strengthMg,perMl,concMgMl,mlPerBottle,note,rx,special,Indication,Route,Compatible_Diluent,Max_Peripheral_Conc,Special_Dosing
+neuro_pain|0,neuro_pain,Paracetamol PO (120mg/5ml),12,10,15,996,,,,,24,,,,,Pain / Fever,PO/Rectal,,,Total daily dose based on age/weight
+neuro_pain|1,neuro_pain,Paracetamol PO (250mg/5ml),12,10,15,1000,,,,,50,,,,,Pain / Fever,PO/Rectal,,,Total daily dose based on age/weight
+neuro_pain|2,neuro_pain,Paracetamol Drops PO (100mg/ml),12,10,15,1000,,,,,100,,,,,Pain / Fever,PO/Rectal,,,Total daily dose based on age/weight
+neuro_pain|3,neuro_pain,Paracetamol IV (10 mg/ml),12,10,15,1000,,,,,10,,,,,Pain / Fever,IV,"NS, D5W",10 mg/mL,Infuse over 15 mins
+neuro_pain|4,neuro_pain,Ibuprofen PO (100mg/5ml),10,5,10,400,,,,,20,,,,,Pain / Fever,PO,,,Give with food
+neuro_pain|5,neuro_pain,Morphine IV (1 mg/ml),0.1,,,10,,,,,1,,,,,Pain,IV/IM/SC,"NS, D5W",5 mg/mL,Monitor for resp. depression
+neuro_pain|6,neuro_pain,Fentanyl IV (50 mcg/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1 mcg/kg. Max 100 mcg (2 ml)/dose.,Pain,IV/IN,"NS, D5W",50 mcg/mL,Titrate to effect
+neuro_pain|7,neuro_pain,Ketorolac IV (30 mg/ml),0.5,,,30,,,,,30,,,,,Acute Pain,IV/IM,"NS, D5W",30 mg/mL,Max 5 days total
+neuro_pain|8,neuro_pain,Diazepam Rectal Gel (5 mg/ml),0.5,,,20,,,,,5,,,,,,,,,
+neuro_pain|9,neuro_pain,Diazepam IV (5 mg/ml),0.2,,,10,,,,,5,,,,,,,,,
+neuro_pain|10,neuro_pain,Lorazepam IV (2 mg/ml),0.1,,,4,,,,,2,,,,,Sedation,IV,"NS, D5W",1 mg/mL,Use preservative-free for neonates
+neuro_pain|11,neuro_pain,Midazolam IN/Buccal (5 mg/ml),0.2,,,10,,,,,5,,,,,,,,,
+respiratory|0,respiratory,Cetirizine Syrup (5mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: <6mo 2.5mg; 6mo-<6yr 2.5-5mg; >=6yr 5-10mg OD,Allergic Rhinitis,PO,,,"Fixed bands: 6m-2y(2.5mg), 2-6y(2.5-5mg), >6y(5-10mg)"
+respiratory|1,respiratory,Chlorpheniramine Syrup (2mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: 2-<6yr 1mg; 6-<12yr 2mg; >=12yr 4mg q4-6h,Allergic Rhinitis,PO,,,Often dosed q4-6h
+respiratory|2,respiratory,Salbutamol Syrup (2mg/5ml),0.15,0.1,0.15,4,,,,,0.4,,,,,Bronchospasm,PO,,,Monitor for tachycardia/tremor
+respiratory|3,respiratory,Salbutamol Nebulizer (2.5 mg/nebule),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1 nebule (2.5 mg) per dose. Standard unit-dose nebule.,Bronchospasm,Inhalation,,,Nebulized
+respiratory|4,respiratory,Ipratropium Nebulizer (250 mcg/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - <20 kg: 1 ml (250 mcg). >=20 kg: 2 ml (500 mcg max).,,,,,
+respiratory|5,respiratory,Budesonide Nebulizer (0.5 mg/2ml respule),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 respules by severity. Max 2 mg/day.,Croup / Asthma,Inhalation,,,Rinse mouth after inhalation
+respiratory|6,respiratory,Dexamethasone PO/IV (4 mg/ml),0.6,0.15,0.6,16,,,,,4,,,,,Croup / Inflammation,PO/IV,NS,4 mg/mL,Often single dose for Croup
+respiratory|7,respiratory,Prednisolone PO (5mg/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Asthma 1-2 mg/kg/day; max by age 20mg <2yr / 30mg 2-5yr / 40mg >5yr,Asthma / Inflammation,PO,,,Give with food
+respiratory|8,respiratory,Hydrocortisone IV,5,2,5,250,,,,,,,,,,Adrenal Insufficiency,IV,"NS, D5W",50 mg/mL,Stress dose
+respiratory|9,respiratory,"Adrenaline Nebulizer (Croup) (1:1,000)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5 ml/kg. Max 5 ml (5 mg)/dose.,,,,,
+respiratory|10,respiratory,Magnesium Sulfate IV (Asthma),50,,,2000,,,,,500,,,,,,,,,
+respiratory|11,respiratory,Fluticasone propionate (Flixotide) MDI 125 mcg,,,,,,,,,,,,,Non-standard dosing (not live-editable) - ICS controller. GINA low-medium 1-2 puff/day. Use spacer.,,,,,
+respiratory|12,respiratory,Salmeterol/Fluticasone (Seretide) MDI 25/125 mcg,,,,,,,,,,,,,Non-standard dosing (not live-editable) - ICS+LABA controller. GINA 1-2 puff/day.,,,,,
+respiratory|13,respiratory,Budesonide/Formoterol (Symbicort) MDI 160/4.5 mcg,,,,,,,,,,,,,Non-standard dosing (not live-editable) - ICS+formoterol controller/MART. 1-2 puff/day.,,,,,
+respiratory|14,respiratory,Carbocysteine (mucolytic),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 2-5yr 100mg BID; 6-11yr 100-250mg TID; >=12yr 750mg TID,,,,,
+respiratory|15,respiratory,Ambroxol (mucolytic),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 2-<6yr 7.5-15mg TID; 6-12yr 15-30mg BID-TID; >12yr 60-120mg/day,,,,,
+gi|0,gi,Ondansetron PO (4mg/5ml),0.15,0.1,0.15,8,,,,,0.8,,,,,,,,,
+gi|1,gi,Ondansetron IV (2 mg/ml),0.15,,,8,,,,,2,,,,,,,,,
+gi|2,gi,Domperidone PO (1mg/ml),0.25,0.25,0.4,10,,,,,1,,,,,GI Motility,PO,,,Before feeds
+gi|3,gi,Omeprazole PO/IV,1,,,40,,,,,,,,,,,,,,
+gi|4,gi,Famotidine PO/IV (10 mg/ml),0.5,,,20,,,,,10,,,,,GERD,IV/PO,"NS, D5W",2 mg/mL,
+gi|5,gi,Lactulose PO (3.3g/5ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.667-2 g/kg/day (1-3 ml/kg/day). Max 40 g/day (~60 ml/day).,Constipation,PO,,,Titrate for soft stool
+gi|6,gi,Lidocaine Oral Gel 2% (topical - mouth ulcers),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Topical mucosal analgesia for HFMD/herpangina ulcers. Apply sparingly with cotton tip. Do not swallow large amounts. Not weight-based.,,,,,
+gi|7,gi,Eurofer PO (10 mg iron/ml),6,3,6,100,,2,,,10,,,,,Iron Deficiency Anemia,PO,,,Dose based on elemental iron
+gi|8,gi,Lansoprazole PO,1,0.7,3,30,30,1,,,,,,,,GERD,PO,,,Admin 30-60m pre-meal
+gi|9,gi,Aluminum/Magnesium Hydroxide (Alum milk),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 0.5-1 ml/kg/dose TID. Max 20 ml/dose, 80 ml/day.",,,,,
+gi|10,gi,Simethicone Drops (20 mg/0.3 ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - <10.9kg 20mg QID; >=10.9kg/2-<12yr 40mg QID (max 480/day); >=12yr 40-125mg QID,,,,,
+gi|11,gi,Dioctahedral Smectite (Smecta),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 18 g/day div 3 x3 days then 9 g/day div 3 (1 sachet=3g); <=7 days,,,,,
+antimicrobial|0,antimicrobial,Amoxicillin Drops (50mg/ml),45,25,50,1000,,2,,,50,,,,,AOM,PO,,,Total daily dose
+antimicrobial|1,antimicrobial,Amoxicillin PO (250mg/5ml) - HIGH DOSE,90,80,100,1000,4000,2,,,50,,,,,AOM,PO,,,Total daily dose
+antimicrobial|2,antimicrobial,Augmentin PO (457mg/5ml) - HIGH DOSE,90,80,100,1000,,2,,,80,,,,,AOM,PO,,,Total daily dose
+antimicrobial|3,antimicrobial,Augmentin ES PO (600mg/5ml) - HIGH DOSE,90,80,100,1000,,2,,,120,,,,,AOM,PO,,,Total daily dose
+antimicrobial|4,antimicrobial,Azithromycin PO (200mg/5ml),10,10,12,500,,,,,40,,,,,Infection,PO,,,"Day 1: 10mg/kg, Day 2-5: 5mg/kg"
+antimicrobial|5,antimicrobial,Cephalexin PO (250mg/5ml),50,25,50,1000,2000,2,,,50,,,,,Skin Inf.,PO,,,
+antimicrobial|6,antimicrobial,Cefdinir PO (125mg/5ml),14,7,14,600,600,1,,,25,,,,,Resp/Skin,PO,,,Take 2h apart from iron/antacids
+antimicrobial|7,antimicrobial,Cotrimoxazole/Bactrim PO (200/40mg/5ml),8,6,12,320,,2,,,8,,,,,,,,,
+antimicrobial|8,antimicrobial,Ceftriaxone IV (Standard),70,50,75,2000,,,,,,,,,,,,,,
+antimicrobial|9,antimicrobial,Ceftriaxone IV (Meningitis),100,80,100,,4000,2,,,,,,,,,,,,
+antimicrobial|10,antimicrobial,Cefotaxime IV,150,100,200,2000,12000,3,,,,,,,,Bacterial Inf,IV/IM,"NS, D5W",100 mg/mL,
+antimicrobial|11,antimicrobial,Meropenem IV,20,20,40,2000,,,,,,,,,,,,,,
+antimicrobial|12,antimicrobial,Vancomycin IV,15,10,15,1000,2000,,,,,,,,,,,,,
+antimicrobial|13,antimicrobial,Gentamicin IV,7.5,6,7.5,500,,,,,,,,,,Bacterial Inf,IV/IM,"NS, D5W",10 mg/mL,Dosed based on monitoring
+antimicrobial|14,antimicrobial,Acyclovir IV,10,10,20,800,,,,,,,,,,Viral Infection,IV,"NS, D5W",7 mg/mL,Maintain hydration
+antimicrobial|15,antimicrobial,Fluconazole IV/PO,6,6,12,800,,,,,,,,,,,,,,
+antimicrobial|16,antimicrobial,Oseltamivir PO (Tamiflu),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Weight-based bands. Max 75 mg/dose.,,,,,
+antimicrobial|17,antimicrobial,Amikacin IV,15,15,20,1500,,1,,,,,,,,,,,,
+antimicrobial|18,antimicrobial,Ciprofloxacin PO (250mg/5ml),30,20,40,750,,2,,,50,,,,,Severe Inf.,PO,,,
+antimicrobial|19,antimicrobial,Augmentin PO (457mg/5ml) - Standard 45 mg/kg/day (UTI),45,40,50,875,,2,,,80,,,,,AOM,PO,,,Total daily dose
+cardio|0,cardio,Furosemide PO (10 mg/ml),1,,,40,,,,,10,,,,,Edema/Heart Failure,PO,,,Monitor electrolytes
+cardio|1,cardio,Furosemide IV (10 mg/ml),1,,,40,,,,,10,,,,,Edema/Heart Failure,IV,"NS, D5W",10 mg/mL,Infuse slowly (max 4mg/min)
+cardio|2,cardio,Spironolactone PO,1,,,100,,,,,,,,,,Diuretic (Potassium Sparing),PO,,,Monitor K+ levels
+cardio|3,cardio,Captopril PO,0.1,,,50,,,,,,,,,,Hypertension,PO,,,Titrate slowly
+cardio|4,cardio,Milrinone IV Loading,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 50 mcg/kg load. Max 2500 mcg.,Low Cardiac Output / Shock,IV,"NS, D5W",200 mcg/mL,Dosed in mcg/kg/min
+emergency|0,emergency,"Epinephrine ARREST (1:10,000)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.1 ml/kg. Max 10 ml (1 mg)/dose.,,,,,
+emergency|1,emergency,"Epinephrine ANAPHYLAXIS (1:1,000)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.01 ml/kg. Max 0.5 ml (0.5 mg)/dose.,,,,,
+emergency|2,emergency,Amiodarone IV (50mg/ml),5,,,300,,,,,50,,,,,Arrhythmia,IV,D5W,2 mg/mL,Load over 20-60 min
+emergency|3,emergency,Adenosine IV (3mg/ml) - 1st Dose,0.1,,,6,,,,,3,,,,,SVT,IV (Rapid Push),,3 mg/mL,Rapid push followed by NS flush
+emergency|4,emergency,Atropine IV (0.1 mg/ml),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 0.02 mg/kg. Min 1 ml, max 5 ml/dose.",Bradycardia,IV/IO,NS,0.1 mg/mL,Min dose 0.1 mg
+emergency|5,emergency,Calcium Gluconate (10%),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.6 ml/kg. Max 20 ml/dose.,,,,,
+emergency|6,emergency,Calcium Chloride (10%),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.2 ml/kg. Max 20 ml/dose.,,,,,
+emergency|7,emergency,Dextrose: D10W (Hypoglycemia),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 5 ml/kg. Max 250 ml/dose.,,,,,
+emergency|8,emergency,Dextrose: D25W (Hypoglycemia),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 2 ml/kg. Max 100 ml/dose.,,,,,
+emergency|9,emergency,Lidocaine 2% (20mg/ml),1,,,100,,,,,20,,,,,,,,,
+emergency|10,emergency,Magnesium Sulfate 50% (500mg/ml),50,,,2000,,,,,500,,,,,,,,,
+emergency|11,emergency,Naloxone IV/IM (0.4mg/ml),0.1,,,2,,,,,0.4,,,,,Opioid Reversal,IV/IM/IN,"NS, D5W",0.4 mg/mL,Titrate to effect
+emergency|12,emergency,Sodium Bicarbonate 8.4% (1mEq/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1 mEq/kg. Max 50 mEq (50 ml)/dose.,,,,,
+emergency|13,emergency,Ketamine IV (RSI),1.5,,,100,,,,,10,,,,,Anesthesia,IV/IM,"NS, D5W",10 mg/mL,Titrate to effect
+emergency|14,emergency,Rocuronium IV (RSI),1,,,100,,,,,10,,,,,,,,,
+emergency|15,emergency,Defibrillation Shock,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 2 J/kg. Max 200 J.,VF / Pulseless VT,Electrical,,,"1st shock 2J/kg, then 4J/kg"
+pals|0,pals,Dopamine Infusion,,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 5-20) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",Shock,IV,"NS, D5W",3200 mcg/mL,Dosed in mcg/kg/min
+pals|1,pals,Norepinephrine Infusion,,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 0.01-2) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",Shock,IV,"NS, D5W",Central preferred,Dosed in mcg/kg/min
+pals|2,pals,Dobutamine Infusion,,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 5-20) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",Low Cardiac Output,IV,"NS, D5W",5000 mcg/mL,Dosed in mcg/kg/min
+pals|3,pals,Milrinone Infusion (PALS),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 0.25-0.75) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",Low Cardiac Output / Shock,IV,"NS, D5W",200 mcg/mL,Dosed in mcg/kg/min
+pals|4,pals,Vasopressin Infusion,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.3-2 milliunits/kg/min. Second vasopressor; do NOT titrate >0.04 units/min. Central line. Unit-based infusion - dilution calculator not yet supported for this drug; calculate manually.,Refractory Shock,IV,"NS, D5W",Central preferred,Dosed in units/kg/min
+pals|5,pals,Epinephrine Infusion (shock),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 0.01-1) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",Arrest / Brady,IV/IO,NS,0.1 mg/mL (Code push),Repeat q3-5 mins prn
+pals|6,pals,Succinylcholine IV (RSI),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 1-2 mg/kg. Infant: 2 mg/kg; child: 1.5 mg/kg; IM 4-5 mg/kg. Contraindicated: hyperkalemia, burns >24h, myopathy.",Rapid Sequence Intubation,IV/IM,NS,20 mg/mL,Contraindicated if hyperkalemia risk
+pals|7,pals,Vecuronium IV (post-intubation paralysis),0.1,,,10,,,,,,,,,,Post-intubation paralysis,IV,"NS, D5W",1 mg/mL,Neuromuscular monitoring required
+pals|8,pals,Sugammadex IV (rocuronium reversal),16,,,200,,,,,,,,,,Rocuronium/Vecuronium reversal,IV,"NS, D5W",100 mg/mL,Dose based on TOF count
+pals|9,pals,Propofol IV (induction),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 mg/kg (0.1-0.2 ml/kg). Reduce dose in shock. Apnea/hypotension risk. >3 yr only. Max 200 mg.,Anesthesia,IV,D5W,10 mg/mL,Requires specialized monitoring
+pals|10,pals,Dexmedetomidine Infusion,,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/h, range 0.2-1) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",ICU Sedation,IV,NS,4 mcg/mL,Loading dose 0.5 mcg/kg
+pals|11,pals,Midazolam Infusion (ICU sedation),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 1-4) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",Sedation,IV,"NS, D5W",0.5 mg/mL,Avoid rapid IVP (hypotension)
+pals|12,pals,Fentanyl Infusion (ICU analgesia),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/h, range 1-5) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",Pain,IV/IN,"NS, D5W",50 mcg/mL,Titrate to effect
+pals|13,pals,Mannitol 20% (ICP),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5-1 g/kg (2.5-5 ml/kg of 20%). Monitor serum osm <320 mOsm/kg. Foley required. Max 250 ml.,,,,,
+pals|14,pals,Flumazenil IV (benzo reversal),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 0.01 mg/kg (0.1 ml/kg) per dose. Max 0.2 mg/dose; total max 1 mg. CONTRAINDICATED: benzo-dependent, co-TCA, seizure risk.",Benzo reversal,IV,"NS, D5W",0.1 mg/mL,Monitor for resedation
+pals|15,pals,Pralidoxime (2-PAM) IV (organophosphate),25,25,50,2000,,,,,,,,,,Organophosphate Poisoning,IV,NS,20 mg/mL,Infuse over 15-30 min
+pals|16,pals,Hydroxocobalamin IV (cyanide),70,,,5000,,,,,,,,,,Cyanide Poisoning,IV,NS,25 mg/mL,Infuse over 15 min
+pals|17,pals,Glucagon IV (beta-blocker OD),0.05,0.05,0.15,5,,,,,,,,,,Beta-blocker / CCB OD,IV,"D5W, NS",1 mg/mL,Follow with continuous infusion
+pals|18,pals,Fosphenytoin IV (2nd line seizure),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 20 mg PE/kg (max 1500 mg PE). Monitor ECG. Do NOT exceed 3 mg PE/kg/min.,Status Epilepticus,IV/IM,"NS, D5W",25 mg PE/mL,Dosed as Phenytoin Equivalents (PE)
+pals|19,pals,Procainamide IV (SVT/VT),15,,,1000,,,,,,,,,,SVT/VT,IV,"NS, D5W",20 mg/mL,Monitor ECG (QRS width)
+pals|20,pals,Septic Shock Fluid Bolus (PALS),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 10-20 ml/kg/bolus. Reassess after each. Avoid >60 ml/kg unless ICU. Preferred: LR (less hyperchloremia).,,,,,
+pals|21,pals,5% Albumin Bolus (fluid-refractory shock),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 10-20 ml/kg. Consider after 40-60 ml/kg crystalloid. Avoid in TBI.,,,,,
+pals|22,pals,Piperacillin-Tazobactam IV (sepsis - HAI),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 300 mg pip/kg/day / Q6-8h (max 16 g pip/day). HAI/broad-spectrum coverage. First hour of sepsis recognition.,Sepsis - HAI,IV,"NS, D5W",100 mg/mL,Based on Piperacillin
+pals|23,pals,Hydrocortisone IV (septic shock adjunct),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 mg/kg/day / Q6-8h (max 50 mg/m2/day). Only if fluid + vasopressor refractory. Do not routine-use.,Adrenal Insufficiency,IV,"NS, D5W",50 mg/mL,Stress dose
+pals|24,pals,Sildenafil PO (pulmonary HTN),0.5,0.5,1,10,,,,,,,,,,Pulmonary HTN,PO,,,Titrate to effect
+ncpr|0,ncpr,"Epinephrine IV/IO - NCPR (1:10,000)",,,,,,,,,,,,,"Non-standard dosing (not live-editable) - 0.01-0.03 mg/kg (0.1-0.3 ml/kg of 1:10,000). NCPR 1st-line drug. HR <60 after adequate PPV + 30s compressions.",Arrest / Brady,IV/IO,NS,0.1 mg/mL (Code push),Repeat q3-5 mins prn
+ncpr|1,ncpr,Epinephrine ETT - NCPR (temporary only),0.05,0.05,0.1,1,,,,,0.1,,,,,,,,,
+ncpr|2,ncpr,Normal Saline 10 ml/kg - NCPR volume,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 10 ml/kg over 5-10 min. Repeat x1-2 PRN. Use O-neg pRBCs if hemorrhagic shock (abruption/vasa previa).,,,,,
+ncpr|3,ncpr,Sodium Bicarbonate 4.2% - NCPR (0.5 mEq/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 mEq/kg. ONLY after adequate ventilation established. CO2 must be clearing. Dilute to 0.5 mEq/ml (4.2%). Slow >=5 min.,,,,,
+ncpr|4,ncpr,D10W Bolus - Neonate (Hypoglycemia),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 2 ml/kg D10W (200 mg/kg). AVOID D25W/D50W in neonates (hyperosmolar sclerosis). Follow with D10W infusion. Monitor BGL Q30-60 min.,,,,,
+ncpr|5,ncpr,Naloxone - NCPR (opioid reversal),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.1 mg/kg. ONLY if known maternal opioid within 4h AND HR >100 after PPV. NOT for general resuscitation of birth depression.,Opioid Reversal,IV/IM/IN,"NS, D5W",0.4 mg/mL,Titrate to effect
+ncpr|6,ncpr,Calcium Gluconate 10% - Neonate (hypocalcemia),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 1-2 ml/kg/day as infusion. Monitor ECG. Do NOT bolus fast. Extravasation causes necrosis.,,,,,
+ncpr|7,ncpr,Prostaglandin E1 / Alprostadil (duct-dependent CHD),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 0.01-0.1) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",,,,,
+ncpr|8,ncpr,Phenobarbital IV - Neonate (seizure / HIE),20,,,400,,,,,,,,,,Seizure / HIE,IV,"NS, D5W",25 mg/mL,Loading dose
+ncpr|9,ncpr,Levetiracetam IV - Neonate (seizure alternative),40,40,60,1500,,,,,,,,,,Seizure alt.,IV,"NS, D5W",50 mg/mL,Infuse over 15 min
+ncpr|10,ncpr,Dopamine Infusion - Neonate (hypotension),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 5-20) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",Shock,IV,"NS, D5W",3200 mcg/mL,Dosed in mcg/kg/min
+ncpr|11,ncpr,Dobutamine Infusion - Neonate (low CO),,,,,,,,,,,,,"Continuous IV infusion (mcg/kg/min, range 5-20) - uses the infusion dilution calculator, not Sheet-overridable dosing fields yet",Low Cardiac Output,IV,"NS, D5W",5000 mcg/mL,Dosed in mcg/kg/min
+ncpr|12,ncpr,Hydrocortisone IV - Neonate (vasopressor-refractory),1,,,25,,,,,,,,,,Adrenal Insufficiency,IV,"NS, D5W",50 mg/mL,Stress dose
+ncpr|13,ncpr,Caffeine Citrate IV/PO (apnea of prematurity),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Loading: 20 mg/kg IV over 30 min. Maintenance: 5-10 mg/kg/day. Start within 3 days in <32 wk. Reduces extubation failure. Monitor HR.,Apnea of Prematurity,IV/PO,"NS, D5W",20 mg/mL,Dose based on Citrate content
+ncpr|14,ncpr,Vitamin K1 (Phytonadione) IM - All Newborns,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5 mg IM for <1500 g; 1 mg IM for >=1500 g. Give at birth. Essential for all newborns (hemorrhagic disease prevention).,,,,,
+ncpr|15,ncpr,Poractant Alfa (Curosurf) - Surfactant (RDS),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 100-200 mg/kg first dose (1.25-2.5 ml/kg). Repeat 100 mg/kg Q12h PRN. Give within 2h (rescue) or prophylactic <27 wk. Reduce FiO2 as tolerated.,,,,,
+ncpr|16,ncpr,Ampicillin IV - Neonate (early-onset sepsis),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 100-200 mg/kg/day / Q8-12h (term); Q12h (preterm). Cover GBS + Listeria. Combine with gentamicin.,Early-onset Sepsis,IV,"NS, D5W",100 mg/mL,Dose depends on gestation
+fluids|0,fluids,0.9% Normal Saline (Fluid Bolus),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 20 ml/kg. Max 1000 ml/bolus.,,,,,
+fluids|1,fluids,Ringer's Lactate (Fluid Bolus),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 20 ml/kg. Max 1000 ml/bolus.,,,,,
+fluids|2,fluids,3% Hypertonic Saline,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 3 ml/kg. Max 250 ml.,,,,,
+fluids|3,fluids,Packed Red Blood Cells (PRBCs),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 10 ml/kg. Max 350 ml/unit.,,,,,
+fluids|4,fluids,Maintenance Fluid (D5 1/2 NS),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 4-2-1 Rule. Max 120 ml/hr.,,,,,
+fluids|5,fluids,Maintenance Fluid (D5 NS),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 4-2-1 Rule. Max 120 ml/hr.,,,,,
+fluids|6,fluids,Potassium Chloride (KCl),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 2 mEq/kg/day. Max 40 mEq/L peripherally.,,,,,
+infant_supp|0,infant_supp,Vitamin E Drops - Preterm (Aqua-E 50 IU/ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Preterm: 15-25 IU/day. Aqua-E ~50 IU/ml -> 0.3-0.5 ml/day. Give if unfortified human milk; HMF/preterm formula usually sufficient. Max 25 IU/day.,,,,,
+infant_supp|1,infant_supp,Ferrous Sulfate Drops - Preterm (15 mg Fe/0.6 ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Preterm: 2-4 mg elemental iron/kg/day. Max 15 mg/day. Start at 2-4 wk of age (or at full enteral feeds ~100 ml/kg/day). Continue to 6-12 mo corrected age. Conc = 25 mg Fe/ml.,,,,,
+infant_supp|2,infant_supp,Multivitamin (MTV) Drops - Preterm,,,,,,,,,,,,,"Non-standard dosing (not live-editable) - Preterm: 0.5-1 ml/day once tolerating full enteral feeds. Ensure formulation covers Vit A, C, D without exceeding upper limits with HMF.",,,,,
+infant_supp|3,infant_supp,Iron Drops - Term Breastfed (15 mg Fe/0.6 ml),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Term exclusively/partially breastfed: 1 mg elemental iron/kg/day (start per guideline). Continue until adequate iron-rich complementary foods introduced. Conc = 25 mg Fe/ml. Max 15 mg/day.,,,,,
+infant_supp|4,infant_supp,Ferrous Sulfate Tablet - Term Breastfed (65 mg elemental/tab),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Term exclusively/partially breastfed iron prophylaxis: 1 mg elemental iron/kg/day (start per guideline). Max 15 mg/day elemental Fe. Tab contains 65 mg elemental Fe. Dose calculated as elemental mg/day / 65.,,,,,
+infant_supp|5,infant_supp,Ferrous Gluconate Tablet - Term Breastfed (35 mg elemental/tab),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Term exclusively/partially breastfed iron prophylaxis: 1 mg elemental iron/kg/day (start per guideline). Max 15 mg/day elemental Fe. Tab contains 35 mg elemental Fe. Dose calculated as elemental mg/day / 35.,,,,,
+infant_supp|6,infant_supp,Vitamin D3 Drops - Infant (400 IU/drop or 400 IU/ml),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - All breastfed & partially breastfed infants from first days of life. Also formula-fed infants taking <1 L/day of fortified formula. Dose: 400 IU/day (1 drop if 400 IU/drop, or 1 ml if 400 IU/ml).",,,,,
+infectious|0,infectious,Clindamycin PO (75mg/5ml),10,,,450,,,,,15,,,,,Infection,PO,,,Dose based on severity
+infectious|1,infectious,Clindamycin IV,10,,,900,,,,,,,,,,Infection,IV,"NS, D5W",18 mg/mL,Infuse over 10-60 mins
+infectious|2,infectious,Metronidazole PO/IV,7.5,,,500,,,,,,,,,,Anaerobic Infect.,PO/IV,NS,5 mg/mL,Avoid alcohol
+infectious|3,infectious,Doxycycline PO,2.2,,,100,,,,,,,,,,Infection,PO,,,Avoid if <8 years
+infectious|4,infectious,Isoniazid (INH) PO - TB treatment,10,10,15,300,,1,,,,,,,,,,,,
+infectious|5,infectious,Rifampicin (RIF) PO - TB treatment,15,10,20,600,,1,,,,,,,,,,,,
+infectious|6,infectious,Pyrazinamide (PZA) PO - TB treatment,35,30,40,2000,,1,,,,,,,,,,,,
+infectious|7,infectious,Ethambutol (EMB) PO - TB treatment,20,15,25,1200,,1,,,,,,,,,,,,
+infectious|8,infectious,Pyridoxine (Vitamin B6) - give with INH,1,,,50,,1,,,,,,,,,,,,
+infectious|9,infectious,Isoniazid (INH) - TB preventive therapy (TPT/LTBI),10,10,15,300,,1,,,,,,,,,,,,
+infectious|10,infectious,Co-trimoxazole (TMP-SMX) - PCP prophylaxis,5,,,160,,1,,,8,,,,,,,,,
+infectious|11,infectious,Dapsone - PCP prophylaxis (alternative),2,,,100,,1,,,,,,,,,,,,
+infectious|12,infectious,Zidovudine (AZT) - neonatal HIV prophylaxis,4,,,,,2,,,,,,,,,,,,
+infectious|13,infectious,Lamivudine (3TC) - neonatal HIV prophylaxis,2,,,,,2,,,,,,,,,,,,
+infectious|14,infectious,Nevirapine (NVP) - neonatal HIV prophylaxis,4,,,,,1,,,,,,,,,,,,
+infectious|15,infectious,Prednisolone - TB meningitis adjunct,1,1,2,60,,1,,,,,,,,,,,,
+infectious|16,infectious,Levofloxacin (Lfx) - 2nd-line TB,15,15,20,1500,,1,,,,,,,,,,,,
+infectious|17,infectious,Moxifloxacin (Mfx) - 2nd-line TB,10,10,15,400,,1,,,,,,,,,,,,
+infectious|18,infectious,Bedaquiline (Bdq) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band fixed dosing with loading + 3x/week maintenance,,,,,
+infectious|19,infectious,Linezolid (Lzd) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band: <=15kg 15 mg/kg/day; >15kg 10-12 mg/kg/day (max 600),,,,,
+infectious|20,infectious,Clofazimine (Cfz) - 2nd-line TB,3,2,5,100,,1,,,,,,,,,,,,
+infectious|21,infectious,Cycloserine (Cs) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band: 7-<30kg 15-20; >=30kg 10-15 mg/kg/day div BID (max 1g),,,,,
+infectious|22,infectious,Delamanid (Dlm) - 2nd-line TB,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-band: 3-5y 25mg BID; 6-11y 50mg BID; 12-17y 100mg BID,,,,,
+infectious|23,infectious,Ethionamide (Eto) - 2nd-line TB,15,15,20,1000,,,,,,,,,,,,,,
+infectious|24,infectious,Para-aminosalicylic acid (PAS) - 2nd-line TB,200,200,300,10000,,,,,,,,,,,,,,
+infectious|25,infectious,Dolutegravir (DTG) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - weight-band: 3-<6kg 5mg; 6-<10kg 15mg; 10-<14kg 20mg; 14-<20kg 25mg; >=20kg 50mg OD,,,,,
+infectious|26,infectious,TLD (TDF/3TC/DTG 300/300/50) - ART FDC,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=30kg 1 tablet OD (first-line FDC),,,,,
+infectious|27,infectious,Abacavir (ABC) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 16 mg/kg OD; bands 14-<20kg 300; 20-<25kg 450; >25kg 600 OD,,,,,
+infectious|28,infectious,Lamivudine (3TC) - ART (treatment),,,,,,,,,,,,,Non-standard dosing (not live-editable) - 4 mg/kg q12h (max 150/dose),,,,,
+infectious|29,infectious,Zidovudine (AZT) - ART (treatment),,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 4-<9kg 12mg/kg; 9-30kg 9mg/kg; >=30kg 300mg q12h,,,,,
+infectious|30,infectious,Tenofovir DF (TDF) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 17-<22kg 150; 22-<28kg 200; 28-<35kg 250; >=35kg 300 OD,,,,,
+infectious|31,infectious,Emtricitabine (FTC) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 6 mg/kg OD (max 240); >33kg 200 OD,,,,,
+infectious|32,infectious,Efavirenz (EFV) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 10-<15kg 200; 15-<20kg 250; 20-<25kg 300; 25-<32.5kg 350; >=32.5kg 400 OD,,,,,
+infectious|33,infectious,Rilpivirine (RPV) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=12y & >=35kg 25mg OD with food,,,,,
+infectious|34,infectious,Etravirine (ETR) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 10-<20kg 100; 20-<25kg 125; 25-<30kg 150; >=30kg 200 q12h,,,,,
+infectious|35,infectious,Lopinavir/ritonavir (LPV/r) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - bands 15-25kg 200/50; >25-35kg 300/75; >35kg 400/100 q12h,,,,,
+infectious|36,infectious,Atazanavir/ritonavir (ATV/r) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 15-<35kg ATV200/r100; >=35kg ATV300/r100 OD,,,,,
+infectious|37,infectious,Darunavir/ritonavir (DRV/r) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - 15-40kg DRV600/r100; >40kg DRV900/r100 OD,,,,,
+infectious|38,infectious,Ritonavir (RTV) - PI booster,,,,,,,,,,,,,Non-standard dosing (not live-editable) - booster: <15kg 3mg/kg; >=15kg 2.5mg/kg q12h,,,,,
+infectious|39,infectious,Raltegravir (RAL) - ART,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=12y & >=25kg 400mg q12h (film-coated),,,,,
+infectious|40,infectious,TAF/FTC (25/200) - ART FDC,,,,,,,,,,,,,Non-standard dosing (not live-editable) - >=6y & >=25kg 1 tablet OD,,,,,
+allergy|0,allergy,Diphenhydramine PO/IV,1,,,50,,,,,,,,,,Allergy/Urticaria,PO/IV,NS,5 mg/mL,Sedating antihistamine
+allergy|1,allergy,Hydroxyzine PO,0.5,0.5,1,50,,,,,,,,,,Allergy/Pruritus,PO,,,Monitor sedation
+allergy|2,allergy,Loratadine PO (non-sedating),,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: 2-<6yr 5mg OD; >=6yr 5mg BID or 10mg OD,Allergic Rhinitis,PO,,,Weight/Age bands
+allergy|3,allergy,Montelukast PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based fixed: <6yr 4mg; 6-<15yr 5mg; >=15yr 10mg OD evening,Asthma,PO,,,Administer at bedtime
+allergy|4,allergy,Desloratadine PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 6-11mo 1mg; 1-5yr 1.25mg; 6-11yr 2.5mg; >=12yr 5mg OD,Allergic Rhinitis,PO,,,Weight/Age bands
+allergy|5,allergy,Bilastine PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 2-11yr (>=16kg) 10mg OD; >=12yr 20mg OD,Allergic Rhinitis,PO,,,Take 1h before or 2h after food
+allergy|6,allergy,Pseudoephedrine PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - age-based: 4-<6yr 15mg; 6-<12yr 30mg; >=12yr 60mg q4-6h,Nasal Congestion,PO,,,Avoid in children <4yr
+renal|0,renal,Nitrofurantoin PO (25mg/5ml),1.5,1.5,2,100,,,,,5,,,,,UTI,PO,,,Give with food
+renal|1,renal,Trimethoprim PO (UTI prophylaxis),2,,,100,,1,,,,,,,,,,,,
+renal|2,renal,Cefixime PO (100mg/5ml),8,,,400,,1,,,20,,,,,,,,,
+hematology|0,hematology,Tranexamic Acid IV/PO,10,10,15,1000,,,,,,,,,,Hemorrhage,IV/PO,NS,100 mg/mL,Infuse IV slowly
+hematology|1,hematology,Folic Acid PO,,,,,,,,,,,,,Non-standard dosing (not live-editable) - Weight-band dosing: <10 kg = 0.1 mg/day; >=10 kg = 1 mg/day. Hemolytic anemia/chronic hemolysis supplementation.,Deficiency,PO,,,Often dosed in mg
+dermatology|0,dermatology,Hydrocortisone 1% Cream (topical),,,,,,,,,,,,,Non-standard dosing (not live-editable) - Low-potency topical steroid for eczema/dermatitis. Not weight-based. Avoid prolonged use on face/skin folds - risk of atrophy.,Dermatitis,Topical,,,Apply thin layer
+dermatology|1,dermatology,Mupirocin 2% Ointment (topical),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - Impetigo/localized skin infection, or MRSA nasal decolonization (apply to nares BID x 5 days). Not weight-based.",Skin Infection,Topical,,,For impetigo/local inf.
+dermatology|2,dermatology,Permethrin 5% Cream (scabies),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - Standard scabies treatment, all ages >=2 months. Not weight-based - full-body application regardless of size. Treat household contacts simultaneously.",,,,,
+endocrine|0,endocrine,Levothyroxine PO (congenital hypothyroidism),,,,,,,,,,,,,"Non-standard dosing (not live-editable) - Age-banded mcg/kg/day (approximated here by weight as a rough proxy - dose by actual age and confirm with endocrinology, NOT pure weight): 0-3 mo ~12 mcg/kg/day; 3-12 mo ~8 mcg/kg/day; 1-5 yr ~6 mcg/kg/day; 6-12 yr ~4 mcg/kg/day; >12 yr ~2.5 mcg/kg/day.",Hypothyroid,PO,,,Empty stomach
+endocrine|1,endocrine,"Dextrose Gel 40% (oral/buccal, neonatal hypoglycemia)",,,,,,,,,,,,,Non-standard dosing (not live-editable) - 0.5 g/kg/dose (200 mg/kg as 40% gel = 0.4 g/ml). Max 10 ml/dose. First-line for asymptomatic/mild neonatal hypoglycemia before considering IV.,Hypoglycemia,Buccal,,,0.5 mL/kg; buccal rub

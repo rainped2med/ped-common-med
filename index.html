@@ -175,6 +175,8 @@
         @keyframes itemIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .cart-item-rx { font-family: 'SF Mono', 'Cascadia Code', ui-monospace, 'Courier New', Courier, monospace; font-weight: bold; font-size: 0.95em; color: var(--ink); line-height: 1.55; }
         .cart-item-note { font-size: 0.78em; color: var(--ink-muted); margin-top: 6px; }
+        .cart-item-clinical { font-size: 0.76em; color: var(--info-tx); background: var(--info-bg); border: 1px solid var(--info-bd); border-radius: 8px; padding: 7px 10px; margin-top: 8px; line-height: 1.5; }
+        .cart-item-clinical b { font-weight: 700; }
         .ivmix-box { margin-top: 10px; background: var(--info-bg); border: 1px solid var(--info-bd); border-radius: 10px; padding: 11px; }
         .ivmix-title { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--info-tx); font-weight: 800; margin-bottom: 8px; }
         .ivmix-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -1336,7 +1338,7 @@
             { name: "Ipratropium Nebulizer (250 mcg/ml)", rx: "Ipratropium Bromide {dose} ml Nebulized q 6 hr", note: "<20 kg: 1 ml (250 mcg). >=20 kg: 2 ml (500 mcg max). NOTE: single-agent ipratropium nebule often unavailable - use combined form (Combivent / Berodual). (Reviewer)", calc: w => (w < 20 ? "1" : "2") },
             { name: "Budesonide Nebulizer (0.5 mg/2ml respule)", rx: "Budesonide {dose} respule(s) Nebulized BID", note: "Asthma exacerbation: 0.5-1 mg neb q 10-15 min up to 3x in 1 hr (Thai AE guideline). Maintenance: 500 mcg total daily dose OD for age 6-11 yr (GINA). Max 2 mg/day.", calc: w => (w < 15 ? "1" : "2") },
             { name: "Dexamethasone PO/IV (4 mg/ml)", rx: "Dexamethasone (4 mg/ml) {dose} ml PO/IV x 1 dose for Croup", note: "Croup: 0.6 mg/kg x1 (max 16 mg). Asthma exacerbation: 0.6 mg/kg OD PO/IM/IV. Pre-extubation: 0.5 mg/kg/dose. Other indications - consult specialty. (Reviewer)", roundHalfMl: true, concMgMl: 4, doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 0.6, doseRange: [0.15, 0.6], maxMg: 16, calc: w => formatMlHalf(Math.min((w * 0.6) / 4, 4)) },
-            { name: "Prednisolone PO (5mg/5ml)", rx: "Prednisolone Syrup (5 mg/5 ml) {dose} ml PO OD for 3-5 days", note: "Asthma: 1-2 mg/kg/day. Max by AGE (enter age): 20 mg/day <2 yr; 30 mg/day 2-5 yr; 40 mg/day >5 yr (Thai asthma GL). Syrup 1 mg/ml.", roundHalfMl: true, calc: w => { var a = getAgeDays(); var cap = a == null ? 40 : (a < 2 * 365.25 ? 20 : (a <= 5 * 365.25 ? 30 : 40)); return formatMlHalf(Math.min(w * 1, cap)); } },
+            { name: "Prednisolone PO (5 mg tablet)", rx: "Prednisolone (5 mg tab) {dose} mg PO OD for 3-5 days", note: "Asthma: 1-2 mg/kg/day. Max by AGE (enter age): 20 mg/day <2 yr; 30 mg/day 2-5 yr; 40 mg/day >5 yr (Thai asthma GL). 5 mg tablets (halvable to 2.5 mg); tablets = dose / 5.", decimals: 1, calc: w => { var a = getAgeDays(); var cap = a == null ? 40 : (a < 2 * 365.25 ? 20 : (a <= 5 * 365.25 ? 30 : 40)); var mg = Math.round(Math.min(w * 1, cap) / 2.5) * 2.5; return formatDoseValue(mg, { decimals: 1 }); } },
             { name: "Hydrocortisone IV", rx: "Hydrocortisone {dose} mg IV q 6 hr", note: "Asthma: 5 mg/kg/dose q6 hr. Max 250 mg/dose (Thai asthma GL).", doseAdjustable: true, doseUnit: "mg/kg/dose", standardMgKg: 5, doseRange: [2, 5], maxMg: 250, decimals: 0, defaultVolume: 50, calc: w => formatDoseValue(Math.min(w * 5, 250), { decimals: 0 }) },
             { name: "Adrenaline Nebulizer (Croup) (1:1,000)", rx: "Epinephrine 1:1,000 (1 mg/ml) {dose} ml + NS to 5 ml Nebulized", note: "Croup: 0.05-0.1 ml/kg, max 0.5 ml/dose, diluted in 2-3 ml NSS (Lexidrug). Lock to croup indication.", roundHalfMl: true, calc: w => formatMlHalf(Math.min(w * 0.5, 5)) },
             { name: "Magnesium Sulfate IV (Asthma)", rx: "Magnesium Sulfate (500 mg/ml) {dose} ml IV over 20 mins", note: "Asthma: 25-50 mg/kg over 20-60 min (Thai AS GL). Max 2000 mg/dose (Lexidrug: <30 kg max 4 g, >30 kg max 8 g/day cumulative).", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 50) / 500, 4)), doseAdjustable: true, standardMgKg: 50, doseUnit: "mg/kg/dose", maxMg: 2000, concMgMl: 500 },
@@ -1768,6 +1770,18 @@
     }
 
     const ALLOWED_OVERRIDE_FIELDS = ["standardMgKg", "maxMg", "maxMgPerDay", "dosesPerDay", "concMgMl", "note", "rx"];
+    /* Informational (non-dosing) columns from the enriched sheet. Applied to ANY drug by key,
+       displayed in the card but never fed into the dosing math. Sheet header -> med field. */
+    const INFO_OVERRIDE_FIELDS = {
+        "indication": "indication",
+        "route": "route",
+        "compatible_diluent": "diluent",
+        "diluent": "diluent",
+        "max_peripheral_conc": "maxConc",
+        "maxconc": "maxConc",
+        "special_dosing": "special",
+        "special": "special"
+    };
 
     function normalizeRow(row) {
         const norm = {};
@@ -1808,6 +1822,11 @@
                 const derived = deriveConcMgMl(row);
                 if (derived != null) entry.concMgMl = derived;
             }
+            Object.keys(INFO_OVERRIDE_FIELDS).forEach(col => {
+                const v = row[col];
+                if (v === undefined || v === "" || String(v).trim().toUpperCase() === "N/A") return;
+                entry[INFO_OVERRIDE_FIELDS[col]] = String(v).trim();
+            });
             if (Object.keys(entry).length) overrides[key] = entry;
         });
         return overrides;
@@ -1822,16 +1841,25 @@
             const catId = key.slice(0, pipe);
             const medIdx = key.slice(pipe + 1);
             const med = getMed(catId, medIdx);
-            if (!med || !med.doseAdjustable) return;
+            if (!med) return;
             const entry = { ...overrides[key] };
-            if (entry.maxCap !== undefined) {
-                const cap = entry.maxCap;
-                delete entry.maxCap;
-                if (med.maxMg !== undefined) entry.maxMg = cap;
-                else entry.maxMgPerDay = cap;
+            /* Informational fields apply to ANY drug (not gated by doseAdjustable). */
+            const infoTargets = new Set(Object.values(INFO_OVERRIDE_FIELDS));
+            const info = {};
+            infoTargets.forEach(f => { if (entry[f] !== undefined) { info[f] = entry[f]; delete entry[f]; } });
+            let touched = false;
+            if (Object.keys(info).length) { Object.assign(med, info); touched = true; }
+            /* Dosing fields only apply to dose-adjustable drugs. */
+            if (med.doseAdjustable) {
+                if (entry.maxCap !== undefined) {
+                    const cap = entry.maxCap;
+                    delete entry.maxCap;
+                    if (med.maxMg !== undefined) entry.maxMg = cap;
+                    else entry.maxMgPerDay = cap;
+                }
+                if (Object.keys(entry).length) { Object.assign(med, entry); touched = true; }
             }
-            Object.assign(med, entry);
-            applied++;
+            if (touched) applied++;
         });
         return applied;
     }
@@ -2882,6 +2910,18 @@
             }
             div.appendChild(rxLine);
             div.appendChild(noteLine);
+            const clinBits = [];
+            if (med.indication) clinBits.push(`<b>Indication:</b> ${med.indication}`);
+            if (med.route) clinBits.push(`<b>Route:</b> ${med.route}`);
+            if (med.diluent) clinBits.push(`<b>Diluent:</b> ${med.diluent}`);
+            if (med.maxConc) clinBits.push(`<b>Max periph. conc:</b> ${med.maxConc}`);
+            if (med.special) clinBits.push(`<b>Note:</b> ${med.special}`);
+            if (clinBits.length) {
+                const clin = document.createElement("div");
+                clin.className = "cart-item-clinical";
+                clin.innerHTML = clinBits.join(" &nbsp;·&nbsp; ");
+                div.appendChild(clin);
+            }
             if (item.statDose) {
                 const statNote = document.createElement("div");
                 statNote.className = "stat-note";
