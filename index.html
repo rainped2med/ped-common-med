@@ -971,12 +971,31 @@
         };
     }
 
+    /* Parse a drug's Compatible_Diluent text into which fluids are allowed.
+       If the text names no fluid (e.g. "Central preferred"), we have no info -> allow both. */
+    function ivDiluentCompat(med) {
+        const d = (med.diluent || "").toUpperCase();
+        const nss = /\bNS\b|SALINE|NSS|D5NS|0\.45/.test(d);
+        const d5w = /D5W|D5NS|DEXTROSE|D10/.test(d);
+        const hasInfo = nss || d5w;
+        return { nss: hasInfo ? nss : true, d5w: hasInfo ? d5w : true, hasInfo, text: med.diluent || "" };
+    }
+
     /* Recommend the diluent from the drug's Compatible_Diluent enrichment (falls back to NSS). */
     function recommendIvDiluent(med) {
-        const d = (med.diluent || "").toUpperCase();
-        if (/\bNS\b|SALINE|NSS/.test(d)) return "NSS";
-        if (/D5W|DEXTROSE|D10/.test(d)) return "D5W";
+        const c = ivDiluentCompat(med);
+        if (c.nss) return "NSS";
+        if (c.d5w) return "D5W";
         return "NSS";
+    }
+
+    /* Warning string if the chosen diluent conflicts with the drug's compatibility (else ""). */
+    function ivDiluentWarning(med, chosen) {
+        const c = ivDiluentCompat(med);
+        if (!c.hasInfo || chosen === "Other") return "";
+        if (chosen === "NSS" && !c.nss) return `⚠ ${med.name.split(" (")[0]} is not compatible with normal saline — use ${c.text}.`;
+        if (chosen === "D5W" && !c.d5w) return `⚠ ${med.name.split(" (")[0]} is not compatible with D5W — use ${c.text}.`;
+        return "";
     }
 
     /* Default the dosing interval from the drug's frequency, snapped to a preset. */
@@ -1069,6 +1088,13 @@
             warnEl.style.display = "";
         } else if (warnEl) {
             warnEl.style.display = "none";
+        }
+
+        const dilwarnEl = box.querySelector('[data-ivmix="dilwarn"]');
+        if (dilwarnEl) {
+            const msg = ivDiluentWarning(med, item.ivMix.diluent);
+            dilwarnEl.textContent = msg;
+            dilwarnEl.style.display = msg ? "" : "none";
         }
 
         const orderEl = box.querySelector(".ivmix-order");
@@ -3019,6 +3045,7 @@
                         </div>
                     </div>
                     ${mix && mix.volumeTooLow ? '<p class="ivmix-warn" data-ivmix="warn">Total volume is less than drug volume — increase total bag volume.</p>' : ""}
+                    ${ivDiluentWarning(med, item.ivMix.diluent) ? `<p class="ivmix-warn" data-ivmix="dilwarn">${ivDiluentWarning(med, item.ivMix.diluent)}</p>` : '<p class="ivmix-warn" data-ivmix="dilwarn" style="display:none"></p>'}
                 `;
                 const inputs = box.querySelectorAll(".ivmix-grid input");
                 const sel = box.querySelector("select");
