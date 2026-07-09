@@ -460,6 +460,7 @@
                         <option value="infant_supp" data-i18n="cat_infant_supp">Infant supplementation</option>
                         <option value="pals" data-i18n="cat_pals">PALS — Pediatric Advanced Life Support</option>
                         <option value="ncpr" data-i18n="cat_ncpr">NCPR / NRP — Neonatal Resuscitation</option>
+                        <option value="neonatal" data-i18n="cat_neonatal">Neonatology — ward formulary</option>
                     </select>
                     <select id="medication" onchange="onBrowseMedSelect()" disabled>
                         <option value="" data-i18n="medicationPlaceholder">-- Medication --</option>
@@ -548,6 +549,7 @@
             cat_infant_supp: "Infant supplementation",
             cat_pals: "PALS — Pediatric Advanced Life Support",
             cat_ncpr: "NCPR / NRP — Neonatal Resuscitation",
+            cat_neonatal: "Neonatology — ward formulary",
             cat_tb_hiv: "TB & HIV",
             themeDark: "Dark",
             themeLight: "Light"
@@ -599,6 +601,7 @@
             cat_infant_supp: "อาหารเสริมสำหรับทารก",
             cat_pals: "PALS — การช่วยชีวิตขั้นสูงในเด็ก",
             cat_ncpr: "NCPR / NRP — การกู้ชีพทารกแรกเกิด",
+            cat_neonatal: "ทารกแรกเกิด — รายการยา",
             cat_tb_hiv: "วัณโรค และ เอชไอวี",
             themeDark: "มืด",
             themeLight: "สว่าง"
@@ -1663,6 +1666,47 @@
         endocrine: [
             { name: "Levothyroxine PO (congenital hypothyroidism)", rx: "Levothyroxine {dose} mcg PO OD", note: "Age-banded mcg/kg/day (approximated here by weight as a rough proxy — dose by actual age and confirm with endocrinology, NOT pure weight): 0–3 mo ≈12 mcg/kg/day; 3–12 mo ≈8 mcg/kg/day; 1–5 yr ≈6 mcg/kg/day; 6–12 yr ≈4 mcg/kg/day; >12 yr ≈2.5 mcg/kg/day.", decimals: 0, calc: w => { let mcgKg; if (w <= 5) mcgKg = 12; else if (w <= 10) mcgKg = 8; else if (w <= 20) mcgKg = 6; else if (w <= 40) mcgKg = 4; else mcgKg = 2.5; return formatDoseValue(w * mcgKg, { decimals: 0 }); } },
             { name: "Dextrose Gel 40% (oral/buccal, neonatal hypoglycemia)", rx: "Dextrose Gel 40% {dose} ml PO/buccal massaged into cheek mucosa", note: "0.5 g/kg/dose (200 mg/kg as 40% gel = 0.4 g/ml). Max 10 ml/dose. First-line for asymptomatic/mild neonatal hypoglycemia before considering IV.", roundHalfMl: true, calc: w => formatMlHalf(Math.min((w * 0.5) / 0.4, 10)) }
+        ],
+        neonatal: [
+            /* ===== Neonatology ward formulary — NEONATAL doses. Intervals for aminoglycosides &
+               vancomycin depend on gestational (GA) & postnatal age (PNA); confirm with Neofax/NICU protocol. ===== */
+            /* --- Antibiotics / antivirals / antifungals --- */
+            { name: "Ampicillin IV (neonate)", rx: "Ampicillin {dose} mg IV q 8-12 hr", note: "Sepsis 50 mg/kg/dose; meningitis/GBS 100 mg/kg/dose. Interval q12h (<=7 days / preterm) or q8h (term >7 days). Covers GBS + Listeria; pair with gentamicin.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 50, 2000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 50, doseRange: [50, 100], doseUnit: "mg/kg/dose", maxMg: 2000 },
+            { name: "Cloxacillin IV (neonate)", rx: "Cloxacillin {dose} mg IV q 8-12 hr", note: "25-50 mg/kg/dose (anti-staphylococcal). Interval by PNA. Max 2000 mg/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 25, 2000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 25, doseRange: [25, 50], doseUnit: "mg/kg/dose", maxMg: 2000 },
+            { name: "Penicillin G IV (neonate)", rx: "Penicillin G {dose} units IV q 8-12 hr", note: "50,000 units/kg/dose (GBS/congenital syphilis; meningitis up to 100,000 u/kg/dose). Interval by PNA.", decimals: 0, calc: w => formatDoseValue(w * 50000, { decimals: 0 }), doseAdjustable: true, standardMgKg: 50000, doseRange: [50000, 100000], doseUnit: "units/kg/dose" },
+            { name: "Gentamicin IV (neonate)", rx: "Gentamicin {dose} mg IV (interval by GA/PNA)", note: "4-5 mg/kg/dose extended-interval. Term: q24h; preterm: q36-48h. CONFIRM interval by GA/PNA; monitor levels & renal function.", decimals: 1, calc: w => formatDoseValue(w * 4, { decimals: 1 }), doseAdjustable: true, standardMgKg: 4, doseRange: [4, 5], doseUnit: "mg/kg/dose" },
+            { name: "Amikacin IV (neonate)", rx: "Amikacin {dose} mg IV (interval by GA/PNA)", note: "15 mg/kg/dose extended-interval. Term: q24h; preterm: q36-48h. CONFIRM interval by GA/PNA; monitor levels.", decimals: 0, calc: w => formatDoseValue(w * 15, { decimals: 0 }), doseAdjustable: true, standardMgKg: 15, doseRange: [15, 18], doseUnit: "mg/kg/dose" },
+            { name: "Cefotaxime IV (neonate)", rx: "Cefotaxime {dose} mg IV q 8-12 hr", note: "50 mg/kg/dose. Interval q12h (<=7 days) or q8h (>7 days); meningitis q6-8h. Max 2000 mg/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 50, 2000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 50, doseUnit: "mg/kg/dose", maxMg: 2000 },
+            { name: "Ceftazidime IV (neonate)", rx: "Ceftazidime {dose} mg IV q 8-12 hr", note: "30-50 mg/kg/dose (Pseudomonas cover). Interval by PNA. Max 2000 mg/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 50, 2000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 50, doseRange: [30, 50], doseUnit: "mg/kg/dose", maxMg: 2000 },
+            { name: "Meropenem IV (neonate)", rx: "Meropenem {dose} mg IV q 8-12 hr", note: "20 mg/kg/dose; meningitis/Pseudomonas 40 mg/kg/dose. Interval by PNA. Max 2000 mg/dose.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 20, 2000), { decimals: 0 }), doseAdjustable: true, standardMgKg: 20, doseRange: [20, 40], doseUnit: "mg/kg/dose", maxMg: 2000 },
+            { name: "Vancomycin IV (neonate)", rx: "Vancomycin {dose} mg IV (interval by GA/PNA)", note: "15 mg/kg/dose. Interval q8-24h by GA/PNA (target trough). CONFIRM by protocol; monitor levels & renal function.", decimals: 0, calc: w => formatDoseValue(w * 15, { decimals: 0 }), doseAdjustable: true, standardMgKg: 15, doseRange: [10, 15], doseUnit: "mg/kg/dose" },
+            { name: "Metronidazole IV (neonate)", rx: "Metronidazole {dose} mg IV q 12 hr", note: "7.5 mg/kg/dose q12h (loading 15 mg/kg once). Anaerobic cover / NEC. Interval widens in preterm.", decimals: 0, calc: w => formatDoseValue(Math.min(w * 7.5, 500), { decimals: 0 }), doseAdjustable: true, standardMgKg: 7.5, doseUnit: "mg/kg/dose", maxMg: 500 },
+            { name: "Fluconazole IV/PO (neonate)", rx: "Fluconazole {dose} mg IV/PO (interval by PNA)", note: "Treatment 12 mg/kg/dose (loading then q24-72h by PNA); prophylaxis 3-6 mg/kg twice weekly. Invasive candidiasis.", decimals: 0, calc: w => formatDoseValue(w * 12, { decimals: 0 }), doseAdjustable: true, standardMgKg: 12, doseRange: [6, 12], doseUnit: "mg/kg/dose" },
+            { name: "Acyclovir IV (neonate)", rx: "Acyclovir {dose} mg IV q 8 hr", note: "20 mg/kg/dose q8h x 14-21 days (neonatal HSV). Maintain hydration; monitor renal function.", decimals: 0, calc: w => formatDoseValue(w * 20, { decimals: 0 }), doseAdjustable: true, standardMgKg: 20, doseUnit: "mg/kg/dose" },
+            /* --- Respiratory / CNS --- */
+            { name: "Caffeine citrate IV/PO (neonate)", rx: "Caffeine citrate {dose} mg IV over 30 min (loading)", note: "Loading 20 mg/kg, then maintenance 5-10 mg/kg/day OD. Apnea of prematurity; start <32 wk within 3 days. Monitor HR.", decimals: 0, calc: w => formatDoseValue(w * 20, { decimals: 0 }), doseAdjustable: true, standardMgKg: 20, doseUnit: "mg/kg/dose" },
+            { name: "Phenobarbital IV (neonate)", rx: "Phenobarbital {dose} mg IV loading (over 20-30 min)", note: "Loading 20 mg/kg; repeat 10 mg/kg q20 min (max 40 mg/kg). Maintenance 3-5 mg/kg/day. 1st-line neonatal seizures/HIE. Monitor respiration.", decimals: 0, calc: w => formatDoseValue(w * 20, { decimals: 0 }), doseAdjustable: true, standardMgKg: 20, doseUnit: "mg/kg/dose" },
+            { name: "Poractant alfa (Curosurf) - surfactant", rx: "Poractant alfa {dose} mg intratracheal (first dose)", note: "100-200 mg/kg first dose (1.25-2.5 ml/kg); repeat 100 mg/kg q12h PRN. RDS. Give within 2 h (rescue) or prophylactic <27 wk.", decimals: 0, calc: w => formatDoseValue(w * 200, { decimals: 0 }), doseAdjustable: true, standardMgKg: 200, doseRange: [100, 200], doseUnit: "mg/kg/dose" },
+            /* --- Cardiovascular (continuous infusions - dose range only, use infusion calculator) --- */
+            { name: "Dopamine infusion (neonate)", rx: "Dopamine {dose} - continuous IV infusion", note: "5-20 mcg/kg/min. First vasopressor for neonatal hypotension. UVC/central preferred. Use the infusion dilution calculator.", calc: w => null },
+            { name: "Dobutamine infusion (neonate)", rx: "Dobutamine {dose} - continuous IV infusion", note: "5-20 mcg/kg/min. Preferred for low cardiac output with normal BP. Use the infusion dilution calculator.", calc: w => null },
+            { name: "Adrenaline infusion (neonate)", rx: "Adrenaline {dose} - continuous IV infusion", note: "0.05-1 mcg/kg/min. Refractory hypotension. Central line preferred. Use the infusion dilution calculator.", calc: w => null },
+            { name: "Prostaglandin E1 / Alprostadil infusion", rx: "Alprostadil (PGE1) {dose} - continuous IV infusion", note: "Start 0.01 mcg/kg/min; titrate 0.01-0.1. Duct-dependent CHD. HIGH apnea risk - have ETT ready. Use the infusion dilution calculator.", calc: w => null },
+            { name: "Hydrocortisone IV (neonate)", rx: "Hydrocortisone {dose} mg IV q 8 hr", note: "1 mg/kg/dose q8h (refractory hypotension / relative adrenal insufficiency, esp. preterm).", decimals: 1, calc: w => formatDoseValue(w * 1, { decimals: 1 }), doseAdjustable: true, standardMgKg: 1, doseUnit: "mg/kg/dose" },
+            { name: "Furosemide IV (neonate)", rx: "Furosemide {dose} mg IV q 12-24 hr", note: "1 mg/kg/dose. Interval q12-24h (q24h in preterm - long half-life). Monitor electrolytes; ototoxic if rapid.", decimals: 1, calc: w => formatDoseValue(Math.min(w * 1, 2), { decimals: 1 }), doseAdjustable: true, standardMgKg: 1, doseUnit: "mg/kg/dose", maxMg: 2 },
+            /* --- Fluids / metabolic --- */
+            { name: "Calcium gluconate 10% (neonate)", rx: "Calcium gluconate 10% (100 mg/ml) {dose} ml IV slow", note: "Acute hypocalcemia 1-2 ml/kg/dose (100-200 mg/kg) slow IV with ECG; or 1-2 ml/kg/day infusion. Extravasation causes necrosis.", roundHalfMl: true, concMgMl: 100, doseAdjustable: true, standardMgKg: 100, doseUnit: "mg/kg/dose", maxMg: 200, calc: w => formatMlHalf(w * 1) },
+            { name: "Dextrose D10W bolus (neonate)", rx: "D10W {dose} ml IV bolus (200 mg/kg)", note: "2 ml/kg D10W for hypoglycemia. AVOID D25W/D50W (hyperosmolar). Follow with glucose infusion; recheck BGL q30-60 min.", roundHalfMl: true, calc: w => formatMlHalf(w * 2) },
+            { name: "Sodium bicarbonate 4.2% (neonate)", rx: "Sodium bicarbonate 4.2% (0.5 mEq/ml) {dose} ml IV slow >=5 min", note: "1-2 mEq/kg (2-4 ml/kg of 4.2%) slow, ONLY after adequate ventilation. Dilute 1:1 to 4.2%.", roundHalfMl: true, calc: w => formatMlHalf(w * 2) },
+            { name: "Vitamin K1 (phytonadione) IM (neonate)", rx: "Vitamin K1 {dose} mg IM once at birth", note: "1 mg IM (>=1500 g); 0.5 mg IM (<1500 g). All newborns - hemorrhagic disease prevention.", decimals: 1, calc: w => (w < 1.5 ? "0.5" : "1") },
+            /* --- Analgesia / sedation --- */
+            { name: "Morphine IV (neonate)", rx: "Morphine {dose} mg IV slow q 4-6 hr", note: "0.05-0.1 mg/kg/dose. Monitor for respiratory depression/hypotension; longer half-life in neonates.", decimals: 2, calc: w => formatDoseValue(w * 0.05, { decimals: 2 }), doseAdjustable: true, standardMgKg: 0.05, doseRange: [0.05, 0.1], doseUnit: "mg/kg/dose" },
+            { name: "Fentanyl IV (neonate)", rx: "Fentanyl {dose} mcg IV slow", note: "1-2 mcg/kg/dose. Procedural/ventilated analgesia. Chest-wall rigidity if rapid push.", decimals: 1, calc: w => formatDoseValue(w * 1, { decimals: 1 }), doseAdjustable: true, standardMgKg: 1, doseRange: [1, 2], doseUnit: "mcg/kg/dose" },
+            { name: "Midazolam IV (neonate)", rx: "Midazolam {dose} mg IV slow", note: "0.05-0.15 mg/kg/dose. CAUTION in neonates (hypotension, myoclonus); avoid rapid push. Not preferred in preterm.", decimals: 2, calc: w => formatDoseValue(w * 0.05, { decimals: 2 }), doseAdjustable: true, standardMgKg: 0.05, doseRange: [0.05, 0.15], doseUnit: "mg/kg/dose" },
+            /* --- GI / other --- */
+            { name: "Omeprazole PO (neonate)", rx: "Omeprazole {dose} mg PO OD", note: "0.5-1 mg/kg/day once daily (symptomatic GERD; use judiciously in neonates).", decimals: 1, calc: w => formatDoseValue(Math.min(w * 0.7, 20), { decimals: 1 }), doseAdjustable: true, standardMgKg: 0.7, doseRange: [0.5, 1], doseUnit: "mg/kg/day", dosesPerDay: 1, maxMg: 20 },
+            { name: "Paracetamol PO (neonate)", rx: "Paracetamol {dose} mg PO q 6-8 hr", note: "10-15 mg/kg/dose q6-8h (term; q8-12h preterm). Max 60 mg/kg/day term. (PDA closure protocol uses higher IV dosing - specialist.)", decimals: 0, calc: w => formatDoseValue(w * 12, { decimals: 0 }), doseAdjustable: true, standardMgKg: 12, doseRange: [10, 15], doseUnit: "mg/kg/dose" },
+            { name: "Naloxone (neonate)", rx: "Naloxone (0.4 mg/ml) {dose} mg IV/IM", note: "0.1 mg/kg. ONLY if maternal opioid within 4 h AND HR >100 after effective PPV. NOT for routine birth depression.", decimals: 2, calc: w => formatDoseValue(w * 0.1, { decimals: 2 }), doseAdjustable: true, standardMgKg: 0.1, doseUnit: "mg/kg/dose" }
         ]
     };
 
