@@ -189,6 +189,12 @@
         .ivmix-readonly { padding: 7px 9px; font-size: 0.82em; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 7px; color: var(--ink); }
         .ivmix-warn { margin-top: 6px; font-size: 0.78em; color: var(--danger-tx); font-weight: 600; }
         .ivmix-rec { color: var(--ink-muted); font-weight: 400; }
+        .ivmix-dose-hint { font-size: 0.75em; color: var(--ink-soft); margin: -2px 0 8px; }
+        .neo-dose-box { margin-top: 10px; background: var(--info-bg); border: 1px solid var(--info-bd); border-radius: 10px; padding: 11px; }
+        .neo-dose-row { display: flex; align-items: center; gap: 10px; }
+        .neo-dose-row label { font-size: 0.8em; color: var(--ink-soft); font-weight: 600; }
+        .neo-dose-row input { max-width: 130px; padding: 7px 9px; font-size: 0.9em; border-color: var(--brand-blue); font-weight: 700; }
+        .ivmix-grid input[data-ivmix="dose"] { border-color: var(--brand-blue); font-weight: 700; }
         .ivmix-interval-cell { grid-column: 1 / -1; }
         .ivmix-chips { display: flex; flex-wrap: wrap; gap: 6px; }
         .ivmix-chip { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--field-border); background: var(--field-bg); color: var(--ink-soft); font-size: 0.8em; font-weight: 700; cursor: pointer; transition: all 0.12s ease; font-family: inherit; }
@@ -961,6 +967,41 @@
         return Number(((range.min + range.max) / 2).toFixed(2));
     }
 
+    /* Round a dose UP to a nurse-mixable step so the suggested number is practical. */
+    function roundUpMix(mg) {
+        if (mg == null || isNaN(mg) || mg <= 0) return mg;
+        let step;
+        if (mg >= 100) step = 10;
+        else if (mg >= 20) step = 5;
+        else if (mg >= 1) step = 0.5;
+        else step = 0.1;
+        return parseFloat((Math.ceil(mg / step) * step).toFixed(2));
+    }
+
+    /* Unit-aware round-up for neonatal simple doses so the number is practical to draw up. */
+    function roundUpNeo(val, unit) {
+        if (val == null || isNaN(val) || val <= 0) return val;
+        if (unit === "units") return Math.ceil(val / 1000) * 1000;
+        if (unit === "ml" || unit === "mcg" || unit === "mEq") return parseFloat((Math.ceil(val * 10) / 10).toFixed(2));
+        return roundUpMix(val); // mg
+    }
+
+    /* Auto-suggested (rounded-up) dose in mg for an IV-mix drug: from neonatal mg/kg if present,
+       otherwise from the standard weight-based calculation. */
+    function getBaseDoseMg(med, w) {
+        if (!w || w <= 0) return null;
+        if (med.neoDoseMgKg) return roundUpMix(med.neoDoseMgKg * w);
+        const d = parseFloat(calculateMedDose(med, w));
+        return isNaN(d) ? null : roundUpMix(d);
+    }
+
+    /* Dose actually used for the IV mix: the user's override if they typed one, else the suggestion. */
+    function effectiveIvDose(med, w, item) {
+        const ov = item && item.ivMix ? item.ivMix.doseOverride : null;
+        if (ov != null && ov !== "" && !isNaN(parseFloat(ov)) && parseFloat(ov) > 0) return parseFloat(ov);
+        return getBaseDoseMg(med, w);
+    }
+
     function buildDefaultIvMix(med, dose) {
         const standardConc = getStandardIvConc(med);
         const mgDose = parseFloat(dose);
@@ -1060,7 +1101,7 @@
         const item = rxCart.find(x => x.id === itemId);
         if (!item || !item.ivMix) return;
         const med = getMed(item.catId, item.medIdx);
-        if (!med || !isIvAntibiotic(med)) return;
+        if (!med || !(isIvAntibiotic(med) || med.ivMix)) return;
 
         const box = document.querySelector(`.cart-item[data-cart-id="${itemId}"] .ivmix-box`);
         if (!box) {
@@ -1069,7 +1110,7 @@
         }
 
         const w = getWeight();
-        const dose = w ? calculateMedDose(med, w) : null;
+        const dose = w ? effectiveIvDose(med, w, item) : null;
         const mix = w && dose != null ? computeIvMix(med, dose, item.ivMix) : null;
 
         const setText = (sel, text) => {
@@ -1077,6 +1118,8 @@
             if (el) el.textContent = text;
         };
 
+        const mgKgNow = (dose != null && w) ? +(dose / w).toFixed(2) : null;
+        setText('[data-ivmix="mgkg"]', mgKgNow != null ? `= ${mgKgNow} mg/kg` : "");
         setText('[data-ivmix="drugMl"]', mix && !isNaN(mix.drugMl) ? String(mix.drugMl) : "—");
         const diluentTxt = mix && !isNaN(mix.diluentMl) ? String(Math.max(0, mix.diluentMl)) : "—";
         setText('[data-ivmix="diluentMl"]', diluentTxt);
@@ -1108,6 +1151,11 @@
         if (orderEl) {
             const mixLine = w && dose != null ? buildIvMixOrderLine(med, dose, item.ivMix) : null;
             orderEl.textContent = mixLine || "Enter weight to calculate IV mix volume and order line.";
+            if (mixLine) {
+                item.plain = mixLine;
+                const rxEl = document.querySelector(`.cart-item[data-cart-id="${itemId}"] .cart-item-rx`);
+                if (rxEl) rxEl.textContent = item.statDose ? stripFrequencyForStat(mixLine) : mixLine;
+            }
         }
     }
 
@@ -1187,7 +1235,7 @@
     }
 
     function buildIvMixOrderLine(med, dose, ivMix) {
-        if (!isIvAntibiotic(med) || !ivMix) return null;
+        if (!(isIvAntibiotic(med) || med.ivMix) || !ivMix) return null;
         const mgDose = parseFloat(dose);
         if (isNaN(mgDose)) return null;
         const mix = computeIvMix(med, dose, ivMix);
@@ -1676,42 +1724,42 @@
                neonatal dosing is gestational- (GA) & postnatal-age (PNA) dependent, so each drug shows a
                "Dosing reference" the neonatologist reads to decide the dose. refOnly = no computed number. ===== */
             /* --- Antibiotics / antivirals / antifungals --- */
-            { name: "Ampicillin IV (neonate)", rx: "Ampicillin IV — dose per neonatal reference (GA/PNA)", refOnly: true, reference: "GA <35 wk:\n  ≤ 7 d PNA: 50 mg/kg/dose q12h\n  8–28 d PNA: 75 mg/kg/dose q12h\nGA ≥35 wk:\n  ≤ 28 d PNA: 50 mg/kg/dose q8h" },
-            { name: "Cloxacillin IV (neonate)", rx: "Cloxacillin IV — dose per neonatal reference (GA/PNA)", refOnly: true, reference: "25–50 mg/kg/dose q8–12h (GA-dependent)." },
-            { name: "Penicillin G IV (neonate)", rx: "Penicillin G IV — dose per neonatal reference (GA/PNA)", refOnly: true, reference: "50,000 units/kg/dose q8–12h (GA-dependent)." },
-            { name: "Gentamicin IV (neonate)", rx: "Gentamicin IV — dose per neonatal reference + TDM", refOnly: true, reference: "Typically 4–5 mg/kg/dose. Interval q24–48h depending on GA & weight. Relies on protocol + therapeutic drug monitoring (TDM)." },
-            { name: "Amikacin IV (neonate)", rx: "Amikacin IV — dose per neonatal reference + TDM", refOnly: true, reference: "Typically 15–20 mg/kg/dose q24–48h depending on GA. Relies on protocol + TDM." },
-            { name: "Cefotaxime IV (neonate)", rx: "Cefotaxime IV — dose per neonatal reference (GA/PNA)", refOnly: true, reference: "50 mg/kg/dose.\nGA <32 wk: <7 d q12h; 7–28 d q8h.\nGA ≥32 wk: ≤7 d q12h; 8–28 d q8h." },
-            { name: "Ceftazidime IV (neonate)", rx: "Ceftazidime IV — dose per neonatal reference (GA/PNA)", refOnly: true, reference: "Typically 50 mg/kg/dose q8–12h depending on GA." },
-            { name: "Meropenem IV (neonate)", rx: "Meropenem IV — dose per neonatal reference (GA/PNA)", refOnly: true, reference: "GA <32 wk: <14 d 20 mg/kg/dose q12h; ≥14 d q8h.\nGA ≥32 wk: <14 d 20 mg/kg/dose q8h; ≥14 d 30 mg/kg/dose q8h.\nElevated MIC pathogens: 40 mg/kg/dose." },
-            { name: "Vancomycin IV (neonate)", rx: "Vancomycin IV — dose per neonatal reference + TDM", refOnly: true, reference: "Typically 10–20 mg/kg/dose q8–24h depending on PMA & serum creatinine. Relies on protocol + TDM." },
-            { name: "Metronidazole IV (neonate)", rx: "Metronidazole IV — dose per neonatal reference (GA)", refOnly: true, reference: "Loading 15 mg/kg once (all ages), then 24 h later:\nGA 23–<34 wk: 7.5 mg/kg/dose q12h\nGA 34–40 wk: 7.5 mg/kg/dose q8h\nGA ≥40 wk: 7.5 mg/kg/dose q6h (or 10 mg/kg q8h)." },
-            { name: "Fluconazole IV/PO (neonate)", rx: "Fluconazole IV/PO — dose per neonatal reference", refOnly: true, reference: "Treatment: load 25 mg/kg day 1, then 12 mg/kg/dose once daily.\nProphylaxis: 3–6 mg/kg/dose twice weekly." },
-            { name: "Acyclovir IV (neonate)", rx: "Acyclovir IV — dose per neonatal reference (PMA)", refOnly: true, reference: "PMA <30 wk: 20 mg/kg/dose q12h\nPMA 30–<36 wk: 20 mg/kg/dose q8h\nPMA 36–41 wk: 20 mg/kg/dose q6–8h." },
+            { name: "Ampicillin IV (neonate)", rx: "Ampicillin IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 50, unit: "mg", reference: "GA <35 wk:\n  ≤ 7 d PNA: 50 mg/kg/dose q12h\n  8–28 d PNA: 75 mg/kg/dose q12h\nGA ≥35 wk:\n  ≤ 28 d PNA: 50 mg/kg/dose q8h" },
+            { name: "Cloxacillin IV (neonate)", rx: "Cloxacillin IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 25, unit: "mg", reference: "25–50 mg/kg/dose q8–12h (GA-dependent)." },
+            { name: "Penicillin G IV (neonate)", rx: "Penicillin G IV (neonate)", refOnly: true, neoDoseMgKg: 50000, unit: "units", reference: "50,000 units/kg/dose q8–12h (GA-dependent)." },
+            { name: "Gentamicin IV (neonate)", rx: "Gentamicin IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 4, unit: "mg", reference: "Typically 4–5 mg/kg/dose. Interval q24–48h depending on GA & weight. Relies on protocol + therapeutic drug monitoring (TDM)." },
+            { name: "Amikacin IV (neonate)", rx: "Amikacin IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 15, unit: "mg", reference: "Typically 15–20 mg/kg/dose q24–48h depending on GA. Relies on protocol + TDM." },
+            { name: "Cefotaxime IV (neonate)", rx: "Cefotaxime IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 50, unit: "mg", reference: "50 mg/kg/dose.\nGA <32 wk: <7 d q12h; 7–28 d q8h.\nGA ≥32 wk: ≤7 d q12h; 8–28 d q8h." },
+            { name: "Ceftazidime IV (neonate)", rx: "Ceftazidime IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 50, unit: "mg", reference: "Typically 50 mg/kg/dose q8–12h depending on GA." },
+            { name: "Meropenem IV (neonate)", rx: "Meropenem IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 20, unit: "mg", reference: "GA <32 wk: <14 d 20 mg/kg/dose q12h; ≥14 d q8h.\nGA ≥32 wk: <14 d 20 mg/kg/dose q8h; ≥14 d 30 mg/kg/dose q8h.\nElevated MIC pathogens: 40 mg/kg/dose." },
+            { name: "Vancomycin IV (neonate)", rx: "Vancomycin IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 10, unit: "mg", reference: "Typically 10–20 mg/kg/dose q8–24h depending on PMA & serum creatinine. Relies on protocol + TDM." },
+            { name: "Metronidazole IV (neonate)", rx: "Metronidazole IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 7.5, unit: "mg", reference: "Loading 15 mg/kg once (all ages), then 24 h later:\nGA 23–<34 wk: 7.5 mg/kg/dose q12h\nGA 34–40 wk: 7.5 mg/kg/dose q8h\nGA ≥40 wk: 7.5 mg/kg/dose q6h (or 10 mg/kg q8h)." },
+            { name: "Fluconazole IV/PO (neonate)", rx: "Fluconazole IV/PO (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 12, unit: "mg", reference: "Treatment: load 25 mg/kg day 1, then 12 mg/kg/dose once daily.\nProphylaxis: 3–6 mg/kg/dose twice weekly." },
+            { name: "Acyclovir IV (neonate)", rx: "Acyclovir IV (neonate)", refOnly: true, ivMix: true, neoDoseMgKg: 20, unit: "mg", reference: "PMA <30 wk: 20 mg/kg/dose q12h\nPMA 30–<36 wk: 20 mg/kg/dose q8h\nPMA 36–41 wk: 20 mg/kg/dose q6–8h." },
             /* --- Respiratory / CNS --- */
-            { name: "Caffeine citrate IV/PO (neonate)", rx: "Caffeine citrate — dose per neonatal reference", refOnly: true, reference: "Loading 20 mg/kg/dose once (as caffeine citrate); maintenance 5–10 mg/kg/dose once daily, started 24 h after loading." },
-            { name: "Phenobarbital IV (neonate)", rx: "Phenobarbital IV — dose per neonatal reference", refOnly: true, reference: "Loading 20 mg/kg/dose (may repeat 5–10 mg/kg increments if seizures persist); maintenance 3–4 mg/kg/day in 1–2 divided doses." },
-            { name: "Poractant alfa (Curosurf) - surfactant", rx: "Poractant alfa (Curosurf) — dose per neonatal reference", refOnly: true, reference: "Initial 2.5 ml/kg/dose via ETT; subsequent 1.25 ml/kg/dose at 12-h intervals, up to 2 more doses if still requiring ventilation + oxygen." },
+            { name: "Caffeine citrate IV/PO (neonate)", rx: "Caffeine citrate (neonate)", refOnly: true, neoDoseMgKg: 20, unit: "mg", reference: "Loading 20 mg/kg/dose once (as caffeine citrate); maintenance 5–10 mg/kg/dose once daily, started 24 h after loading." },
+            { name: "Phenobarbital IV (neonate)", rx: "Phenobarbital IV (neonate)", refOnly: true, neoDoseMgKg: 20, unit: "mg", reference: "Loading 20 mg/kg/dose (may repeat 5–10 mg/kg increments if seizures persist); maintenance 3–4 mg/kg/day in 1–2 divided doses." },
+            { name: "Poractant alfa (Curosurf) - surfactant", rx: "Poractant alfa (Curosurf)", refOnly: true, neoDoseMgKg: 2.5, unit: "ml", reference: "Initial 2.5 ml/kg/dose via ETT; subsequent 1.25 ml/kg/dose at 12-h intervals, up to 2 more doses if still requiring ventilation + oxygen." },
             /* --- Cardiovascular / vasoactive / resuscitation --- */
             { name: "Dopamine infusion (neonate)", rx: "Dopamine infusion — dose per neonatal reference", refOnly: true, reference: "Usual range 2–20 mcg/kg/min, titrate to response. Use the infusion dilution calculator." },
             { name: "Dobutamine infusion (neonate)", rx: "Dobutamine infusion — dose per neonatal reference", refOnly: true, reference: "Initial 0.5–1 mcg/kg/min; usual range 2–20 mcg/kg/min, titrate to response." },
-            { name: "Adrenaline (Epinephrine) IV (neonate)", rx: "Adrenaline IV — dose per neonatal reference", refOnly: true, reference: "Resuscitation: 0.01–0.03 mg/kg (0.1–0.3 ml/kg of 0.1 mg/ml) q3–5 min PRN." },
+            { name: "Adrenaline (Epinephrine) IV (neonate)", rx: "Adrenaline IV (neonate)", refOnly: true, neoDoseMgKg: 0.01, unit: "mg", reference: "Resuscitation: 0.01–0.03 mg/kg (0.1–0.3 ml/kg of 0.1 mg/ml) q3–5 min PRN." },
             { name: "Prostaglandin E1 / Alprostadil infusion", rx: "Alprostadil (PGE1) infusion — dose per neonatal reference", refOnly: true, reference: "Initial 0.05–0.1 mcg/kg/min; titrate to lowest effective dose to maintain ductal patency. HIGH apnea risk — have ETT ready." },
-            { name: "Hydrocortisone IV (neonate)", rx: "Hydrocortisone IV — dose per neonatal reference (GA)", refOnly: true, reference: "Stress: 1–2 mg/kg once, then 0.5–1 mg/kg/dose.\nGA <35 wk: 0.5–1 mg/kg/dose q8–12h.\nGA ≥35 wk: 0.5–1 mg/kg/dose q6–8h." },
-            { name: "Furosemide IV (neonate)", rx: "Furosemide IV — dose per neonatal reference (PMA)", refOnly: true, reference: "Preterm (PMA <31 wk): 0.5–1 mg/kg/dose q24–48h.\nTerm (PMA ≥31 wk): 0.5–1 mg/kg/dose q12–48h.\nInfusion: 1–2 mg/kg bolus then 0.1–0.4 mg/kg/h." },
+            { name: "Hydrocortisone IV (neonate)", rx: "Hydrocortisone IV (neonate)", refOnly: true, neoDoseMgKg: 0.5, unit: "mg", reference: "Stress: 1–2 mg/kg once, then 0.5–1 mg/kg/dose.\nGA <35 wk: 0.5–1 mg/kg/dose q8–12h.\nGA ≥35 wk: 0.5–1 mg/kg/dose q6–8h." },
+            { name: "Furosemide IV (neonate)", rx: "Furosemide IV (neonate)", refOnly: true, neoDoseMgKg: 0.5, unit: "mg", reference: "Preterm (PMA <31 wk): 0.5–1 mg/kg/dose q24–48h.\nTerm (PMA ≥31 wk): 0.5–1 mg/kg/dose q12–48h.\nInfusion: 1–2 mg/kg bolus then 0.1–0.4 mg/kg/h." },
             /* --- Fluids / metabolic --- */
-            { name: "Calcium gluconate 10% (neonate)", rx: "Calcium gluconate 10% — dose per neonatal reference", refOnly: true, reference: "Acute/symptomatic: 100–200 mg/kg/dose (1–2 ml/kg) slow IV with cardiac monitoring. Extravasation causes necrosis." },
-            { name: "Dextrose D10W bolus (neonate)", rx: "D10W bolus — dose per neonatal reference", refOnly: true, reference: "Hypoglycemia: 2 ml/kg (= 200 mg/kg) IV bolus. Avoid D25W/D50W in neonates." },
-            { name: "Sodium bicarbonate 4.2% (neonate)", rx: "Sodium bicarbonate 4.2% — dose per neonatal reference", refOnly: true, reference: "1–2 mEq/kg/dose given slowly. ONLY after adequate ventilation established." },
+            { name: "Calcium gluconate 10% (neonate)", rx: "Calcium gluconate 10% (neonate)", refOnly: true, neoDoseMgKg: 100, unit: "mg", reference: "Acute/symptomatic: 100–200 mg/kg/dose (1–2 ml/kg) slow IV with cardiac monitoring. Extravasation causes necrosis." },
+            { name: "Dextrose D10W bolus (neonate)", rx: "D10W bolus (neonate)", refOnly: true, neoDoseMgKg: 2, unit: "ml", reference: "Hypoglycemia: 2 ml/kg (= 200 mg/kg) IV bolus. Avoid D25W/D50W in neonates." },
+            { name: "Sodium bicarbonate 4.2% (neonate)", rx: "Sodium bicarbonate 4.2% (neonate)", refOnly: true, neoDoseMgKg: 1, unit: "mEq", reference: "1–2 mEq/kg/dose given slowly. ONLY after adequate ventilation established." },
             { name: "Vitamin K1 (phytonadione) IM (neonate)", rx: "Vitamin K1 IM — dose per neonatal reference (BW)", refOnly: true, reference: "Birth weight ≤1500 g: 0.3–0.5 mg/kg once IM.\nBirth weight >1500 g: 1 mg once IM.\nTreatment (bleeding): 1 mg/dose IV/IM/SUBQ." },
             /* --- Analgesia / sedation --- */
-            { name: "Morphine IV (neonate)", rx: "Morphine IV — dose per neonatal reference", refOnly: true, reference: "Intermittent: 0.05–0.1 mg/kg/dose q4–8h PRN.\nInfusion: initial 0.01 mg/kg/h (10 mcg/kg/h); usual 0.01–0.05 mg/kg/h." },
-            { name: "Fentanyl IV (neonate)", rx: "Fentanyl IV — dose per neonatal reference", refOnly: true, reference: "Intermittent: 1–3 mcg/kg/dose over ≥5 min q2–4h.\nInfusion: optional load 1–2 mcg/kg, then 0.5–1 mcg/kg/h, titrate." },
-            { name: "Midazolam IV (neonate)", rx: "Midazolam IV — dose per neonatal reference", refOnly: true, reference: "Loading 0.05–0.2 mg/kg/dose over ≥1 h (caution if hemodynamically unstable).\nInfusion: 0.06–0.4 mg/kg/h (1–7 mcg/kg/min)." },
+            { name: "Morphine IV (neonate)", rx: "Morphine IV (neonate)", refOnly: true, neoDoseMgKg: 0.05, unit: "mg", reference: "Intermittent: 0.05–0.1 mg/kg/dose q4–8h PRN.\nInfusion: initial 0.01 mg/kg/h (10 mcg/kg/h); usual 0.01–0.05 mg/kg/h." },
+            { name: "Fentanyl IV (neonate)", rx: "Fentanyl IV (neonate)", refOnly: true, neoDoseMgKg: 1, unit: "mcg", reference: "Intermittent: 1–3 mcg/kg/dose over ≥5 min q2–4h.\nInfusion: optional load 1–2 mcg/kg, then 0.5–1 mcg/kg/h, titrate." },
+            { name: "Midazolam IV (neonate)", rx: "Midazolam IV (neonate)", refOnly: true, neoDoseMgKg: 0.05, unit: "mg", reference: "Loading 0.05–0.2 mg/kg/dose over ≥1 h (caution if hemodynamically unstable).\nInfusion: 0.06–0.4 mg/kg/h (1–7 mcg/kg/min)." },
             /* --- GI / other --- */
-            { name: "Omeprazole PO (neonate)", rx: "Omeprazole PO — dose per neonatal reference", refOnly: true, reference: "1 mg/kg/dose once daily." },
-            { name: "Paracetamol (Acetaminophen) PO/IV (neonate)", rx: "Paracetamol — dose per neonatal reference (GA/PMA)", refOnly: true, reference: "PO:\n  GA 28–32 wk: 10–15 mg/kg/dose q6–12h (max 40 mg/kg/day)\n  GA 33–36 wk / term <10 d: q6–8h\n  Term ≥10 d: q4–6h (max 75 mg/kg/day)\nIV:\n  PMA <32 wk: 7.5–10 mg/kg/dose q6–8h\n  PMA 32–36 wk: 7.5–12.5 mg/kg/dose q6h\n  PMA >36 wk: 10–15 mg/kg/dose q6h" },
-            { name: "Naloxone (neonate)", rx: "Naloxone — dose per neonatal reference", refOnly: true, reference: "Full reversal (opioid intoxication): 0.1 mg/kg/dose IV/IM. AVOID in neonates born to opioid-dependent mothers (acute withdrawal)." }
+            { name: "Omeprazole PO (neonate)", rx: "Omeprazole PO (neonate)", refOnly: true, neoDoseMgKg: 1, unit: "mg", reference: "1 mg/kg/dose once daily." },
+            { name: "Paracetamol (Acetaminophen) PO/IV (neonate)", rx: "Paracetamol (neonate)", refOnly: true, neoDoseMgKg: 10, unit: "mg", reference: "PO:\n  GA 28–32 wk: 10–15 mg/kg/dose q6–12h (max 40 mg/kg/day)\n  GA 33–36 wk / term <10 d: q6–8h\n  Term ≥10 d: q4–6h (max 75 mg/kg/day)\nIV:\n  PMA <32 wk: 7.5–10 mg/kg/dose q6–8h\n  PMA 32–36 wk: 7.5–12.5 mg/kg/dose q6h\n  PMA >36 wk: 10–15 mg/kg/dose q6h" },
+            { name: "Naloxone (neonate)", rx: "Naloxone (neonate)", refOnly: true, neoDoseMgKg: 0.1, unit: "mg", reference: "Full reversal (opioid intoxication): 0.1 mg/kg/dose IV/IM. AVOID in neonates born to opioid-dependent mothers (acute withdrawal)." }
         ]
     };
 
@@ -3060,27 +3108,35 @@
             statRow.appendChild(statBtn);
             div.appendChild(statRow);
 
-            if (isIvAntibiotic(med) && !med.refOnly) {
-                if (!item.ivMix) item.ivMix = buildDefaultIvMix(med, dose);
+            if ((isIvAntibiotic(med) && !med.refOnly) || med.ivMix) {
+                const baseDose = getBaseDoseMg(med, w);
+                if (!item.ivMix) item.ivMix = buildDefaultIvMix(med, baseDose);
                 if (!item.ivMix.standardConcMgMl) {
                     item.ivMix.standardConcMgMl = getStandardIvConc(med);
                 }
-                const mix = w ? computeIvMix(med, dose, item.ivMix) : null;
+                const effDose = w ? effectiveIvDose(med, w, item) : null;
+                const mix = w ? computeIvMix(med, effDose, item.ivMix) : null;
+                const mgKgNow = (effDose != null && w) ? +(effDose / w).toFixed(2) : null;
 
                 const box = document.createElement("div");
                 box.className = "ivmix-box";
                 const r = mix ? mix.range : getIvAbxConcRange(med);
                 const stdConc = mix ? mix.standardConc : getStandardIvConc(med);
                 box.innerHTML = `
-                    <div class="ivmix-title">IV Mix — adjust total volume only</div>
+                    <div class="ivmix-title">IV Mix — set the dose, then adjust the mix</div>
+                    <div class="ivmix-dose-hint" data-ivmix="doseHint">${baseDose != null ? `Suggested ${baseDose} mg (rounded up) — edit if you prefer a different dose.` : "Enter patient weight to suggest a dose."}</div>
                     <div class="ivmix-grid">
                         <div>
-                            <label>Standard concentration (mg/ml) [${r.min}–${r.max}]</label>
-                            <div class="ivmix-readonly">${stdConc}</div>
+                            <label>Dose (mg) <span class="ivmix-rec" data-ivmix="mgkg">${mgKgNow != null ? `= ${mgKgNow} mg/kg` : ""}</span></label>
+                            <input type="text" inputmode="decimal" pattern="[0-9.]*" data-ivmix="dose" value="${effDose != null ? effDose : ""}" />
                         </div>
                         <div>
                             <label>Drug volume needed (ml)</label>
                             <div class="ivmix-readonly" data-ivmix="drugMl">${mix && !isNaN(mix.drugMl) ? mix.drugMl : "—"}</div>
+                        </div>
+                        <div>
+                            <label>Standard concentration (mg/ml) [${r.min}–${r.max}]</label>
+                            <div class="ivmix-readonly">${stdConc}</div>
                         </div>
                         <div>
                             <label>Total bag volume (ml)</label>
@@ -3116,10 +3172,21 @@
                     ${mix && mix.volumeTooLow ? '<p class="ivmix-warn" data-ivmix="warn">Total volume is less than drug volume — increase total bag volume.</p>' : ""}
                     ${ivDiluentWarning(med, item.ivMix.diluent) ? `<p class="ivmix-warn" data-ivmix="dilwarn">${ivDiluentWarning(med, item.ivMix.diluent)}</p>` : '<p class="ivmix-warn" data-ivmix="dilwarn" style="display:none"></p>'}
                 `;
-                const inputs = box.querySelectorAll(".ivmix-grid input");
+                const doseInput = box.querySelector('[data-ivmix="dose"]');
+                const volInput = box.querySelectorAll(".ivmix-grid input")[1];
+                const dripInput = box.querySelectorAll(".ivmix-grid input")[2];
                 const sel = box.querySelector("select");
-                inputs[0].addEventListener("input", (e) => updateIvMix(item.id, "totalVolumeMl", e.target.value));
-                inputs[0].addEventListener("blur", (e) => {
+                doseInput.addEventListener("input", (e) => updateIvMix(item.id, "doseOverride", e.target.value));
+                doseInput.addEventListener("blur", (e) => {
+                    const v = parseFloat(e.target.value);
+                    if (isNaN(v) || v <= 0) {
+                        item.ivMix.doseOverride = "";
+                        e.target.value = getBaseDoseMg(med, getWeight()) ?? "";
+                        refreshIvMixUI(item.id);
+                    }
+                });
+                volInput.addEventListener("input", (e) => updateIvMix(item.id, "totalVolumeMl", e.target.value));
+                volInput.addEventListener("blur", (e) => {
                     const v = parseFloat(e.target.value);
                     if (isNaN(v) || v < 1) {
                         item.ivMix.totalVolumeMl = String(med.defaultVolume || 100);
@@ -3128,7 +3195,7 @@
                     }
                 });
                 sel.onchange = (e) => updateIvMix(item.id, "diluent", e.target.value);
-                inputs[1].addEventListener("input", (e) => updateIvMix(item.id, "dripMin", e.target.value));
+                dripInput.addEventListener("input", (e) => updateIvMix(item.id, "dripMin", e.target.value));
                 box.querySelectorAll('[data-ivmix="intervalChips"] .ivmix-chip').forEach(btn => {
                     btn.onclick = () => {
                         box.querySelectorAll('[data-ivmix="intervalChips"] .ivmix-chip').forEach(b => b.classList.remove("active"));
@@ -3139,10 +3206,48 @@
 
                 const order = document.createElement("div");
                 order.className = "ivmix-order";
-                const mixLine = w ? buildIvMixOrderLine(med, dose, item.ivMix) : null;
+                const mixLine = w ? buildIvMixOrderLine(med, effDose, item.ivMix) : null;
                 order.textContent = mixLine || "Enter weight to calculate IV mix volume and order line.";
+                if (mixLine) item.plain = mixLine;
                 box.appendChild(order);
                 div.appendChild(box);
+            }
+
+            /* Neonatal simple-dose editor (weight-based, not an IV-mix drug): suggest a rounded dose the
+               neonatologist can adjust, guided by the reference above. */
+            if (med.neoDoseMgKg && !med.ivMix) {
+                const unit = med.unit || "mg";
+                const base = w ? roundUpNeo(med.neoDoseMgKg * w, unit) : null;
+                const eff = (item.neoDose != null && item.neoDose !== "" && !isNaN(parseFloat(item.neoDose)) && parseFloat(item.neoDose) > 0)
+                    ? parseFloat(item.neoDose) : base;
+                const label = med.name.replace(/\s*\(.*\)\s*$/, "").trim();
+                const nbox = document.createElement("div");
+                nbox.className = "neo-dose-box";
+                nbox.innerHTML = `
+                    <div class="ivmix-title">Set the dose</div>
+                    <div class="ivmix-dose-hint">${base != null ? `Suggested ${base} ${unit} (${med.neoDoseMgKg} ${unit}/kg &times; ${w} kg, rounded up) — adjust as needed.` : "Enter patient weight to suggest a dose."}</div>
+                    <div class="neo-dose-row">
+                        <label>Dose (${unit})</label>
+                        <input type="text" inputmode="decimal" pattern="[0-9.]*" data-neo="dose" value="${eff != null ? eff : ""}" />
+                    </div>
+                    <div class="ivmix-order" data-neo="order">${eff != null ? `${label}: ${eff} ${unit}` : "Enter weight to calculate the dose."}</div>
+                `;
+                const ninput = nbox.querySelector('[data-neo="dose"]');
+                const norder = nbox.querySelector('[data-neo="order"]');
+                const setNeo = () => {
+                    const val = parseFloat(ninput.value);
+                    const useVal = (!isNaN(val) && val > 0) ? val : null;
+                    const line = useVal != null ? `${label}: ${useVal} ${unit}` : "Enter a dose.";
+                    norder.textContent = line;
+                    if (useVal != null) item.plain = line;
+                };
+                ninput.addEventListener("input", (e) => { item.neoDose = e.target.value; setNeo(); });
+                ninput.addEventListener("blur", (e) => {
+                    const val = parseFloat(e.target.value);
+                    if (isNaN(val) || val <= 0) { item.neoDose = ""; e.target.value = (w ? roundUpNeo(med.neoDoseMgKg * w, unit) : "") ?? ""; setNeo(); }
+                });
+                if (eff != null) item.plain = `${label}: ${eff} ${unit}`;
+                div.appendChild(nbox);
             }
 
             if (qtySupported(med) && !item.statDose) {
