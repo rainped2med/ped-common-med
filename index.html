@@ -190,6 +190,42 @@
         .ivmix-warn { margin-top: 6px; font-size: 0.78em; color: var(--danger-tx); font-weight: 600; }
         .ivmix-rec { color: var(--ink-muted); font-weight: 400; }
         .ivmix-dose-hint { font-size: 0.75em; color: var(--ink-soft); margin: -2px 0 8px; }
+        /* ── Mode toggle + OPD Deck ── */
+        .mode-toggle-bar { display: flex; gap: 6px; margin-right: auto; margin-left: 10px; }
+        .mode-btn { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--ink-soft); font-size: 0.8em; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.14s ease; }
+        .mode-btn:hover { background: var(--surface-sunken); color: var(--ink); border-color: var(--field-border-hover); }
+        .mode-btn.active { background: linear-gradient(135deg, var(--brand-blue), var(--brand-teal)); border-color: transparent; color: #fff; }
+        .opd-section { background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+        .opd-head { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; flex-wrap: wrap; }
+        .opd-head h3 { margin: 0; font-size: 0.98em; letter-spacing: -0.01em; }
+        .opd-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--brand-teal); flex: none; box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-teal) 20%, transparent); }
+        .opd-hint { font-size: 0.75em; color: var(--ink-muted); margin-left: auto; }
+        .opd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        .opd-full { margin-bottom: 10px; }
+        .opd-section label { font-size: 0.78em; color: var(--ink-soft); font-weight: 600; margin-bottom: 4px; display: block; }
+        .opd-section textarea { width: 100%; padding: 9px 11px; border-radius: 9px; border: 1.5px solid var(--field-border); background: var(--field-bg); color: var(--ink); font-family: inherit; font-size: 0.9em; resize: vertical; }
+        .opd-section textarea:focus { outline: none; border-color: var(--brand-blue); box-shadow: 0 0 0 4px var(--ring); }
+        .pe-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; margin-bottom: 10px; }
+        .pe-item { border: 1px solid var(--border-soft); border-radius: 10px; padding: 9px 11px; background: var(--paper); transition: all 0.14s ease; }
+        .pe-item.abn { border-color: var(--danger-bd); background: var(--danger-bg); }
+        .pe-top { display: flex; align-items: center; gap: 8px; }
+        .pe-top label { margin: 0; font-size: 0.86em; font-weight: 650; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 7px; }
+        .pe-item.abn .pe-top label { color: var(--danger-tx); }
+        .pe-top input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--danger-strong); cursor: pointer; }
+        .pe-detail { margin-top: 7px; display: none; }
+        .pe-item.abn .pe-detail { display: block; }
+        .pe-detail input { font-size: 0.85em; padding: 7px 9px; }
+        .opd-preview { margin-top: 12px; background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 10px; padding: 13px; font-family: 'SF Mono', 'Cascadia Code', ui-monospace, 'Courier New', monospace; font-size: 0.78em; line-height: 1.5; color: var(--ink); white-space: pre-wrap; overflow-x: auto; max-height: 420px; }
+        .fav-bar { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+        .btn-fav-action { padding: 7px 12px; border-radius: 999px; border: 1px solid var(--warn-bd); background: var(--warn-bg); color: var(--warn-tx); font-size: 0.78em; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.12s ease; }
+        .btn-fav-action:hover { background: var(--warn-tx); color: var(--paper); border-color: var(--warn-tx); }
+        .fav-list { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .fav-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--warn-bd); background: var(--warn-bg); color: var(--warn-tx); font-size: 0.76em; font-weight: 600; }
+        .fav-chip button { border: none; background: transparent; color: inherit; cursor: pointer; font-weight: 800; padding: 0 2px; font-size: 1.05em; }
+        .fav-chip button:hover { color: var(--danger-strong); }
+        .fav-star { border: none; background: transparent; cursor: pointer; font-size: 1em; padding: 0 4px; opacity: 0.45; transition: opacity 0.12s ease, transform 0.12s ease; }
+        .fav-star:hover { opacity: 1; transform: scale(1.15); }
+        .fav-star.on { opacity: 1; }
         .neo-dose-box { margin-top: 10px; background: var(--info-bg); border: 1px solid var(--info-bd); border-radius: 10px; padding: 11px; }
         .neo-dose-row { display: flex; align-items: center; gap: 10px; }
         .neo-dose-row label { font-size: 0.8em; color: var(--ink-soft); font-weight: 600; }
@@ -358,6 +394,10 @@
             </svg>
             <span id="theme-btn-label">Dark</span>
         </button>
+        <div class="mode-toggle-bar">
+            <button type="button" class="mode-btn active" id="mode-btn-med" onclick="setMode('med')">&#128138; Medication</button>
+            <button type="button" class="mode-btn" id="mode-btn-opd" onclick="setMode('opd')">&#129658; OPD Deck</button>
+        </div>
         <div class="lang-toggle-bar">
             <button type="button" class="lang-btn active" id="lang-btn-en" onclick="setLanguage('en')">EN</button>
             <button type="button" class="lang-btn" id="lang-btn-th" onclick="setLanguage('th')">ไทย</button>
@@ -416,6 +456,39 @@
         <span class="ph-hint" data-i18n="pharmacistHint">Shows the standard mg/kg dose range and flags if the order falls outside it</span>
     </div>
     <div class="sync-status-bar" id="sync-status-bar">Catalog: using bundled defaults (offline)</div>
+
+    <!-- ───── History (OPD mode) ───── -->
+    <div class="opd-section hidden" id="opd-history">
+        <div class="opd-head"><span class="opd-dot"></span><h3>History</h3></div>
+        <div class="opd-grid">
+            <div><label for="hx-cc">Chief complaint</label><input type="text" id="hx-cc" placeholder="e.g. fever 2 days"></div>
+            <div><label for="hx-duration">Duration</label><input type="text" id="hx-duration" placeholder="e.g. 2 days"></div>
+        </div>
+        <div class="opd-full"><label for="hx-pi">Present illness</label><textarea id="hx-pi" rows="3" placeholder="Onset, course, associated symptoms, treatment taken..."></textarea></div>
+        <div class="opd-grid">
+            <div><label for="hx-past">Past history / underlying</label><input type="text" id="hx-past" placeholder="e.g. asthma, none"></div>
+            <div><label for="hx-imm">Immunization</label><input type="text" id="hx-imm" placeholder="e.g. up to date / EPI complete"></div>
+            <div><label for="hx-birth">Birth / perinatal</label><input type="text" id="hx-birth" placeholder="e.g. term, NSVD, BW 3.1 kg"></div>
+            <div><label for="hx-family">Family / contact</label><input type="text" id="hx-family" placeholder="e.g. sibling with URI"></div>
+        </div>
+    </div>
+
+    <!-- ───── Physical examination (OPD mode) — tick ABNORMAL only ───── -->
+    <div class="opd-section hidden" id="opd-exam">
+        <div class="opd-head">
+            <span class="opd-dot"></span><h3>Physical examination</h3>
+            <span class="opd-hint">Tick only what is abnormal and explain — anything unticked is reported as no abnormality</span>
+        </div>
+        <div class="opd-grid">
+            <div><label for="pe-vs-t">Temp (&deg;C)</label><input type="text" id="pe-vs-t" placeholder="37.0"></div>
+            <div><label for="pe-vs-hr">HR (/min)</label><input type="text" id="pe-vs-hr" placeholder="110"></div>
+            <div><label for="pe-vs-rr">RR (/min)</label><input type="text" id="pe-vs-rr" placeholder="24"></div>
+            <div><label for="pe-vs-bp">BP (mmHg)</label><input type="text" id="pe-vs-bp" placeholder="90/60"></div>
+            <div><label for="pe-vs-spo2">SpO2 (%)</label><input type="text" id="pe-vs-spo2" placeholder="98"></div>
+        </div>
+        <div id="pe-items" class="pe-items"></div>
+        <div class="opd-full"><label for="pe-other">Other findings</label><input type="text" id="pe-other" placeholder="Anything not covered above"></div>
+    </div>
 
     <div class="main-grid">
         <!-- LEFT: Search -->
@@ -494,8 +567,46 @@
                     <button class="btn btn-primary" id="copyAllBtn" onclick="copyAllCart()" disabled data-i18n="copyAllBtn">Copy all orders</button>
                     <button class="btn btn-secondary" onclick="clearCart()" data-i18n="clearBtn">Clear</button>
                 </div>
+                <div class="fav-bar">
+                    <button type="button" class="btn-fav-action" onclick="exportFavourites()">&#11088; Export favourites (CSV)</button>
+                    <button type="button" class="btn-fav-action" onclick="document.getElementById('fav-import-file').click()">&#8681; Import favourites (CSV)</button>
+                    <input type="file" id="fav-import-file" accept=".csv,text/csv" class="hidden" onchange="importFavourites(this)">
+                </div>
+                <div id="fav-list" class="fav-list"></div>
             </div>
         </div>
+    </div>
+
+    <!-- ───── Management plan (OPD mode) ───── -->
+    <div class="opd-section hidden" id="opd-plan">
+        <div class="opd-head"><span class="opd-dot"></span><h3>Management plan</h3></div>
+        <div class="opd-full"><label for="mp-dx">Diagnosis / impression</label><input type="text" id="mp-dx" placeholder="Auto-filled from the diagnosis you picked — edit freely"></div>
+        <div class="opd-grid">
+            <div><label for="mp-ix">Investigation</label><input type="text" id="mp-ix" placeholder="e.g. CBC, CXR, UA"></div>
+            <div><label for="mp-disposition">Disposition</label><input type="text" id="mp-disposition" placeholder="e.g. home, admit, refer"></div>
+        </div>
+        <div class="opd-full"><label for="mp-plan">Plan / treatment</label><textarea id="mp-plan" rows="3" placeholder="Non-drug management, procedures, referrals..."></textarea></div>
+        <div class="opd-full"><label for="mp-advice">Advice / education</label><textarea id="mp-advice" rows="2" placeholder="Parent education, warning signs explained..."></textarea></div>
+    </div>
+
+    <!-- ───── Follow-up plan (OPD mode) ───── -->
+    <div class="opd-section hidden" id="opd-followup">
+        <div class="opd-head"><span class="opd-dot"></span><h3>Follow-up plan</h3></div>
+        <div class="opd-grid">
+            <div><label for="fu-next">Next visit</label><input type="text" id="fu-next" placeholder="e.g. 1 week / PRN"></div>
+            <div><label for="fu-return">Return immediately if</label><input type="text" id="fu-return" placeholder="e.g. high fever, poor feeding, dyspnea"></div>
+        </div>
+        <div class="opd-full"><label for="fu-notes">Notes</label><textarea id="fu-notes" rows="2" placeholder="Anything else for the record"></textarea></div>
+    </div>
+
+    <!-- ───── Copy to medical record (OPD mode) ───── -->
+    <div class="opd-section hidden" id="opd-record">
+        <div class="opd-head"><span class="opd-dot"></span><h3>Medical record</h3></div>
+        <div class="cart-actions">
+            <button class="btn btn-primary" onclick="copyOpdRecord()" id="btn-opd-copy">&#128203; Copy to medical record</button>
+            <button class="btn btn-secondary" onclick="clearOpdFields()">Clear OPD fields</button>
+        </div>
+        <pre id="opd-preview" class="opd-preview hidden"></pre>
     </div>
 </div>
 
@@ -505,6 +616,10 @@
 <script>
     const MAX_CART = 10;
     let rxCart = [];
+    /* Doctor's favourite drug list — kept locally, exported/imported as a plain CSV file.
+       Declared here (not with the OPD code below) so renderCart can never hit a temporal dead zone. */
+    let favourites = [];
+    try { favourites = JSON.parse(localStorage.getItem("pedRxFavourites") || "[]"); } catch (e) { favourites = []; }
     let cartIdCounter = 0;
     let activeDiagnosis = null;
     let pharmacistMode = false;
@@ -3106,6 +3221,14 @@
             statBtn.textContent = item.statDose ? "✓ STAT (one-time dose)" : "Mark as STAT (one-time dose)";
             statBtn.onclick = () => toggleStatDose(item.id);
             statRow.appendChild(statBtn);
+            const favKey = medKey(item.catId, item.medIdx);
+            const favBtn = document.createElement("button");
+            favBtn.type = "button";
+            favBtn.className = "fav-star" + (isFavourite(favKey) ? " on" : "");
+            favBtn.textContent = isFavourite(favKey) ? "★" : "☆";
+            favBtn.title = isFavourite(favKey) ? "Remove from favourites" : "Save to favourites";
+            favBtn.onclick = () => toggleFavourite(favKey);
+            statRow.appendChild(favBtn);
             div.appendChild(statRow);
 
             if ((isIvAntibiotic(med) && !med.refOnly) || med.ivMix) {
@@ -3589,11 +3712,275 @@
         }
     });
 
+    /* ═══════════ OPD Deck ═══════════ */
+
+    /* Physical exam: tick ONLY what is abnormal and explain it (cardio-consult style).
+       Anything left unticked is reported as "no abnormality noted" — we never assert
+       a system was examined-and-normal unless the clinician says so. */
+    const PE_SYSTEMS = [
+        "General appearance", "HEENT", "Neck / Lymph nodes", "Chest / Lungs",
+        "Heart / CVS", "Abdomen", "Genitalia / Perineum", "Extremities / MSK",
+        "Skin", "Neurological"
+    ];
+
+    function renderPeItems() {
+        const box = document.getElementById("pe-items");
+        if (!box || box.dataset.built) return;
+        box.dataset.built = "1";
+        PE_SYSTEMS.forEach((sys, i) => {
+            const wrap = document.createElement("div");
+            wrap.className = "pe-item";
+            wrap.dataset.system = sys;
+            wrap.innerHTML = `
+                <div class="pe-top">
+                    <label for="pe-cb-${i}"><input type="checkbox" id="pe-cb-${i}"> ${sys}</label>
+                </div>
+                <div class="pe-detail">
+                    <input type="text" placeholder="Describe the abnormality — e.g. injected tonsils">
+                </div>`;
+            const cb = wrap.querySelector("input[type=checkbox]");
+            const detail = wrap.querySelector(".pe-detail input");
+            cb.addEventListener("change", () => {
+                wrap.classList.toggle("abn", cb.checked);
+                if (cb.checked) detail.focus();
+            });
+            box.appendChild(wrap);
+        });
+    }
+
+    function getPeAbnormal() {
+        const out = [];
+        document.querySelectorAll("#pe-items .pe-item").forEach(wrap => {
+            const cb = wrap.querySelector("input[type=checkbox]");
+            if (!cb || !cb.checked) return;
+            const d = wrap.querySelector(".pe-detail input").value.trim();
+            out.push(d ? `${wrap.dataset.system}: ${d}` : wrap.dataset.system);
+        });
+        return out;
+    }
+
+    /* The hospital EMR rejects fancy Unicode punctuation / box-drawing (Thai letters are fine).
+       Everything copied out is passed through this last. */
+    function sanitizeForEmr(text) {
+        const map = { "‘": "'", "’": "'", "“": '"', "”": '"', "…": "...", "×": "x", "÷": "/", "≥": ">=", "≤": "<=", "•": "-" };
+        return String(text).replace(/[‐-―‘’“”•…×÷≥≤─-╿⚠️]/g, m => (map[m] !== undefined ? map[m] : "-"));
+    }
+
+    function setMode(mode) {
+        currentMode = mode === "opd" ? "opd" : "med";
+        document.querySelectorAll(".opd-section").forEach(el => el.classList.toggle("hidden", currentMode !== "opd"));
+        document.getElementById("mode-btn-med").classList.toggle("active", currentMode === "med");
+        document.getElementById("mode-btn-opd").classList.toggle("active", currentMode === "opd");
+        if (currentMode === "opd") renderPeItems();
+        try { localStorage.setItem("pedRxMode", currentMode); } catch (e) {}
+    }
+    let currentMode = "med";
+
+    const val = id => (document.getElementById(id)?.value || "").trim();
+
+    function buildOpdRecord() {
+        const L = [];
+        const date = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+        const w = getWeight();
+        const ageDays = getAgeDays();
+        let ageTxt = "";
+        if (ageDays != null) {
+            const y = Math.floor(ageDays / 365.25);
+            const m = Math.round((ageDays - y * 365.25) / 30.4375);
+            ageTxt = y > 0 ? `${y} yr ${m} mo` : `${m} mo`;
+        }
+
+        L.push("[ OPD VISIT ]");
+        L.push(`  Date: ${date}`);
+        L.push(`  Weight: ${w ? w + " kg" : "-"}   Age: ${ageTxt || "-"}`);
+
+        /* History */
+        const hx = [
+            ["Chief complaint", val("hx-cc")], ["Duration", val("hx-duration")],
+            ["Present illness", val("hx-pi")], ["Past history", val("hx-past")],
+            ["Immunization", val("hx-imm")], ["Birth history", val("hx-birth")],
+            ["Family / contact", val("hx-family")]
+        ].filter(x => x[1]);
+        const allergies = (typeof patientAllergieIds !== "undefined" && patientAllergieIds.size)
+            ? [...patientAllergieIds].map(id => formatAllergyLabel(id)) : [];
+        if (hx.length || allergies.length) {
+            L.push("", "[ HISTORY ]");
+            hx.forEach(([k, v]) => L.push(`  ${k}: ${v}`));
+            if (allergies.length) L.push(`  Drug allergy: ${allergies.join(", ")}`);
+        }
+
+        /* Physical examination */
+        const vs = [
+            ["T", val("pe-vs-t"), "C"], ["HR", val("pe-vs-hr"), "/min"], ["RR", val("pe-vs-rr"), "/min"],
+            ["BP", val("pe-vs-bp"), "mmHg"], ["SpO2", val("pe-vs-spo2"), "%"]
+        ].filter(x => x[1]).map(([k, v, u]) => `${k} ${v} ${u}`);
+        const abn = getPeAbnormal();
+        const peOther = val("pe-other");
+        if (vs.length || abn.length || peOther) {
+            L.push("", "[ PHYSICAL EXAMINATION ]");
+            if (vs.length) L.push(`  Vitals: ${vs.join("   ")}`);
+            if (abn.length) {
+                L.push("  Abnormal findings:");
+                abn.forEach(a => L.push(`  ! ${a}`));
+            } else {
+                L.push("  No abnormality noted on systems examined.");
+            }
+            if (peOther) L.push(`  Other: ${peOther}`);
+        }
+
+        /* Management plan */
+        const dxField = val("mp-dx");
+        const dx = dxField || (activeDiagnosis && activeDiagnosis.name) || "";
+        const mp = [["Investigation", val("mp-ix")], ["Plan", val("mp-plan")],
+                    ["Advice", val("mp-advice")], ["Disposition", val("mp-disposition")]].filter(x => x[1]);
+        if (dx || mp.length) {
+            L.push("", "[ MANAGEMENT PLAN ]");
+            if (dx) L.push(`  Diagnosis: ${dx}`);
+            mp.forEach(([k, v]) => L.push(`  ${k}: ${v}`));
+        }
+
+        /* Medication — reuses the reviewed order lines from the cart */
+        if (rxCart.length) {
+            L.push("", "[ MEDICATION ]");
+            rxCart.forEach(it => {
+                L.push(`  - ${it.plain}`);
+                if (it.statDose) L.push("    (STAT - one-time dose now)");
+            });
+        }
+
+        /* Follow-up */
+        const fu = [["Next visit", val("fu-next")], ["Return immediately if", val("fu-return")],
+                    ["Notes", val("fu-notes")]].filter(x => x[1]);
+        if (fu.length) {
+            L.push("", "[ FOLLOW-UP PLAN ]");
+            fu.forEach(([k, v]) => L.push(`  ${k}: ${v}`));
+        }
+
+        return sanitizeForEmr(L.join("\n"));
+    }
+
+    function copyOpdRecord() {
+        const text = buildOpdRecord();
+        const pre = document.getElementById("opd-preview");
+        pre.textContent = text;
+        pre.classList.remove("hidden");
+        const btn = document.getElementById("btn-opd-copy");
+        const done = () => { btn.textContent = "✓ Copied"; setTimeout(() => { btn.textContent = "📋 Copy to medical record"; }, 2200); };
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done).catch(() => legacyCopy(text, done));
+        } else legacyCopy(text, done);
+    }
+
+    function legacyCopy(text, done) {
+        try {
+            const ta = Object.assign(document.createElement("textarea"), { value: text, style: "position:fixed;opacity:0" });
+            document.body.appendChild(ta); ta.select(); document.execCommand("copy");
+            document.body.removeChild(ta); done();
+        } catch (e) { showToast("Copy failed - select the preview text manually."); }
+    }
+
+    function clearOpdFields() {
+        ["hx-cc", "hx-duration", "hx-pi", "hx-past", "hx-imm", "hx-birth", "hx-family",
+         "pe-vs-t", "pe-vs-hr", "pe-vs-rr", "pe-vs-bp", "pe-vs-spo2", "pe-other",
+         "mp-dx", "mp-ix", "mp-plan", "mp-advice", "mp-disposition",
+         "fu-next", "fu-return", "fu-notes"].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = "";
+        });
+        document.querySelectorAll("#pe-items .pe-item").forEach(wrap => {
+            wrap.classList.remove("abn");
+            const cb = wrap.querySelector("input[type=checkbox]"); if (cb) cb.checked = false;
+            const d = wrap.querySelector(".pe-detail input"); if (d) d.value = "";
+        });
+        const pre = document.getElementById("opd-preview");
+        pre.classList.add("hidden"); pre.textContent = "";
+        showToast("OPD fields cleared");
+    }
+
+    /* ═══════════ Drug favourites (local CSV — no account, works offline) ═══════════ */
+    function saveFavourites() { try { localStorage.setItem("pedRxFavourites", JSON.stringify(favourites)); } catch (e) {} }
+
+    function isFavourite(key) { return favourites.includes(key); }
+    function toggleFavourite(key) {
+        const i = favourites.indexOf(key);
+        if (i >= 0) favourites.splice(i, 1); else favourites.push(key);
+        saveFavourites(); renderFavourites(); renderCart();
+    }
+
+    function renderFavourites() {
+        const box = document.getElementById("fav-list");
+        if (!box) return;
+        box.replaceChildren();
+        if (!favourites.length) {
+            box.innerHTML = `<span style="font-size:0.76em;color:var(--ink-muted)">No favourites yet - tap the star on any order to save it, then export to CSV.</span>`;
+            return;
+        }
+        favourites.forEach(key => {
+            const [cat, idx] = key.split("|");
+            const med = getMed(cat, idx);
+            if (!med) return;
+            const chip = document.createElement("span");
+            chip.className = "fav-chip";
+            const add = document.createElement("span");
+            add.textContent = med.name;
+            add.style.cursor = "pointer";
+            add.title = "Add to the list";
+            add.onclick = () => addToCart(cat, parseInt(idx, 10));
+            const rm = document.createElement("button");
+            rm.type = "button"; rm.textContent = "×"; rm.title = "Remove favourite";
+            rm.onclick = () => toggleFavourite(key);
+            chip.appendChild(add); chip.appendChild(rm);
+            box.appendChild(chip);
+        });
+    }
+
+    function exportFavourites() {
+        if (!favourites.length) { showToast("No favourites to export yet"); return; }
+        const rows = [["key", "name"]];
+        favourites.forEach(key => {
+            const [cat, idx] = key.split("|");
+            const med = getMed(cat, idx);
+            rows.push([key, med ? med.name : ""]);
+        });
+        const csv = rows.map(r => r.map(c => /[",\n]/.test(c) ? '"' + String(c).replace(/"/g, '""') + '"' : c).join(",")).join("\n");
+        const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "ped-rx-favourites.csv";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        showToast(`Exported ${favourites.length} favourite${favourites.length > 1 ? "s" : ""}`);
+    }
+
+    function importFavourites(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            const text = String(reader.result || "").replace(/^﻿/, "");
+            const lines = text.split(/\r?\n/).filter(l => l.trim());
+            let added = 0, unknown = 0;
+            lines.forEach((line, i) => {
+                const key = (line.split(",")[0] || "").trim().replace(/^"|"$/g, "");
+                if (!key || (i === 0 && key.toLowerCase() === "key")) return;
+                if (!/^[a-z_]+\|\d+$/.test(key)) return;
+                if (!getMed(key.split("|")[0], key.split("|")[1])) { unknown++; return; }
+                if (!favourites.includes(key)) { favourites.push(key); added++; }
+            });
+            saveFavourites(); renderFavourites(); renderCart();
+            showToast(`Imported ${added} favourite${added === 1 ? "" : "s"}${unknown ? ` (${unknown} not in catalog)` : ""}`);
+        };
+        reader.readAsText(file);
+        input.value = "";
+    }
+
     applyTranslations();
     initDiagnosisUI();
     document.getElementById("suggested-box").classList.add("visible");
     document.getElementById("suggested-hint").style.display = "block";
     document.getElementById("suggested-hint").textContent = t("suggestedHint");
+
+    try { setMode(localStorage.getItem("pedRxMode") || "med"); } catch (e) { setMode("med"); }
+    renderFavourites();
 
     syncCatalogFromSheet();
     flushPendingUsageLogs();
