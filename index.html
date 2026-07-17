@@ -218,6 +218,24 @@
         .pe-detail { margin-top: 7px; display: none; }
         .pe-item.abn .pe-detail { display: block; }
         .pe-detail input { font-size: 0.85em; padding: 7px 9px; }
+        /* ── PFT ── */
+        .pft-section { background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+        .pft-section label { font-size: 0.78em; color: var(--ink-soft); font-weight: 600; margin-bottom: 4px; display: block; }
+        .pft-section textarea { width: 100%; padding: 9px 11px; border-radius: 9px; border: 1.5px solid var(--field-border); background: var(--field-bg); color: var(--ink); font-family: inherit; font-size: 0.9em; resize: vertical; }
+        .pft-section textarea:focus { outline: none; border-color: var(--brand-blue); box-shadow: 0 0 0 4px var(--ring); }
+        .pft-scroll { overflow-x: auto; margin-bottom: 10px; }
+        .pft-table { width: 100%; border-collapse: collapse; min-width: 560px; font-variant-numeric: tabular-nums; }
+        .pft-table th { text-align: left; font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-soft); font-weight: 800; padding: 8px 6px; border-bottom: 1px solid var(--border-strong); white-space: nowrap; }
+        .pft-table td { padding: 5px 6px; border-bottom: 1px solid var(--border-soft); }
+        .pft-table tr:last-child td { border-bottom: none; }
+        .pft-param { font-size: 0.85em; font-weight: 650; color: var(--ink); white-space: nowrap; }
+        .pft-table input { width: 100%; min-width: 68px; padding: 6px 8px; font-size: 0.85em; }
+        .pft-calc { font-size: 0.85em; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+        .pft-calc.good { color: var(--ok-tx); }
+        .pft-calc.low { color: var(--warn-tx); }
+        .pft-rev { margin-bottom: 10px; padding: 10px 13px; border-radius: 9px; font-size: 0.82em; font-weight: 600; line-height: 1.5; }
+        .pft-rev.yes { background: var(--ok-bg); border: 1px solid var(--ok-bd); color: var(--ok-tx); }
+        .pft-rev.no { background: var(--surface-sunken); border: 1px solid var(--border-strong); color: var(--ink-soft); }
         .opd-preview { margin-top: 12px; background: var(--surface-sunken); border: 1px solid var(--border-strong); border-radius: 10px; padding: 13px; font-family: 'SF Mono', 'Cascadia Code', ui-monospace, 'Courier New', monospace; font-size: 0.78em; line-height: 1.5; color: var(--ink); white-space: pre-wrap; overflow-x: auto; max-height: 420px; }
         .fav-bar { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
         .btn-fav-action { padding: 7px 12px; border-radius: 999px; border: 1px solid var(--warn-bd); background: var(--warn-bg); color: var(--warn-tx); font-size: 0.78em; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.12s ease; }
@@ -400,6 +418,7 @@
         <div class="mode-toggle-bar">
             <button type="button" class="mode-btn active" id="mode-btn-med" onclick="setMode('med')">&#128138; Medication</button>
             <button type="button" class="mode-btn" id="mode-btn-opd" onclick="setMode('opd')">&#129658; OPD Deck</button>
+            <button type="button" class="mode-btn" id="mode-btn-pft" onclick="setMode('pft')">&#129729; PFT</button>
         </div>
         <div class="lang-toggle-bar">
             <button type="button" class="lang-btn active" id="lang-btn-en" onclick="setLanguage('en')">EN</button>
@@ -600,6 +619,37 @@
             <div><label for="fu-return">Return immediately if</label><input type="text" id="fu-return" placeholder="e.g. high fever, poor feeding, dyspnea"></div>
         </div>
         <div class="opd-full"><label for="fu-notes">Notes</label><textarea id="fu-notes" rows="2" placeholder="Anything else for the record"></textarea></div>
+    </div>
+
+    <!-- ───── Pulmonary function test (PFT mode) ───── -->
+    <div class="pft-section hidden" id="pft-main">
+        <div class="opd-head">
+            <span class="opd-dot"></span><h3>Pulmonary function test</h3>
+            <span class="opd-hint">Enter measured + predicted; %pred and %change are calculated</span>
+        </div>
+        <div class="opd-grid">
+            <div><label for="pft-date">Test date</label><input type="text" id="pft-date" placeholder="e.g. 15 Jul 2026"></div>
+            <div><label for="pft-height">Height (cm)</label><input type="text" id="pft-height" placeholder="e.g. 120"></div>
+            <div><label for="pft-effort">Effort / quality</label><input type="text" id="pft-effort" placeholder="e.g. acceptable, reproducible"></div>
+            <div><label for="pft-bd">Bronchodilator given</label><input type="text" id="pft-bd" placeholder="e.g. salbutamol 400 mcg MDI"></div>
+        </div>
+        <div class="pft-scroll">
+            <table class="pft-table" id="pft-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th><th>Pre</th><th>Predicted</th><th>% Pred</th><th>Post</th><th>% Change</th>
+                    </tr>
+                </thead>
+                <tbody id="pft-body"></tbody>
+            </table>
+        </div>
+        <div id="pft-rev" class="pft-rev hidden"></div>
+        <div class="opd-full"><label for="pft-interp">Interpretation</label><textarea id="pft-interp" rows="2" placeholder="e.g. mild obstructive defect with significant bronchodilator response"></textarea></div>
+        <div class="cart-actions">
+            <button class="btn btn-primary" id="btn-pft-copy" onclick="copyPftRecord()">&#128203; Copy PFT table</button>
+            <button class="btn btn-secondary" onclick="clearPft()">Clear PFT</button>
+        </div>
+        <pre id="pft-preview" class="opd-preview hidden"></pre>
     </div>
 
     <!-- ───── Copy to medical record (OPD mode) ───── -->
@@ -3770,14 +3820,173 @@
     }
 
     function setMode(mode) {
-        currentMode = mode === "opd" ? "opd" : "med";
+        currentMode = ["opd", "pft"].includes(mode) ? mode : "med";
         document.querySelectorAll(".opd-section").forEach(el => el.classList.toggle("hidden", currentMode !== "opd"));
-        document.getElementById("mode-btn-med").classList.toggle("active", currentMode === "med");
-        document.getElementById("mode-btn-opd").classList.toggle("active", currentMode === "opd");
+        document.querySelectorAll(".pft-section").forEach(el => el.classList.toggle("hidden", currentMode !== "pft"));
+        /* The medication grid belongs to the visit, so it stays for OPD — but PFT is a standalone record. */
+        const grid = document.querySelector(".main-grid");
+        if (grid) grid.classList.toggle("hidden", currentMode === "pft");
+        ["med", "opd", "pft"].forEach(m => {
+            const b = document.getElementById("mode-btn-" + m);
+            if (b) b.classList.toggle("active", currentMode === m);
+        });
         if (currentMode === "opd") renderPeItems();
+        if (currentMode === "pft") renderPftRows();
         try { localStorage.setItem("pedRxMode", currentMode); } catch (e) {}
     }
     let currentMode = "med";
+
+    /* ═══════════ Pulmonary function test ═══════════ */
+    const PFT_PARAMS = [
+        { key: "fvc",   label: "FVC",       unit: "L" },
+        { key: "fev1",  label: "FEV1",      unit: "L" },
+        { key: "ratio", label: "FEV1/FVC",  unit: "%" },
+        { key: "fef",   label: "FEF25-75",  unit: "L/s" },
+        { key: "pef",   label: "PEF",       unit: "L/s" }
+    ];
+
+    function renderPftRows() {
+        const body = document.getElementById("pft-body");
+        if (!body || body.dataset.built) return;
+        body.dataset.built = "1";
+        PFT_PARAMS.forEach(p => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="pft-param">${p.label} (${p.unit})</td>
+                <td><input type="text" inputmode="decimal" data-pft="${p.key}-pre"></td>
+                <td><input type="text" inputmode="decimal" data-pft="${p.key}-pred"></td>
+                <td><span class="pft-calc" data-pft="${p.key}-pctpred">-</span></td>
+                <td><input type="text" inputmode="decimal" data-pft="${p.key}-post"></td>
+                <td><span class="pft-calc" data-pft="${p.key}-pctchg">-</span></td>`;
+            body.appendChild(tr);
+        });
+        body.querySelectorAll("input").forEach(inp => inp.addEventListener("input", recalcPft));
+        recalcPft();
+    }
+
+    const pftVal = sel => {
+        const el = document.querySelector(`[data-pft="${sel}"]`);
+        const v = parseFloat(el && el.value);
+        return isNaN(v) ? null : v;
+    };
+
+    function recalcPft() {
+        PFT_PARAMS.forEach(p => {
+            const pre = pftVal(`${p.key}-pre`), pred = pftVal(`${p.key}-pred`), post = pftVal(`${p.key}-post`);
+            const pctPredEl = document.querySelector(`[data-pft="${p.key}-pctpred"]`);
+            const pctChgEl  = document.querySelector(`[data-pft="${p.key}-pctchg"]`);
+            if (pre != null && pred != null && pred > 0) {
+                const pct = Math.round((pre / pred) * 100);
+                pctPredEl.textContent = pct + "%";
+                pctPredEl.className = "pft-calc " + (pct >= 80 ? "good" : "low");
+            } else { pctPredEl.textContent = "-"; pctPredEl.className = "pft-calc"; }
+            if (pre != null && post != null && pre > 0) {
+                const chg = ((post - pre) / pre) * 100;
+                pctChgEl.textContent = (chg >= 0 ? "+" : "") + chg.toFixed(1) + "%";
+                pctChgEl.className = "pft-calc " + (chg >= 12 ? "good" : "");
+            } else { pctChgEl.textContent = "-"; pctChgEl.className = "pft-calc"; }
+        });
+        renderPftReversibility();
+    }
+
+    /* ATS/ERS: significant bronchodilator response = FEV1 rise >=12% AND >=200 ml. */
+    function pftReversibility() {
+        const pre = pftVal("fev1-pre"), post = pftVal("fev1-post");
+        if (pre == null || post == null || pre <= 0) return null;
+        const pctChg = ((post - pre) / pre) * 100;
+        const mlChg = (post - pre) * 1000;
+        return { pctChg, mlChg, significant: pctChg >= 12 && mlChg >= 200 };
+    }
+
+    function renderPftReversibility() {
+        const box = document.getElementById("pft-rev");
+        if (!box) return;
+        const r = pftReversibility();
+        if (!r) { box.classList.add("hidden"); return; }
+        box.classList.remove("hidden");
+        box.className = "pft-rev " + (r.significant ? "yes" : "no");
+        box.textContent = r.significant
+            ? `Significant bronchodilator response: FEV1 +${r.pctChg.toFixed(1)}% (+${Math.round(r.mlChg)} ml) - meets the >=12% and >=200 ml criteria.`
+            : `No significant bronchodilator response: FEV1 ${r.pctChg >= 0 ? "+" : ""}${r.pctChg.toFixed(1)}% (${r.mlChg >= 0 ? "+" : ""}${Math.round(r.mlChg)} ml) - does not meet >=12% and >=200 ml.`;
+    }
+
+    /* Aligned columns, NOT a markdown table: the hospital EMR rejects the pipe character
+       (same lesson as the well-child nutrition tab). Space padding survives a plain-text field. */
+    function buildPftRecord() {
+        const L = [];
+        const pad = (s, n) => String(s).padEnd(n);
+        const date = (document.getElementById("pft-date").value || "").trim()
+            || new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+        const ht = (document.getElementById("pft-height").value || "").trim();
+        const effort = (document.getElementById("pft-effort").value || "").trim();
+        const bd = (document.getElementById("pft-bd").value || "").trim();
+        const interp = (document.getElementById("pft-interp").value || "").trim();
+
+        L.push("[ PULMONARY FUNCTION TEST ]");
+        let head = `  Date: ${date}`;
+        if (ht) head += `    Height: ${ht} cm`;
+        L.push(head);
+        if (effort) L.push(`  Effort/quality: ${effort}`);
+        if (bd) L.push(`  Bronchodilator: ${bd}`);
+        L.push("");
+
+        const anyPost = PFT_PARAMS.some(p => pftVal(`${p.key}-post`) != null);
+        L.push("  " + pad("Parameter", 16) + pad("Pre", 8) + pad("Pred", 8) + pad("%Pred", 8)
+               + (anyPost ? pad("Post", 8) + "%Chg" : ""));
+
+        let rows = 0;
+        PFT_PARAMS.forEach(p => {
+            const pre = pftVal(`${p.key}-pre`), pred = pftVal(`${p.key}-pred`), post = pftVal(`${p.key}-post`);
+            if (pre == null && pred == null && post == null) return;
+            rows++;
+            const pct = (pre != null && pred != null && pred > 0) ? Math.round((pre / pred) * 100) : null;
+            const chg = (pre != null && post != null && pre > 0) ? ((post - pre) / pre) * 100 : null;
+            /* Keep a fixed number of decimals so the decimal points line up down the column —
+               "2.1" next to "1.85" reads badly in a scanned table. Ratios/PEF stay whole numbers. */
+            const dp = (p.key === "ratio") ? 0 : 2;
+            const num = v => v == null ? "-" : v.toFixed(dp);
+            let line = "  " + pad(`${p.label} (${p.unit})`, 16)
+                + pad(num(pre), 8)
+                + pad(num(pred), 8)
+                + pad(pct != null ? pct + "%" : "-", 8);
+            if (anyPost) {
+                line += pad(num(post), 8)
+                      + (chg != null ? (chg >= 0 ? "+" : "") + chg.toFixed(1) + "%" : "-");
+            }
+            L.push(line.replace(/\s+$/, ""));
+        });
+        if (!rows) L.push("  (no values entered)");
+
+        const r = pftReversibility();
+        if (r) {
+            L.push("");
+            L.push("  Bronchodilator response: FEV1 " + (r.pctChg >= 0 ? "+" : "") + r.pctChg.toFixed(1)
+                   + "% (" + (r.mlChg >= 0 ? "+" : "") + Math.round(r.mlChg) + " ml) -> "
+                   + (r.significant ? "SIGNIFICANT (>=12% and >=200 ml)" : "not significant"));
+        }
+        if (interp) { L.push(""); L.push(`  Interpretation: ${interp}`); }
+        return sanitizeForEmr(L.join("\n"));
+    }
+
+    function copyPftRecord() {
+        const text = buildPftRecord();
+        const pre = document.getElementById("pft-preview");
+        pre.textContent = text;
+        pre.classList.remove("hidden");
+        const btn = document.getElementById("btn-pft-copy");
+        const done = () => { btn.textContent = "✓ Copied"; setTimeout(() => { btn.textContent = "📋 Copy PFT table"; }, 2200); };
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done).catch(() => legacyCopy(text, done));
+        } else legacyCopy(text, done);
+    }
+
+    function clearPft() {
+        document.querySelectorAll('#pft-main input, #pft-main textarea').forEach(el => el.value = "");
+        recalcPft();
+        const pre = document.getElementById("pft-preview");
+        pre.classList.add("hidden"); pre.textContent = "";
+        showToast("PFT cleared");
+    }
 
     const val = id => (document.getElementById(id)?.value || "").trim();
 
