@@ -224,6 +224,15 @@
         .pe-item[data-state="normal"] .pe-detail, .pe-item[data-state="abnormal"] .pe-detail { display: block; }
         .pe-detail textarea { width: 100%; padding: 7px 9px; font-size: 0.83em; border-radius: 8px; border: 1.5px solid var(--field-border); background: var(--field-bg); color: var(--ink); font-family: inherit; resize: vertical; }
         .pe-detail textarea:focus { outline: none; border-color: var(--brand-blue); box-shadow: 0 0 0 3px var(--ring); }
+        .vital-flag { font-size: 0.7em; font-weight: 700; margin-top: 3px; min-height: 1em; }
+        .vital-flag.high { color: var(--danger-tx); }
+        .vital-flag.low { color: var(--warn-tx); }
+        input.vital-high { border-color: var(--danger-bd); background: var(--danger-bg); }
+        input.vital-low { border-color: var(--warn-bd); background: var(--warn-bg); }
+        .vital-ref-note { font-size: 0.72em; color: var(--ink-muted); margin: -4px 0 10px; }
+        .pe-bulk { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .pe-bulk-btn { padding: 6px 13px; border-radius: 999px; border: 1px solid var(--ok-bd); background: var(--ok-bg); color: var(--ok-tx); font-size: 0.76em; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.12s ease; }
+        .pe-bulk-btn:hover { background: var(--ok-tx); color: var(--paper); border-color: var(--ok-tx); }
         .chip-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px; }
         .mini-chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--ink-soft); font-size: 0.73em; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.12s ease; }
         .mini-chip:hover { background: var(--brand-blue); border-color: var(--brand-blue); color: #fff; }
@@ -515,11 +524,16 @@
             <span class="opd-hint">Mark Normal or Abnormal per system &mdash; anything left untouched is not reported at all</span>
         </div>
         <div class="opd-grid">
-            <div><label for="pe-vs-t">Temp (&deg;C)</label><input type="text" id="pe-vs-t" placeholder="37.0"></div>
-            <div><label for="pe-vs-hr">HR (/min)</label><input type="text" id="pe-vs-hr" placeholder="110"></div>
-            <div><label for="pe-vs-rr">RR (/min)</label><input type="text" id="pe-vs-rr" placeholder="24"></div>
-            <div><label for="pe-vs-bp">BP (mmHg)</label><input type="text" id="pe-vs-bp" placeholder="90/60"></div>
-            <div><label for="pe-vs-spo2">SpO2 (%)</label><input type="text" id="pe-vs-spo2" placeholder="98"></div>
+            <div><label for="pe-vs-t">Temp (&deg;C)</label><input type="text" id="pe-vs-t" placeholder="37.0"><div class="vital-flag" id="flag-t"></div></div>
+            <div><label for="pe-vs-hr">HR (/min)</label><input type="text" id="pe-vs-hr" placeholder="110"><div class="vital-flag" id="flag-hr"></div></div>
+            <div><label for="pe-vs-rr">RR (/min)</label><input type="text" id="pe-vs-rr" placeholder="24"><div class="vital-flag" id="flag-rr"></div></div>
+            <div><label for="pe-vs-bp">BP (mmHg)</label><input type="text" id="pe-vs-bp" placeholder="90/60"><div class="vital-flag" id="flag-bp"></div></div>
+            <div><label for="pe-vs-spo2">SpO2 (%)</label><input type="text" id="pe-vs-spo2" placeholder="98"><div class="vital-flag" id="flag-spo2"></div></div>
+        </div>
+        <div id="vital-ref-note" class="vital-ref-note"></div>
+        <div class="pe-bulk">
+            <button type="button" class="pe-bulk-btn" onclick="markRemainingNormal()">Mark remaining systems Normal</button>
+            <span class="opd-hint">Only fills systems you have not touched &mdash; it never overwrites what you already marked</span>
         </div>
         <div id="pe-items" class="pe-items"></div>
         <div class="opd-full"><label for="pe-other">Other findings</label><input type="text" id="pe-other" placeholder="Anything not covered above"></div>
@@ -3819,6 +3833,116 @@
           chips: ["altered consciousness", "focal weakness", "abnormal tone", "meningeal signs", "abnormal gait", "seizure activity"] }
     ];
 
+    /* ── Age-based vital sign reference (PALS normal ranges, awake) ──
+       Decision support only: a HR of 118 is normal at 4 y but abnormal at 12 y, and that is
+       easy to eyeball wrong in a busy clinic. Needs the age field to be filled. */
+    function vitalRef(ageDays) {
+        if (ageDays == null) return null;
+        const y = ageDays / 365.25;
+        if (ageDays < 30)  return { band: "neonate",     hr: [100, 205], rr: [30, 60], sbpLow: 60 };
+        if (y < 1)         return { band: "infant",      hr: [100, 190], rr: [30, 53], sbpLow: 70 };
+        if (y < 3)         return { band: "toddler",     hr: [98, 140],  rr: [22, 37], sbpLow: 70 + 2 * Math.floor(y) };
+        if (y < 6)         return { band: "preschool",   hr: [80, 120],  rr: [20, 28], sbpLow: 70 + 2 * Math.floor(y) };
+        if (y < 12)        return { band: "school age",  hr: [75, 118],  rr: [18, 25], sbpLow: 70 + 2 * Math.floor(y) };
+        return { band: "adolescent", hr: [60, 100], rr: [12, 20], sbpLow: 90 };
+    }
+
+    /* Returns {status:'high'|'low'|'ok', text} or null when it cannot be judged. */
+    function checkVital(kind, raw, ref) {
+        const v = parseFloat(raw);
+        if (raw === "" || isNaN(v)) return null;
+        if (kind === "t") {
+            if (v >= 38) return { status: "high", text: "fever" };
+            if (v < 36)  return { status: "low",  text: "hypothermia" };
+            return { status: "ok" };
+        }
+        if (kind === "spo2") {
+            if (v < 94) return { status: "low", text: "low SpO2" };
+            return { status: "ok" };
+        }
+        if (!ref) return null;                       // HR/RR/BP need age
+        if (kind === "hr" || kind === "rr") {
+            const [lo, hi] = ref[kind];
+            /* `text` is wrapped in parentheses by the record builder, so keep it paren-free
+               here or the note reads "RR 40 /min (high for age (18-25))". */
+            if (v > hi) return { status: "high", text: `high for age, normal ${lo}-${hi}` };
+            if (v < lo) return { status: "low",  text: `low for age, normal ${lo}-${hi}` };
+            return { status: "ok" };
+        }
+        if (kind === "bp") {
+            /* Only hypotension is flagged. The hypertension threshold depends on height
+               percentile, which this app does not collect - claiming it would be wrong. */
+            if (v < ref.sbpLow) return { status: "high", text: `hypotension, systolic <${ref.sbpLow}` };
+            return { status: "ok" };
+        }
+        return null;
+    }
+
+    /* BP is entered as "90/60" - judge the systolic. */
+    const systolicOf = raw => (String(raw).split("/")[0] || "").trim();
+
+    function vitalResults() {
+        const ref = vitalRef(getAgeDays());
+        const out = {};
+        [["t", "pe-vs-t"], ["hr", "pe-vs-hr"], ["rr", "pe-vs-rr"], ["bp", "pe-vs-bp"], ["spo2", "pe-vs-spo2"]]
+            .forEach(([kind, id]) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const raw = kind === "bp" ? systolicOf(el.value) : el.value.trim();
+                out[kind] = { raw: el.value.trim(), res: checkVital(kind, raw, ref) };
+            });
+        return { ref, out };
+    }
+
+    function checkVitals() {
+        const { ref, out } = vitalResults();
+        Object.entries(out).forEach(([kind, o]) => {
+            const el = document.getElementById("pe-vs-" + kind);
+            const flag = document.getElementById("flag-" + kind);
+            if (!el || !flag) return;
+            el.classList.remove("vital-high", "vital-low");
+            flag.className = "vital-flag";
+            flag.textContent = "";
+            if (o.res && o.res.status !== "ok") {
+                el.classList.add(o.res.status === "high" ? "vital-high" : "vital-low");
+                flag.classList.add(o.res.status);
+                flag.textContent = o.res.text;
+            }
+        });
+        const note = document.getElementById("vital-ref-note");
+        if (note) {
+            note.textContent = ref
+                ? `Reference: ${ref.band} - HR ${ref.hr[0]}-${ref.hr[1]}, RR ${ref.rr[0]}-${ref.rr[1]}, systolic BP >=${ref.sbpLow} (PALS). Hypertension needs a height-percentile chart and is not flagged.`
+                : "Enter patient age to check HR / RR / BP against age-based reference ranges.";
+        }
+    }
+
+    function initVitalWatchers() {
+        if (document.getElementById("pe-vs-t")?.dataset.watched) return;
+        ["pe-vs-t", "pe-vs-hr", "pe-vs-rr", "pe-vs-bp", "pe-vs-spo2"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.dataset.watched = "1"; el.addEventListener("input", checkVitals); }
+        });
+        /* Age drives the HR/RR/BP thresholds, so re-check whenever it changes. */
+        ["age-value", "age-unit"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener("input", checkVitals);
+        });
+        const unit = document.getElementById("age-unit");
+        if (unit) unit.addEventListener("change", checkVitals);
+    }
+
+    /* Fills only systems still untouched — never overwrites an existing mark. */
+    function markRemainingNormal() {
+        let n = 0;
+        document.querySelectorAll("#pe-items .pe-item").forEach(wrap => {
+            if (wrap.dataset.state !== "unset") return;
+            const btn = wrap.querySelector('[data-set="normal"]');
+            if (btn) { btn.click(); n++; }
+        });
+        showToast(n ? `${n} system${n > 1 ? "s" : ""} marked Normal` : "All systems already marked");
+    }
+
     /* Append a phrase to a field, comma-separated, without duplicating it. */
     function appendPhrase(el, phrase) {
         const cur = el.value.trim();
@@ -3962,6 +4086,8 @@
             initDisposition();
             buildChipRow("return-chips", "fu-return", RETURN_CHIPS);
             buildChipRow("advice-chips", "mp-advice", ADVICE_CHIPS);
+            initVitalWatchers();
+            checkVitals();
         }
         if (currentMode === "pft") renderPftRows();
         try { localStorage.setItem("pedRxMode", currentMode); } catch (e) {}
@@ -4154,10 +4280,17 @@
         }
 
         /* Physical examination */
+        /* Vitals carry their age-based flag into the note, so the reader sees why it mattered. */
+        const vr = vitalResults().out;
         const vs = [
-            ["T", val("pe-vs-t"), "C"], ["HR", val("pe-vs-hr"), "/min"], ["RR", val("pe-vs-rr"), "/min"],
-            ["BP", val("pe-vs-bp"), "mmHg"], ["SpO2", val("pe-vs-spo2"), "%"]
-        ].filter(x => x[1]).map(([k, v, u]) => `${k} ${v} ${u}`);
+            ["T", "t", "C"], ["HR", "hr", "/min"], ["RR", "rr", "/min"],
+            ["BP", "bp", "mmHg"], ["SpO2", "spo2", "%"]
+        ].filter(([, kind]) => vr[kind] && vr[kind].raw)
+         .map(([label, kind, unit]) => {
+            const o = vr[kind];
+            const flag = (o.res && o.res.status !== "ok") ? ` (${o.res.text})` : "";
+            return `${label} ${o.raw} ${unit}${flag}`;
+        });
         const pe = getPeOutput();
         const peOther = val("pe-other");
         if (vs.length || pe.normal.length || pe.abnormal.length || peOther) {
@@ -4243,6 +4376,7 @@
         dispChoice = "";
         document.querySelectorAll("#disp-row .disp-btn").forEach(b => b.classList.remove("active"));
         document.getElementById("mp-disp-detail").classList.add("hidden");
+        checkVitals();
         const pre = document.getElementById("opd-preview");
         pre.classList.add("hidden"); pre.textContent = "";
         showToast("OPD fields cleared");
