@@ -629,7 +629,7 @@
     <!-- ───── Management plan (OPD mode) ───── -->
     <div class="opd-section hidden" id="opd-plan">
         <div class="opd-head"><span class="opd-dot"></span><h3>Management plan</h3></div>
-        <div class="opd-full"><label for="mp-dx">Diagnosis / impression</label><input type="text" id="mp-dx" placeholder="Auto-filled from the diagnosis you picked — edit freely"></div>
+        <div class="opd-full"><label for="mp-dx">Diagnosis / impression</label><input type="text" id="mp-dx" placeholder="Fills in when you pick a diagnosis &mdash; edit freely" oninput="this.dataset.autofilled=''"></div>
         <div class="opd-full"><label for="mp-ix">Investigation</label><input type="text" id="mp-ix" placeholder="e.g. CBC, CXR, UA"></div>
         <div class="opd-full"><label for="mp-plan">Plan / treatment</label><textarea id="mp-plan" rows="3" placeholder="Non-drug management, procedures, referrals..."></textarea></div>
         <div class="opd-full">
@@ -3656,10 +3656,18 @@
             }
             return base;
         });
-        const text = lines.join("\n");
-        navigator.clipboard.writeText(text).then(() => {
-            showToast("Copied " + lines.length + " orders");
-        }).catch(() => alert("Copy failed. Select and copy manually:\n\n" + text));
+        /* Sanitize: 64 drug entries contain characters the hospital EMR rejects (em/en dash, ÷,
+           >=, x), and the STAT prefix added one too. The OPD/PFT copies already did this. */
+        const text = sanitizeForEmr(lines.join("\n"));
+        const done = () => showToast("Copied " + lines.length + " orders");
+        /* Guarded: on file:// Chrome does not expose navigator.clipboard, and calling it
+           unguarded throws synchronously — .catch() never fires and the copy fails silently.
+           This app is offline-first, so that path has to work. */
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done).catch(() => legacyCopy(text, done));
+        } else {
+            legacyCopy(text, done);
+        }
     }
 
     function onWeightChange() {
@@ -3708,6 +3716,14 @@
         activeDiagnosis = diag;
         document.getElementById("diag-badge-wrap").innerHTML =
             `<span class="diag-badge">${diag.name}</span>`;
+
+        /* The OPD diagnosis field advertises itself as auto-filled, so actually fill it.
+           Only when empty or still holding a previous auto-fill — never clobber typed text. */
+        const dxEl = document.getElementById("mp-dx");
+        if (dxEl && (!dxEl.value.trim() || dxEl.dataset.autofilled === "1")) {
+            dxEl.value = diag.name;
+            dxEl.dataset.autofilled = "1";
+        }
 
         renderDiagResults();
         renderDiagQuickPicks();
@@ -4013,12 +4029,19 @@
     }
 
     /* Return precautions — IMCI general danger signs, phrased for parents. */
+    /* Thai to match the advice chips — both are instructions given to Thai parents, and a
+       half-Thai half-English note reads badly in the chart. */
     const RETURN_CHIPS = [
-        "unable to drink or breastfeed", "vomits everything", "convulsion or seizure",
-        "lethargic or difficult to wake", "fast or difficult breathing, chest retraction",
-        "fever 39 C or higher, or fever not improving after 48 h",
-        "no urine passed for 8 h, dry mouth, no tears", "not improving or getting worse",
-        "petechial rash or bleeding", "severe abdominal pain"
+        "กินไม่ได้ ดื่มไม่ได้ หรือดูดนมไม่ได้",
+        "อาเจียนทุกครั้งที่กิน",
+        "ชัก เกร็ง",
+        "ซึม ไม่ค่อยรู้สึกตัว ปลุกตื่นยาก",
+        "หายใจเร็ว หอบ อกบุ๋ม หายใจลำบาก",
+        "ไข้สูง 39 องศาขึ้นไป หรือไข้ไม่ลดหลัง 48 ชั่วโมง",
+        "ไม่ปัสสาวะนานเกิน 8 ชั่วโมง ปากแห้ง ร้องไห้ไม่มีน้ำตา",
+        "อาการไม่ดีขึ้น หรือแย่ลง",
+        "มีจุดเลือดออกตามตัว หรือเลือดออกผิดปกติ",
+        "ปวดท้องรุนแรง"
     ];
     /* Parent education is spoken to Thai families and written into a Thai chart, so these
        are Thai. sanitizeForEmr() only strips fancy punctuation - Thai letters pass through. */
@@ -4360,9 +4383,16 @@
     function legacyCopy(text, done) {
         try {
             const ta = Object.assign(document.createElement("textarea"), { value: text, style: "position:fixed;opacity:0" });
-            document.body.appendChild(ta); ta.select(); document.execCommand("copy");
-            document.body.removeChild(ta); done();
-        } catch (e) { showToast("Copy failed - select the preview text manually."); }
+            document.body.appendChild(ta); ta.select();
+            const ok = document.execCommand("copy");
+            document.body.removeChild(ta);
+            if (ok) { done(); return; }
+            throw new Error("execCommand returned false");
+        } catch (e) {
+            /* Last resort: never leave the clinician with nothing — show the text so it can
+               be selected by hand rather than silently losing the order. */
+            window.prompt("Copy failed — select this text and copy it manually:", text);
+        }
     }
 
     function clearOpdFields() {
