@@ -4020,12 +4020,17 @@
         "no urine passed for 8 h, dry mouth, no tears", "not improving or getting worse",
         "petechial rash or bleeding", "severe abdominal pain"
     ];
+    /* Parent education is spoken to Thai families and written into a Thai chart, so these
+       are Thai. sanitizeForEmr() only strips fancy punctuation - Thai letters pass through. */
     const ADVICE_CHIPS = [
-        "encourage fluids, continue breastfeeding", "small frequent feeds",
-        "paracetamol for fever as prescribed, do not exceed the stated dose",
-        "tepid sponging if high fever", "rest at home, avoid school until fever-free 24 h",
-        "hand hygiene, cover cough", "complete the full antibiotic course",
-        "warning signs explained to parents"
+        "ดื่มน้ำมากๆ ให้นมแม่ต่อเนื่อง",
+        "ให้นม/อาหารทีละน้อยแต่บ่อยครั้ง",
+        "ให้ยาพาราเซตามอลลดไข้ตามที่แพทย์สั่ง ห้ามเกินขนาด",
+        "เช็ดตัวด้วยน้ำอุ่นเมื่อไข้สูง",
+        "พักผ่อนที่บ้าน งดไปโรงเรียนจนไม่มีไข้ครบ 24 ชั่วโมง",
+        "ล้างมือบ่อยๆ ปิดปากและจมูกเวลาไอจาม",
+        "กินยาปฏิชีวนะให้ครบตามกำหนด",
+        "อธิบายอาการเตือนที่ต้องรีบพามาพบแพทย์ให้ผู้ปกครองแล้ว"
     ];
 
     function buildChipRow(containerId, targetId, phrases) {
