@@ -208,16 +208,29 @@
         .opd-section label { font-size: 0.78em; color: var(--ink-soft); font-weight: 600; margin-bottom: 4px; display: block; }
         .opd-section textarea { width: 100%; padding: 9px 11px; border-radius: 9px; border: 1.5px solid var(--field-border); background: var(--field-bg); color: var(--ink); font-family: inherit; font-size: 0.9em; resize: vertical; }
         .opd-section textarea:focus { outline: none; border-color: var(--brand-blue); box-shadow: 0 0 0 4px var(--ring); }
-        .pe-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; margin-bottom: 10px; }
-        .pe-item { border: 1px solid var(--border-soft); border-radius: 10px; padding: 9px 11px; background: var(--paper); transition: all 0.14s ease; }
-        .pe-item.abn { border-color: var(--danger-bd); background: var(--danger-bg); }
-        .pe-top { display: flex; align-items: center; gap: 8px; }
-        .pe-top label { margin: 0; font-size: 0.86em; font-weight: 650; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 7px; }
-        .pe-item.abn .pe-top label { color: var(--danger-tx); }
-        .pe-top input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--danger-strong); cursor: pointer; }
-        .pe-detail { margin-top: 7px; display: none; }
-        .pe-item.abn .pe-detail { display: block; }
-        .pe-detail input { font-size: 0.85em; padding: 7px 9px; }
+        .pe-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 9px; margin-bottom: 10px; }
+        .pe-item { border: 1px solid var(--border-soft); border-radius: 10px; padding: 10px 12px; background: var(--paper); transition: all 0.14s ease; }
+        .pe-item[data-state="normal"] { border-color: var(--ok-bd); background: var(--ok-bg); }
+        .pe-item[data-state="abnormal"] { border-color: var(--danger-bd); background: var(--danger-bg); }
+        .pe-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .pe-name { font-size: 0.86em; font-weight: 650; color: var(--ink); flex: 1 1 auto; }
+        .pe-item[data-state="normal"] .pe-name { color: var(--ok-tx); }
+        .pe-item[data-state="abnormal"] .pe-name { color: var(--danger-tx); }
+        .pe-state-btn { padding: 4px 11px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--field-bg); color: var(--ink-soft); font-size: 0.74em; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.12s ease; }
+        .pe-state-btn:hover { border-color: var(--field-border-hover); color: var(--ink); }
+        .pe-state-btn.on-normal { background: var(--ok-tx); border-color: var(--ok-tx); color: #fff; }
+        .pe-state-btn.on-abnormal { background: var(--danger-strong); border-color: var(--danger-strong); color: #fff; }
+        .pe-detail { margin-top: 8px; display: none; }
+        .pe-item[data-state="normal"] .pe-detail, .pe-item[data-state="abnormal"] .pe-detail { display: block; }
+        .pe-detail textarea { width: 100%; padding: 7px 9px; font-size: 0.83em; border-radius: 8px; border: 1.5px solid var(--field-border); background: var(--field-bg); color: var(--ink); font-family: inherit; resize: vertical; }
+        .pe-detail textarea:focus { outline: none; border-color: var(--brand-blue); box-shadow: 0 0 0 3px var(--ring); }
+        .chip-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px; }
+        .mini-chip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--ink-soft); font-size: 0.73em; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.12s ease; }
+        .mini-chip:hover { background: var(--brand-blue); border-color: var(--brand-blue); color: #fff; }
+        .disp-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 8px; }
+        .disp-btn { padding: 8px 18px; border-radius: 999px; border: 1.5px solid var(--border-strong); background: var(--field-bg); color: var(--ink-soft); font-size: 0.83em; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.14s ease; }
+        .disp-btn:hover { border-color: var(--brand-blue); color: var(--brand-blue); }
+        .disp-btn.active { background: linear-gradient(135deg, var(--brand-blue), var(--brand-teal)); border-color: transparent; color: #fff; }
         /* ── PFT ── */
         .pft-section { background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
         .pft-section label { font-size: 0.78em; color: var(--ink-soft); font-weight: 600; margin-bottom: 4px; display: block; }
@@ -499,7 +512,7 @@
     <div class="opd-section hidden" id="opd-exam">
         <div class="opd-head">
             <span class="opd-dot"></span><h3>Physical examination</h3>
-            <span class="opd-hint">Tick only what is abnormal and explain — anything unticked is reported as no abnormality</span>
+            <span class="opd-hint">Mark Normal or Abnormal per system &mdash; anything left untouched is not reported at all</span>
         </div>
         <div class="opd-grid">
             <div><label for="pe-vs-t">Temp (&deg;C)</label><input type="text" id="pe-vs-t" placeholder="37.0"></div>
@@ -603,20 +616,32 @@
     <div class="opd-section hidden" id="opd-plan">
         <div class="opd-head"><span class="opd-dot"></span><h3>Management plan</h3></div>
         <div class="opd-full"><label for="mp-dx">Diagnosis / impression</label><input type="text" id="mp-dx" placeholder="Auto-filled from the diagnosis you picked — edit freely"></div>
-        <div class="opd-grid">
-            <div><label for="mp-ix">Investigation</label><input type="text" id="mp-ix" placeholder="e.g. CBC, CXR, UA"></div>
-            <div><label for="mp-disposition">Disposition</label><input type="text" id="mp-disposition" placeholder="e.g. home, admit, refer"></div>
-        </div>
+        <div class="opd-full"><label for="mp-ix">Investigation</label><input type="text" id="mp-ix" placeholder="e.g. CBC, CXR, UA"></div>
         <div class="opd-full"><label for="mp-plan">Plan / treatment</label><textarea id="mp-plan" rows="3" placeholder="Non-drug management, procedures, referrals..."></textarea></div>
-        <div class="opd-full"><label for="mp-advice">Advice / education</label><textarea id="mp-advice" rows="2" placeholder="Parent education, warning signs explained..."></textarea></div>
+        <div class="opd-full">
+            <label for="mp-advice">Advice / education</label>
+            <div class="chip-row" id="advice-chips"></div>
+            <textarea id="mp-advice" rows="2" placeholder="Parent education, warning signs explained..."></textarea>
+        </div>
+        <div class="opd-full">
+            <label>Disposition</label>
+            <div class="disp-row" id="disp-row">
+                <button type="button" class="disp-btn" data-disp="Discharge">Discharge</button>
+                <button type="button" class="disp-btn" data-disp="Admit">Admit</button>
+                <button type="button" class="disp-btn" data-disp="Refer">Refer</button>
+            </div>
+            <input type="text" id="mp-disp-detail" class="hidden" placeholder="Refer to / admit to...">
+        </div>
     </div>
 
     <!-- ───── Follow-up plan (OPD mode) ───── -->
     <div class="opd-section hidden" id="opd-followup">
         <div class="opd-head"><span class="opd-dot"></span><h3>Follow-up plan</h3></div>
-        <div class="opd-grid">
-            <div><label for="fu-next">Next visit</label><input type="text" id="fu-next" placeholder="e.g. 1 week / PRN"></div>
-            <div><label for="fu-return">Return immediately if</label><input type="text" id="fu-return" placeholder="e.g. high fever, poor feeding, dyspnea"></div>
+        <div class="opd-full"><label for="fu-next">Next visit</label><input type="text" id="fu-next" placeholder="e.g. 1 week / PRN"></div>
+        <div class="opd-full">
+            <label for="fu-return">Return immediately if</label>
+            <div class="chip-row" id="return-chips"></div>
+            <textarea id="fu-return" rows="2" placeholder="Tap the danger signs above, or type your own"></textarea>
         </div>
         <div class="opd-full"><label for="fu-notes">Notes</label><textarea id="fu-notes" rows="2" placeholder="Anything else for the record"></textarea></div>
     </div>
@@ -3767,49 +3792,151 @@
 
     /* ═══════════ OPD Deck ═══════════ */
 
-    /* Physical exam: tick ONLY what is abnormal and explain it (cardio-consult style).
-       Anything left unticked is reported as "no abnormality noted" — we never assert
-       a system was examined-and-normal unless the clinician says so. */
+    /* Physical exam — three states per system: unset (default) / Normal / Abnormal.
+       UNSET PRODUCES NOTHING in the note. That neutral default is deliberate: a two-state
+       "normal" toggle invites click-fatigue that quietly documents exams never performed.
+       Normal inserts a canned phrase into an EDITABLE box so it can be trimmed per patient. */
     const PE_SYSTEMS = [
-        "General appearance", "HEENT", "Neck / Lymph nodes", "Chest / Lungs",
-        "Heart / CVS", "Abdomen", "Genitalia / Perineum", "Extremities / MSK",
-        "Skin", "Neurological"
+        { name: "General appearance", normal: "alert, active, not in distress, well hydrated",
+          chips: ["ill-looking", "lethargic", "irritable", "pale", "dehydrated", "poor perfusion"] },
+        { name: "HEENT", normal: "no pallor or icterus, throat not injected, no tonsillar exudate, tympanic membranes normal",
+          chips: ["injected pharynx", "injected tonsils", "tonsillar exudate", "red bulging TM", "otorrhea", "rhinorrhea", "pale conjunctiva", "icteric sclera", "oral ulcers"] },
+        { name: "Neck / Lymph nodes", normal: "supple, no significant lymphadenopathy, no neck stiffness",
+          chips: ["cervical lymphadenopathy", "tender node", "neck stiffness", "thyroid enlargement"] },
+        { name: "Chest / Lungs", normal: "clear breath sounds both lungs, no adventitious sounds, no retraction",
+          chips: ["wheezing", "crepitation", "rhonchi", "decreased breath sounds", "retraction", "tachypnea", "stridor", "prolonged expiration"] },
+        { name: "Heart / CVS", normal: "normal S1 S2, regular rhythm, no murmur, peripheral pulses good",
+          chips: ["murmur", "tachycardia", "bradycardia", "irregular rhythm", "gallop", "weak pulses", "delayed capillary refill"] },
+        { name: "Abdomen", normal: "soft, not tender, no hepatosplenomegaly, normal bowel sounds",
+          chips: ["distension", "tenderness", "guarding", "hepatomegaly", "splenomegaly", "palpable mass", "hyperactive bowel sounds"] },
+        { name: "Genitalia / Perineum", normal: "normal external genitalia for age, no lesion",
+          chips: ["erythema", "discharge", "undescended testis", "inguinal hernia", "diaper dermatitis"] },
+        { name: "Extremities / MSK", normal: "no deformity, full range of motion, no edema, capillary refill <2 s",
+          chips: ["edema", "joint swelling", "joint tenderness", "limited range of motion", "deformity", "limp"] },
+        { name: "Skin", normal: "no rash, no petechiae, good skin turgor",
+          chips: ["maculopapular rash", "petechiae", "purpura", "urticaria", "vesicles", "jaundice", "cyanosis", "poor skin turgor", "eczema"] },
+        { name: "Neurological", normal: "alert, no focal neurological deficit, normal tone and reflexes",
+          chips: ["altered consciousness", "focal weakness", "abnormal tone", "meningeal signs", "abnormal gait", "seizure activity"] }
     ];
+
+    /* Append a phrase to a field, comma-separated, without duplicating it. */
+    function appendPhrase(el, phrase) {
+        const cur = el.value.trim();
+        const parts = cur ? cur.split(/,\s*/) : [];
+        if (parts.some(p => p.toLowerCase() === phrase.toLowerCase())) return;
+        el.value = cur ? cur + ", " + phrase : phrase;
+        el.focus();
+    }
 
     function renderPeItems() {
         const box = document.getElementById("pe-items");
         if (!box || box.dataset.built) return;
         box.dataset.built = "1";
-        PE_SYSTEMS.forEach((sys, i) => {
+        PE_SYSTEMS.forEach(sys => {
             const wrap = document.createElement("div");
             wrap.className = "pe-item";
-            wrap.dataset.system = sys;
+            wrap.dataset.system = sys.name;
+            wrap.dataset.state = "unset";
             wrap.innerHTML = `
                 <div class="pe-top">
-                    <label for="pe-cb-${i}"><input type="checkbox" id="pe-cb-${i}"> ${sys}</label>
+                    <span class="pe-name">${sys.name}</span>
+                    <button type="button" class="pe-state-btn" data-set="normal">Normal</button>
+                    <button type="button" class="pe-state-btn" data-set="abnormal">Abnormal</button>
                 </div>
                 <div class="pe-detail">
-                    <input type="text" placeholder="Describe the abnormality — e.g. injected tonsils">
+                    <div class="chip-row" data-role="chips"></div>
+                    <textarea rows="2" placeholder="Describe the finding"></textarea>
                 </div>`;
-            const cb = wrap.querySelector("input[type=checkbox]");
-            const detail = wrap.querySelector(".pe-detail input");
-            cb.addEventListener("change", () => {
-                wrap.classList.toggle("abn", cb.checked);
-                if (cb.checked) detail.focus();
+            const ta = wrap.querySelector("textarea");
+            const chipRow = wrap.querySelector('[data-role="chips"]');
+            sys.chips.forEach(c => {
+                const b = document.createElement("button");
+                b.type = "button"; b.className = "mini-chip"; b.textContent = c;
+                b.onclick = () => appendPhrase(ta, c);
+                chipRow.appendChild(b);
             });
+            wrap.querySelectorAll(".pe-state-btn").forEach(btn => {
+                btn.onclick = () => {
+                    const want = btn.dataset.set;
+                    const now = wrap.dataset.state;
+                    const next = (now === want) ? "unset" : want;   // click again = back to unset
+                    wrap.dataset.state = next;
+                    wrap.querySelectorAll(".pe-state-btn").forEach(b => {
+                        b.className = "pe-state-btn" + (b.dataset.set === next ? " on-" + next : "");
+                    });
+                    chipRow.style.display = next === "abnormal" ? "flex" : "none";
+                    if (next === "normal") { if (!ta.value.trim()) ta.value = sys.normal; ta.focus(); }
+                    else if (next === "abnormal") { if (ta.value.trim() === sys.normal) ta.value = ""; ta.focus(); }
+                    else ta.value = "";
+                };
+            });
+            chipRow.style.display = "none";
             box.appendChild(wrap);
         });
     }
 
-    function getPeAbnormal() {
-        const out = [];
+    /* Returns only systems the clinician actually marked. Untouched systems are absent. */
+    function getPeOutput() {
+        const normal = [], abnormal = [];
         document.querySelectorAll("#pe-items .pe-item").forEach(wrap => {
-            const cb = wrap.querySelector("input[type=checkbox]");
-            if (!cb || !cb.checked) return;
-            const d = wrap.querySelector(".pe-detail input").value.trim();
-            out.push(d ? `${wrap.dataset.system}: ${d}` : wrap.dataset.system);
+            const st = wrap.dataset.state;
+            if (st !== "normal" && st !== "abnormal") return;
+            const txt = wrap.querySelector("textarea").value.trim();
+            const line = txt ? `${wrap.dataset.system}: ${txt}` : wrap.dataset.system;
+            (st === "normal" ? normal : abnormal).push(line);
         });
-        return out;
+        return { normal, abnormal };
+    }
+
+    /* Return precautions — IMCI general danger signs, phrased for parents. */
+    const RETURN_CHIPS = [
+        "unable to drink or breastfeed", "vomits everything", "convulsion or seizure",
+        "lethargic or difficult to wake", "fast or difficult breathing, chest retraction",
+        "fever 39 C or higher, or fever not improving after 48 h",
+        "no urine passed for 8 h, dry mouth, no tears", "not improving or getting worse",
+        "petechial rash or bleeding", "severe abdominal pain"
+    ];
+    const ADVICE_CHIPS = [
+        "encourage fluids, continue breastfeeding", "small frequent feeds",
+        "paracetamol for fever as prescribed, do not exceed the stated dose",
+        "tepid sponging if high fever", "rest at home, avoid school until fever-free 24 h",
+        "hand hygiene, cover cough", "complete the full antibiotic course",
+        "warning signs explained to parents"
+    ];
+
+    function buildChipRow(containerId, targetId, phrases) {
+        const row = document.getElementById(containerId);
+        const target = document.getElementById(targetId);
+        if (!row || !target || row.dataset.built) return;
+        row.dataset.built = "1";
+        phrases.forEach(p => {
+            const b = document.createElement("button");
+            b.type = "button"; b.className = "mini-chip"; b.textContent = p;
+            b.onclick = () => appendPhrase(target, p);
+            row.appendChild(b);
+        });
+    }
+
+    /* Disposition is single-select — Discharge / Admit / Refer are mutually exclusive,
+       so a checkbox set could record "discharge AND admit". Click again to clear. */
+    let dispChoice = "";
+    function initDisposition() {
+        const row = document.getElementById("disp-row");
+        const detail = document.getElementById("mp-disp-detail");
+        if (!row || row.dataset.built) return;
+        row.dataset.built = "1";
+        row.querySelectorAll(".disp-btn").forEach(btn => {
+            btn.onclick = () => {
+                const want = btn.dataset.disp;
+                dispChoice = (dispChoice === want) ? "" : want;
+                row.querySelectorAll(".disp-btn").forEach(b => b.classList.toggle("active", b.dataset.disp === dispChoice));
+                const needsDetail = dispChoice === "Refer" || dispChoice === "Admit";
+                detail.classList.toggle("hidden", !needsDetail);
+                detail.placeholder = dispChoice === "Refer" ? "Refer to..." : "Admit to...";
+                if (!needsDetail) detail.value = "";
+                else detail.focus();
+            };
+        });
     }
 
     /* The hospital EMR rejects fancy Unicode punctuation / box-drawing (Thai letters are fine).
@@ -3830,7 +3957,12 @@
             const b = document.getElementById("mode-btn-" + m);
             if (b) b.classList.toggle("active", currentMode === m);
         });
-        if (currentMode === "opd") renderPeItems();
+        if (currentMode === "opd") {
+            renderPeItems();
+            initDisposition();
+            buildChipRow("return-chips", "fu-return", RETURN_CHIPS);
+            buildChipRow("advice-chips", "mp-advice", ADVICE_CHIPS);
+        }
         if (currentMode === "pft") renderPftRows();
         try { localStorage.setItem("pedRxMode", currentMode); } catch (e) {}
     }
@@ -4026,16 +4158,18 @@
             ["T", val("pe-vs-t"), "C"], ["HR", val("pe-vs-hr"), "/min"], ["RR", val("pe-vs-rr"), "/min"],
             ["BP", val("pe-vs-bp"), "mmHg"], ["SpO2", val("pe-vs-spo2"), "%"]
         ].filter(x => x[1]).map(([k, v, u]) => `${k} ${v} ${u}`);
-        const abn = getPeAbnormal();
+        const pe = getPeOutput();
         const peOther = val("pe-other");
-        if (vs.length || abn.length || peOther) {
+        if (vs.length || pe.normal.length || pe.abnormal.length || peOther) {
             L.push("", "[ PHYSICAL EXAMINATION ]");
             if (vs.length) L.push(`  Vitals: ${vs.join("   ")}`);
-            if (abn.length) {
-                L.push("  Abnormal findings:");
-                abn.forEach(a => L.push(`  ! ${a}`));
-            } else {
-                L.push("  No abnormality noted on systems examined.");
+            if (pe.abnormal.length) {
+                L.push("  Abnormal:");
+                pe.abnormal.forEach(a => L.push(`  ! ${a}`));
+            }
+            if (pe.normal.length) {
+                L.push("  Normal:");
+                pe.normal.forEach(n => L.push(`  - ${n}`));
             }
             if (peOther) L.push(`  Other: ${peOther}`);
         }
@@ -4043,8 +4177,10 @@
         /* Management plan */
         const dxField = val("mp-dx");
         const dx = dxField || (activeDiagnosis && activeDiagnosis.name) || "";
+        const dispDetail = val("mp-disp-detail");
+        const dispTxt = dispChoice ? (dispDetail ? `${dispChoice} - ${dispDetail}` : dispChoice) : "";
         const mp = [["Investigation", val("mp-ix")], ["Plan", val("mp-plan")],
-                    ["Advice", val("mp-advice")], ["Disposition", val("mp-disposition")]].filter(x => x[1]);
+                    ["Advice", val("mp-advice")], ["Disposition", dispTxt]].filter(x => x[1]);
         if (dx || mp.length) {
             L.push("", "[ MANAGEMENT PLAN ]");
             if (dx) L.push(`  Diagnosis: ${dx}`);
@@ -4094,15 +4230,19 @@
     function clearOpdFields() {
         ["hx-cc", "hx-duration", "hx-pi", "hx-past", "hx-imm", "hx-birth", "hx-family",
          "pe-vs-t", "pe-vs-hr", "pe-vs-rr", "pe-vs-bp", "pe-vs-spo2", "pe-other",
-         "mp-dx", "mp-ix", "mp-plan", "mp-advice", "mp-disposition",
+         "mp-dx", "mp-ix", "mp-plan", "mp-advice", "mp-disp-detail",
          "fu-next", "fu-return", "fu-notes"].forEach(id => {
             const el = document.getElementById(id); if (el) el.value = "";
         });
         document.querySelectorAll("#pe-items .pe-item").forEach(wrap => {
-            wrap.classList.remove("abn");
-            const cb = wrap.querySelector("input[type=checkbox]"); if (cb) cb.checked = false;
-            const d = wrap.querySelector(".pe-detail input"); if (d) d.value = "";
+            wrap.dataset.state = "unset";
+            wrap.querySelectorAll(".pe-state-btn").forEach(b => b.className = "pe-state-btn");
+            const chips = wrap.querySelector('[data-role="chips"]'); if (chips) chips.style.display = "none";
+            const ta = wrap.querySelector("textarea"); if (ta) ta.value = "";
         });
+        dispChoice = "";
+        document.querySelectorAll("#disp-row .disp-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById("mp-disp-detail").classList.add("hidden");
         const pre = document.getElementById("opd-preview");
         pre.classList.add("hidden"); pre.textContent = "";
         showToast("OPD fields cleared");
